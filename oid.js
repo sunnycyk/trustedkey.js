@@ -9,9 +9,11 @@ module.exports = {
     documentID: "1.3.6.1.4.1.53318295.2",
     documentImage: "1.3.6.1.4.1.53318295.3",
     documentIssuer: "1.3.6.1.4.1.53318295.4",
+    documentResult: "1.3.6.1.4.1.53318295.5",
     // NOTE: DL OID depends on state/country
     //WADriversLicense: "2.16.840.1.113883.4.3.53",
     gender: "1.3.6.1.5.5.7.9.3",
+    email: "1.2.840.113549.1.9.1",
     commonName: "2.5.4.3",
     dateOfBirth: "1.3.6.1.5.5.7.9.1",
     telephoneNumber: "2.5.4.20",
