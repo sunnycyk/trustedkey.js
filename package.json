@@ -6,7 +6,8 @@
         "microutils.js",
         "oid.js",
         "utils.js",
-        "errors.js"
+        "errors.js",
+        "services"
     ],
     "dependencies": {
         "jsrsasign": "github:enumatech/jsrsasign#for_npm",
