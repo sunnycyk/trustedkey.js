@@ -10,25 +10,29 @@ const RP          = require('request-promise-native')
 const Crypto      = require('crypto')
 const Errors      = require('./errors')
 const Querystring = require('querystring')
-const Jsrsasign = require('jsrsasign')
+const Jsrsasign   = require('jsrsasign')
 
-const micro = module.exports = {}
-micro.shortcuts = {}
+const micro = module.exports = function(baseUrl, clientKeyPair) {
+    this.baseUrl = baseUrl || 'https://demo.trustedkey.com/'
+    this.clientKeyPair = clientKeyPair || Jsrsasign.KEYUTIL.generateKeypair("EC", "secp256r1").prvKeyObj
 
-// CONSIDER: store client keypair in config
-const clientKeyPair = Jsrsasign.KEYUTIL.generateKeypair("EC", "secp256r1").prvKeyObj
+    this.clientKeyPair = clientKeyPair
 
-// CONSIDER: caller should provide absolute URLs
-const BaseUrl = 'https://demo.trustedkey.com/'
+    this.shortcuts = new shortcuts(this)
+}
+
+function shortcuts(microInstance) {
+    this.micro = microInstance
+}
 
 
-micro.shortcuts.checkRevocation = function(subjectaddress) {
+shortcuts.prototype.checkRevocation = function(subjectaddress) {
 
     if (typeof subjectaddress === 'object') {
         subjectaddress = subjectaddress.join(',')
     }
 
-    return micro.get('isRevoked', {
+    return this.micro.get('isRevoked', {
         address: subjectaddress
     }).then(r => {
         if (r.data.isRevoked !== false) {
@@ -39,41 +43,41 @@ micro.shortcuts.checkRevocation = function(subjectaddress) {
 }
 
 
-micro.shortcuts.notify = function(address, nonce, message) {
+shortcuts.prototype.notify = function(address, nonce, message) {
 
-    return micro.getSigned('notify', {
+    return this.micro.getSigned('notify', {
         address: address,
         nonce: nonce,
         message: message,
-    }, clientKeyPair)
+    }, this.micro.clientKeyPair)
 }
 
 
-micro.shortcuts.request = function(address, nonce, callbackUrl, documentUrl, objectIds) {
+shortcuts.prototype.request = function(address, nonce, callbackUrl, documentUrl, objectIds) {
 
-    return micro.getSigned('request', {
+    return this.micro.getSigned('request', {
         address: address,
         nonce: nonce,
         callbackUrl: callbackUrl,
         documentUrl: documentUrl,
         objectIds: objectIds,
-    }, clientKeyPair)
+    }, this.micro.clientKeyPair)
 }
 
 
-micro.get = function(path, params){
+micro.prototype.get = function(path, params){
 
     const url = path + '?' + Querystring.stringify(params)
 
     return RP.get({
-        baseUrl: BaseUrl,
+        baseUrl: this.baseUrl,
         uri: url,
         json: true
     })
 }
 
 
-micro.getSigned = function(path, params, keyPair) {
+micro.prototype.getSigned = function(path, params, keyPair) {
 
     const url = path + '?' + Querystring.stringify(params)
 
@@ -83,7 +87,7 @@ micro.getSigned = function(path, params, keyPair) {
     var sig = keyPair.signWithMessageHash(digest)
 
     return RP.get({
-        baseUrl: BaseUrl,
+        baseUrl: this.baseUrl,
         uri: url,
         json: true,
         headers: {'Authorization': 'secp256r1 '+keyPair.pubKeyHex+':'+sig }
