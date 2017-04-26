@@ -5,8 +5,28 @@ const HttpUtils = require('./http')
  * The API calls for implementing an identity credential/token wallet.
  * @constructor
  */
-const WalletService = module.exports = function(backendUrl) {
+const WalletService = module.exports = function(backendUrl, appKeyPair) {
+    this.appKeyPair = appKeyPair
     this.backendUrl = backendUrl
+}
+
+/**
+ * Create a new pending request
+ *
+ * @param {String} address - Request address
+ * @param {String} nonce - Request nonce
+ * @param {String} callbackUrl - Callback URL
+ * @param {String} documentUrl - Document URL
+ * @param {String} objectIds - OIDs
+ */
+WalletService.prototype.request = function(address, nonce, callbackUrl, documentUrl, objectIds) {
+    return HttpUtils.getSigned(this.baseUrl, 'request', {
+        address: address,
+        nonce: nonce,
+        callbackUrl: callbackUrl,
+        documentUrl: documentUrl,
+        objectIds: objectIds,
+    }, this.appKeyPair)
 }
 
 /**
@@ -40,4 +60,19 @@ WalletService.prototype.registerDevice = function(deviceTokenString) {
     return HttpUtils.get(this.backendUrl, 'registerDevice', {
         devicetoken: deviceTokenString
     })
+}
+
+
+/**
+ * Send notification to a device
+ *
+ * @param {String} address - Device to notify
+ * @param {String} nonce -
+ */
+WalletService.prototype.notify = function(address, nonce, message) {
+    return HttpUtils.getSigned(this.baseUrl, 'notify', {
+        address: address,
+        nonce: nonce,
+        message: message,
+    }, this.appKeyPair)
 }

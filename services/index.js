@@ -3,6 +3,7 @@ const TokenIssuerService        = require('./tokenissuerservice')
 const TrustedKeyIssuerService   = require('./trustedkeyissuerservice')
 const ValidateService           = require('./validateservice')
 const WalletService             = require('./walletservice')
+const Jsrsasign                 = require('jsrsasign')
 
 
 /**
@@ -12,12 +13,14 @@ const WalletService             = require('./walletservice')
  *
  * @constructor
 */
-const services = module.exports = function(backendUrl) {
-    this.credentialRegistryService = new CredentialRegistryService(backendUrl)
-    this.tokenIssuerService = new TokenIssuerService(backendUrl)
-    this.trustedKeyIssuerService = new TrustedKeyIssuerService(backendUrl)
-    this.validateService = new ValidateService(backendUrl)
-    this.walletService = new WalletService(backendUrl)
+const services = module.exports = function(backendUrl, appKeyPair) {
+    var appKeyP = appKeyPair || Jsrsasign.KEYUTIL.generateKeypair("EC", "secp256r1").prvKeyObj
+
+    this.credentialRegistryService = new CredentialRegistryService(backendUrl, appKeyP)
+    this.tokenIssuerService = new TokenIssuerService(backendUrl, appKeyP)
+    this.trustedKeyIssuerService = new TrustedKeyIssuerService(backendUrl, appKeyP)
+    this.validateService = new ValidateService(backendUrl, appKeyP)
+    this.walletService = new WalletService(backendUrl, appKeyP)
 }
 
 

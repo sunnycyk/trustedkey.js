@@ -4,8 +4,9 @@ const Crypto      = require('crypto')
 /**
  Utility class with wrappers for the various Credential Registry API endpoints.
  */
-const CredentialRegistryService = module.exports = function(backendUrl) {
+const CredentialRegistryService = module.exports = function(backendUrl, appKeyPair) {
     this.backendUrl = backendUrl
+    this.appKeyPair = appKeyPair
 }
 
 

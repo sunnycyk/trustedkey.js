@@ -7,8 +7,8 @@ const HttpUtils = require('./http')
  *
  * @constructor
  */
-const TrustedKeyIssuerService = module.exports = function(backendUrl) {
-    TokenIssuerService.call(this, backendUrl)
+const TrustedKeyIssuerService = module.exports = function(backendUrl, appKeyPair) {
+    TokenIssuerService.call(this, backendUrl, appKeyPair)
 }
 TrustedKeyIssuerService.prototype = Object.create(TokenIssuerService.prototype)
 

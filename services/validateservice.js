@@ -6,8 +6,9 @@ const Errors    = require('../errors')
  * An implementation of a the validation API, used to check to validity of credentials and tokens.
  * @constructor
  */
-const ValidateService = module.exports = function(backendUrl) {
+const ValidateService = module.exports = function(backendUrl, appKeyPair) {
     this.backendUrl = backendUrl
+    this.appKeyPair = appKeyPair
 }
 
 
@@ -46,7 +47,11 @@ ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
     var serialNumbers
     if(typeof tokenSerialNumbers !== 'string') {
         serialNumbers = tokenSerialNumbers.map(serialNo => {
-            return '0x' + serialNo
+            if(serialNo.match(/^0x/)) {
+                return serialNo
+            } else {
+                return '0x' + serialNo
+            }
         }).join(',')
     } else {
         serialNumbers = tokenSerialNumbers

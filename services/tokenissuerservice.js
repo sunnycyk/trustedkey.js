@@ -6,8 +6,9 @@ const HttpUtils = require('./http')
  *
  * @constructor
  */
-const TokenIssuerService = module.exports = function(backendUrl) {
+const TokenIssuerService = module.exports = function(backendUrl, appKeyPair) {
     this.backendUrl = backendUrl
+    this.appKeyPair = appKeyPair
 }
 
 
