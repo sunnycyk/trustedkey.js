@@ -29,7 +29,6 @@ function validate(backendUrl, address) {
  *
  * @param {String} credentialAddressString - Credential to check.
  * @throws {Errors.Applicationerror} Will throw if address got revoked
- * @returns {[Promise, boolean]} Promise containing revocation status
 */
 ValidateService.prototype.validateCredential = function(credentialAddressString) {
     return validate(this.backendUrl, credentialAddressString)
@@ -41,7 +40,6 @@ ValidateService.prototype.validateCredential = function(credentialAddressString)
  *
  * @param {string} tokenSerialNumbers - Array of token serial numbers.
  * @throws {Errors.Applicationerror} Will throw if address got revoked
- * @returns {[Promise, boolean]} Promise containing revocation status
 */
 ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
     var serialNumbers

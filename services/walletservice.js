@@ -31,8 +31,6 @@ WalletService.prototype.request = function(address, nonce, callbackUrl, document
 
 /**
  * Grab the next login/signing request for the default registered credential.
- *
- * @returns {[Promise, JSON]}
 */
 WalletService.prototype.getPendingSignatureRequest = function() {
     return HttpUtils.get(this.backendUrl, 'getPendingRequest')

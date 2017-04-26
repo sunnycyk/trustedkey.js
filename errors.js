@@ -4,8 +4,10 @@
 //  Copyright © 2016 Trusted Key Solutions. All rights reserved.
 //
 
+/**
+ * Internal custom errors
+*/
 const errors = module.exports = {}
-
 
 errors.ApplicationError = function(message) {
     Error.captureStackTrace(this)

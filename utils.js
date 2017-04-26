@@ -9,23 +9,46 @@ const Jsrsasign = require('jsrsasign')
 
 const utils = module.exports = {}
 
-
+/**
+ * Convert a certificate serial number to blockchain address
+ *
+ * @param {String} serialhex - Hex encoded serial number
+ * @returns {String} 0x prefixed address
+ */
 utils.serialToAddress = function(serialhex) {
     const paddedSerial = String('00000000000000000000000000000000000000'+serialhex).slice(-40)
     return "0x" + paddedSerial
 }
 
-
-utils.base64url = function(a) {
-    return Buffer.from(a).toString("base64").replace(/=/g,'').replace(/\//g,'_').replace(/\+/g,'-')
+/**
+ * Base64 encode URL string
+ *
+ * @param {String} urlString - URL string to encode
+ * @returns {String} base64-encoded URL
+ */
+utils.base64url = function(urlString) {
+    return Buffer.from(urlString).toString("base64").replace(/=/g,'').replace(/\//g,'_').replace(/\+/g,'-')
 }
 
-
+/**
+ * Get UTC seconds since UNIX epoch or convert date into unix time
+ *
+ * @param {Date} date - Optional date object
+ * @returns {number} Unix timestamp
+ */
 utils.getUnixTime = function(date) {
     return Math.floor((date||new Date).getTime()/1000)
 }
 
 
+/**
+ * Create a JSON Web Signature
+ *
+ * @param {object} message - Message can be string or object. Objects will be JSON stringified
+ * @param {String} secret - HMAC shared secret
+ * @param {object} header - JOSE header
+ * @returns {String} Concatenated JWS HMAC
+ */
 utils.createHmacJws = function(message, secret, header) {
     if (typeof message !== 'string') {
         message = JSON.stringify(message)
@@ -41,6 +64,14 @@ utils.createHmacJws = function(message, secret, header) {
 }
 
 
+/**
+ * Verify a JSON Web Signature
+ *
+ * @param {object} message - Message can be string or object. Objects will be JSON stringified
+ * @param {String} secret - HMAC shared secret
+ * @param {object} header - JOSE header
+ * @returns {boolean}
+ */
 utils.verifyJws = function(jws, secretCallback) {
 
     const parts = jws.split(/\./g)
@@ -80,6 +111,15 @@ utils.verifyJws = function(jws, secretCallback) {
 }
 
 
+/**
+ * Verify an ECDSA named curve signed message
+ *
+ * @param {String} curveName - Curve name (secp256r1)
+ * @param {String} message - Message payload
+ * @param {String} pubkey - Public key to check signature against
+ * @param {String} signature - Signature payload
+ * @return {boolean} Indicate whether signature is correct
+ */
 utils.checkECDSA = function(curveName, message, pubkey, signature) {
 
     // Verify a digest value
@@ -91,6 +131,12 @@ utils.checkECDSA = function(curveName, message, pubkey, signature) {
 }
 
 
+/**
+ * Convert a user public key to blockchain address
+ *
+ * @param {String} pubkeyhex - User public key (hex encoded)
+ * @returns {String} User address with leading 0x
+ */
 utils.userPubKeyHexToAddress = function(pubkeyhex) {
     // Sign a digest value
     var hash = Crypto.createHash('sha256')
