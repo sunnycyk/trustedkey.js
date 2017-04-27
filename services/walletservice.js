@@ -1,6 +1,20 @@
 const HttpUtils = require('./http')
 
 
+// Common JSON sanity check callback
+function checkSuccess(jsonData) {
+    if(!jsonData.data) {
+        throw new Error('API returned JSON without data')
+    }
+
+    if(!jsonData.data.result) {
+        throw new Error('Api returned result "false"')
+    }
+
+    return jsonData
+}
+
+
 /**
  * The API calls for implementing an identity credential/token wallet.
  * @constructor
@@ -26,14 +40,14 @@ WalletService.prototype.request = function(address, nonce, callbackUrl, document
         callbackUrl: callbackUrl,
         documentUrl: documentUrl,
         objectIds: objectIds,
-    }, this.appKeyPair)
+    }, this.appKeyPair).then(checkSuccess)
 }
 
 /**
  * Grab the next login/signing request for the default registered credential.
 */
 WalletService.prototype.getPendingSignatureRequest = function() {
-    return HttpUtils.get(this.backendUrl, 'getPendingRequest')
+    return HttpUtils.get(this.backendUrl, 'getPendingRequest').then(checkSuccess)
 }
 
 
@@ -45,7 +59,7 @@ WalletService.prototype.getPendingSignatureRequest = function() {
 WalletService.prototype.removeSignatureRequest = function(nonceString) {
     return HttpUtils.get(this.backendUrl, 'removePendingRequest', {
         nonce: nonceString
-    })
+    }).then(checkSuccess)
 }
 
 /**
@@ -57,7 +71,7 @@ WalletService.prototype.removeSignatureRequest = function(nonceString) {
 WalletService.prototype.registerDevice = function(deviceTokenString) {
     return HttpUtils.get(this.backendUrl, 'registerDevice', {
         devicetoken: deviceTokenString
-    })
+    }).then(checkSuccess)
 }
 
 
@@ -72,5 +86,5 @@ WalletService.prototype.notify = function(address, nonce, message) {
         address: address,
         nonce: nonce,
         message: message,
-    }, this.appKeyPair)
+    }, this.appKeyPair).then(checkSuccess)
 }
