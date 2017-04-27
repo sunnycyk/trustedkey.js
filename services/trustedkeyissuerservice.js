@@ -5,6 +5,7 @@ const TokenIssuerService = require('./tokenissuerservice.js')
  * Trusted Key issuer API implementation
  *
  * @constructor
+ * @augments {TokenIssuerService}
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
