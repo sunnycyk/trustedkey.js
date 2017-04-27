@@ -1,14 +1,15 @@
 const TokenIssuerService = require('./tokenissuerservice.js')
-const HttpUtils = require('./http')
 
 
 /**
  * Trusted Key issuer API implementation
  *
  * @constructor
+ * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const TrustedKeyIssuerService = module.exports = function(backendUrl, appKeyPair) {
-    TokenIssuerService.call(this, backendUrl, appKeyPair)
+const TrustedKeyIssuerService = module.exports = function(backendUrl, appId, appSecret) {
+    TokenIssuerService.call(this, backendUrl, appId, appSecret)
 }
 TrustedKeyIssuerService.prototype = Object.create(TokenIssuerService.prototype)
 
@@ -17,7 +18,7 @@ TrustedKeyIssuerService.prototype = Object.create(TokenIssuerService.prototype)
  * Request mock tokens, for testing during development only. See `requestTokens`.
 */
 TrustedKeyIssuerService.prototype.requestMockTokens = function(requestIdString) {
-    return HttpUtils.get(this.backendUrl, 'registerIdentity', {
+    return this.httpClient.get('registerIdentity', {
         requestid: requestIdString
     })
 }
@@ -37,7 +38,7 @@ TrustedKeyIssuerService.prototype.requestMockTokens = function(requestIdString) 
  * @param catfishAirVersionNumber: The version of the CatfishAIR REST API to use.
 */
 TrustedKeyIssuerService.prototype.requestTokens = function(requestIDString, catfishAirTransactionIDString, catfishAirVersionNumber) {
-    return HttpUtils.get(this.backendUrl, 'registerAuthenticId', {
+    return this.httpClient.get('registerAuthenticId', {
         transactionid: catfishAirTransactionIDString,
         version: catfishAirVersionNumber,
         requestid: requestIDString

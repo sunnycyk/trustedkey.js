@@ -1,33 +1,36 @@
-const httpUtils = module.exports = {}
+const httpUtils = module.exports = function(appId, appSecret) {
+    this.appId = appId
+    this.appSecret = appSecret
+}
 
 const Querystring = require('querystring')
-const Crypto      = require('crypto')
 const RP          = require('request-promise-native')
 
+const Utils       = require('../utils')
 
-httpUtils.get = function(baseUrl, path, params) {
-    const url = path + '?' + Querystring.stringify(params)
 
-    return RP.get({
-        baseUrl: baseUrl,
-        uri: url,
-        json: true
-    })
+function getAuthHeader(url, appId, appSecret) {
+    const payload = {
+        typ: 'JWT',
+        cty: 'JWT',
+        iss: appId,
+        aud: url
+    }
+    return 'Bearer ' + Utils.createHmacJws(payload, appSecret)
 }
 
 
-httpUtils.getSigned = function(baseUrl, path, params, keyPair) {
+httpUtils.prototype.get = function(baseUrl, path, params) {
     const url = path + '?' + Querystring.stringify(params)
-
-    // Sign a digest value
-    var hash = Crypto.createHash('sha256')
-    var digest = hash.update(url).digest('hex')
-    var sig = keyPair.signWithMessageHash(digest)
+    const headers = {}
+    if(this.appId && this.appSecret) {
+        headers['Authorization'] = getAuthHeader(url, this.appId, this.appSecret)
+    }
 
     return RP.get({
         baseUrl: baseUrl,
         uri: url,
         json: true,
-        headers: {'Authorization': 'secp256r1 '+ keyPair.pubKeyHex +':'+sig }
+        headers: headers
     })
 }

@@ -13,10 +13,11 @@ const errInvalidPemData = "Unexpected: IssuerApi.getTokens PEM data was invalid.
  * A base implementation of the issuer API. Specific issuer APIs will derive from this.
  *
  * @constructor
+ * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const TokenIssuerService = module.exports = function(backendUrl, appKeyPair) {
-    this.backendUrl = backendUrl
-    this.appKeyPair = appKeyPair
+const TokenIssuerService = module.exports = function(backendUrl, appId, appSecret) {
+    this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
 
 
@@ -27,7 +28,7 @@ const TokenIssuerService = module.exports = function(backendUrl, appKeyPair) {
  * @returns {Promise.Array.String} - Promise containing PEM array
 */
 TokenIssuerService.prototype.getTokens = function(requestIdString) {
-    return HttpUtils.get(this.backendUrl, 'getCertificates', {
+    return this.httpClient.get('getCertificates', {
         requestid: requestIdString
     }).then(json => {
         if(!json.data) {
@@ -57,10 +58,10 @@ TokenIssuerService.prototype.getTokens = function(requestIdString) {
  *
  * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestTokens` API.
  * @throws {Error} Throws Error if request failed
- * @returns {Promise.null} Promise returning null if success
+ * @returns {Promise} Promise returning null if success
 */
 TokenIssuerService.prototype.deleteTokens = function(requestIdString) {
-    return HttpUtils.get(this.backendUrl, 'deleteRequest', {
+    return this.httpClient.get(this.backendUrl, 'deleteRequest', {
         requestid: requestIdString
     }).then(json => {
         if(!json.data) {
@@ -80,10 +81,10 @@ TokenIssuerService.prototype.deleteTokens = function(requestIdString) {
  * Delete all the tokens for the default credential.
  *
  * @throws {Error} Throws Error if request failed
- * @returns {Promise.null} Promise returning null if success
+ * @returns {Promise} Promise returning null if success
 */
 TokenIssuerService.prototype.deleteAllTokens = function() {
-    return HttpUtils.get(this.backendUrl, 'deleteAllRequests').then(json => {
+    return this.httpClient.get(this.backendUrl, 'deleteAllRequests').then(json => {
         if(!json.data) {
             throw new Error(errJsonWithoutData)
         }

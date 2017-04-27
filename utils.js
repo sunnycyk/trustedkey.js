@@ -51,7 +51,7 @@ utils.getUnixTime = function(date) {
  *
  * @param {object} message - Message can be string or object. Objects will be JSON stringified
  * @param {String} secret - HMAC shared secret
- * @param {object} header - JOSE header
+ * @param {object} [header={alg: "HS256"}] - JOSE header
  * @returns {String} Concatenated JWS HMAC
  */
 utils.createHmacJws = function(message, secret, header) {
