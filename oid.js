@@ -6,6 +6,8 @@
 
 /**
  * Some well-known OIDs, for convenience.
+ *
+ * @exports oid
  */
 module.exports = {
 
@@ -89,3 +91,5 @@ module.exports = {
      */
     postalAddress: "2.5.4.16",
 }
+
+oid  // Make linter shut up about unused object

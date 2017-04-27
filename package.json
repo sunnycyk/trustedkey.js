@@ -2,16 +2,19 @@
   "name": "trustedkey-js",
   "version": "0.1.0",
   "private": true,
-    "files": [
-        "microutils.js",
-        "oid.js",
-        "utils.js",
-        "errors.js",
-        "services"
-    ],
-    "dependencies": {
-        "jsrsasign": "github:enumatech/jsrsasign#for_npm",
-        "request": "^2.79.0",
-        "request-promise-native": "^1.0.3"
-    }
+  "files": [
+    "microutils.js",
+    "oid.js",
+    "utils.js",
+    "errors.js",
+    "services"
+  ],
+  "dependencies": {
+    "jsrsasign": "github:enumatech/jsrsasign#for_npm",
+    "request": "^2.79.0",
+    "request-promise-native": "^1.0.3"
+  },
+  "devDependencies": {
+    "jsdoc": "^3.4.3"
+  }
 }

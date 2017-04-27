@@ -1,0 +1,15 @@
+{
+    "source": {
+        "exclude": [
+            "node_modules",
+            "docs"
+        ]
+    },
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": false,
+        "default": {
+            "outputSourceFiles": true
+        }
+    }
+}

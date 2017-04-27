@@ -2,7 +2,9 @@ const HttpUtils = require('./http')
 const Crypto      = require('crypto')
 
 /**
- Utility class with wrappers for the various Credential Registry API endpoints.
+ * Utility class with wrappers for the various Credential Registry API endpoints.
+ *
+ * @constructor
  */
 const CredentialRegistryService = module.exports = function(backendUrl, appKeyPair) {
     this.backendUrl = backendUrl

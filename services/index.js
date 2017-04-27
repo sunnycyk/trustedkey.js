@@ -11,6 +11,7 @@ const Jsrsasign                 = require('jsrsasign')
  *
  * Instances are put into an attribute called shared.
  *
+ * @exports services
  * @constructor
 */
 const services = module.exports = function(backendUrl, appKeyPair) {
@@ -24,9 +25,27 @@ const services = module.exports = function(backendUrl, appKeyPair) {
 }
 
 
-// Help editors to autocomplete
+/**
+ * CredentialRegistryService instance
+*/
 services.credentialRegistryService = undefined
+
+/**
+ * TokenIssuerService instance
+*/
 services.tokenIssuerService = undefined
+
+/**
+ * TrustedKeyIssuerService instance
+*/
 services.trustedKeyIssuerService = undefined
+
+/**
+ * ValidateService instance
+*/
 services.validateService = undefined
+
+/**
+ * WalletService instance
+*/
 services.walletService = undefined

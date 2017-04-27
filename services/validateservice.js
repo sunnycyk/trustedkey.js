@@ -1,5 +1,4 @@
 const HttpUtils = require('./http')
-const Errors    = require('../errors')
 
 
 /**
@@ -12,12 +11,25 @@ const ValidateService = module.exports = function(backendUrl, appKeyPair) {
 }
 
 
+/**
+ * Custom error thrown on revoked credentials
+ *
+ * @param {String} message - Error message
+*/
+ValidateService.RevokationError = function(message) {
+    Error.captureStackTrace(this)
+    this.message = message
+    this.name = "ApplicationError"
+}
+ValidateService.RevokationError.prototype = Object.create(Error.prototype)
+
+
 function validate(backendUrl, address) {
     return HttpUtils.get(backendUrl, 'isRevoked', {
         address: address
     }).then(r => {
         if (r.data.isRevoked !== false) {
-            throw new Errors.ApplicationError("Address got revoked: " + address)
+            throw new ValidateService.RevokationError("Address got revoked: " + address)
         }
         return true
     })
@@ -28,7 +40,7 @@ function validate(backendUrl, address) {
  * Validate the given credential by calling into the smart contract.
  *
  * @param {String} credentialAddressString - Credential to check.
- * @throws {Errors.Applicationerror} Will throw if address got revoked
+ * @throws {ValidateService.RevokationError} Will throw if address got revoked
 */
 ValidateService.prototype.validateCredential = function(credentialAddressString) {
     return validate(this.backendUrl, credentialAddressString)
@@ -39,7 +51,7 @@ ValidateService.prototype.validateCredential = function(credentialAddressString)
  * Validate given token(s) by calling into the smart contract.
  *
  * @param {string} tokenSerialNumbers - Array of token serial numbers.
- * @throws {Errors.Applicationerror} Will throw if address got revoked
+ * @throws {ValidateService.RevokationError} Will throw if address got revoked
 */
 ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
     var serialNumbers

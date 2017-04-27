@@ -7,6 +7,11 @@
 const Crypto    = require('crypto')
 const Jsrsasign = require('jsrsasign')
 
+/**
+ * Static Trustedkey utility functions
+ *
+ * @exports utils
+*/
 const utils = module.exports = {}
 
 /**
