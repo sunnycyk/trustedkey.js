@@ -5,6 +5,7 @@ const HttpUtils = require('./http')
  * An implementation of a the validation API, used to check to validity of credentials and tokens.
  *
  * @constructor
+ * @param {String} backendUrl - The base backend URL
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */

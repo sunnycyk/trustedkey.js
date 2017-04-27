@@ -13,6 +13,7 @@ const errInvalidPemData = "Unexpected: IssuerApi.getTokens PEM data was invalid.
  * A base implementation of the issuer API. Specific issuer APIs will derive from this.
  *
  * @constructor
+ * @param {String} backendUrl - The base backend URL
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */

@@ -5,6 +5,7 @@ const Crypto    = require('crypto')
  * Utility class with wrappers for the various Credential Registry API endpoints.
  *
  * @constructor
+ * @param {String} backendUrl - The base backend URL
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
