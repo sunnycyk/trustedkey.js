@@ -1,14 +1,16 @@
 const HttpUtils = require('./http')
-const Crypto      = require('crypto')
+const Crypto    = require('crypto')
 
 /**
  * Utility class with wrappers for the various Credential Registry API endpoints.
  *
  * @constructor
+ * @param {String} backendUrl - The base backend URL
+ * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const CredentialRegistryService = module.exports = function(backendUrl, appKeyPair) {
-    this.backendUrl = backendUrl
-    this.appKeyPair = appKeyPair
+const CredentialRegistryService = module.exports = function(backendUrl, appId, appSecret) {
+    this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
 
 
@@ -26,7 +28,7 @@ CredentialRegistryService.revokeDefaultCredential = function(delegateAddressStri
     var digest = hash.update(addressWithout0x).digest('hex')
     var sig = keyPair.signWithMessageHash(digest)
 
-    return HttpUtils.get(this.backendUrl, 'revoke', {
+    return this.httpClient.get('revoke', {
         signature: sig.digest('hex')
     })
 }

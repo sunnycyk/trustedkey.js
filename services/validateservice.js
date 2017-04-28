@@ -3,11 +3,14 @@ const HttpUtils = require('./http')
 
 /**
  * An implementation of a the validation API, used to check to validity of credentials and tokens.
+ *
  * @constructor
+ * @param {String} backendUrl - The base backend URL
+ * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const ValidateService = module.exports = function(backendUrl, appKeyPair) {
-    this.backendUrl = backendUrl
-    this.appKeyPair = appKeyPair
+const ValidateService = module.exports = function(backendUrl, appId, appSecret) {
+    this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
 
 
@@ -24,8 +27,8 @@ ValidateService.RevokationError = function(message) {
 ValidateService.RevokationError.prototype = Object.create(Error.prototype)
 
 
-function validate(backendUrl, address) {
-    return HttpUtils.get(backendUrl, 'isRevoked', {
+function validate(httpClient, address) {
+    return httpClient.get('isRevoked', {
         address: address
     }).then(r => {
         if (r.data.isRevoked !== false) {
@@ -43,7 +46,7 @@ function validate(backendUrl, address) {
  * @throws {ValidateService.RevokationError} Will throw if address got revoked
 */
 ValidateService.prototype.validateCredential = function(credentialAddressString) {
-    return validate(this.backendUrl, credentialAddressString)
+    return validate(credentialAddressString)
 }
 
 
@@ -66,5 +69,5 @@ ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
     } else {
         serialNumbers = tokenSerialNumbers
     }
-    return validate(this.backendUrl, serialNumbers)
+    return validate(serialNumbers)
 }
