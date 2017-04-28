@@ -1,4 +1,5 @@
-const httpUtils = module.exports = function(appId, appSecret) {
+const httpUtils = module.exports = function(backendUrl, appId, appSecret) {
+    this.backendUrl = backendUrl
     this.appId = appId
     this.appSecret = appSecret
 }
@@ -20,7 +21,7 @@ function getAuthHeader(url, appId, appSecret) {
 }
 
 
-httpUtils.prototype.get = function(baseUrl, path, params) {
+httpUtils.prototype.get = function(path, params) {
     const url = path + '?' + Querystring.stringify(params)
     const headers = {}
     if(this.appId && this.appSecret) {
@@ -28,7 +29,7 @@ httpUtils.prototype.get = function(baseUrl, path, params) {
     }
 
     return RP.get({
-        baseUrl: baseUrl,
+        baseUrl: this.backendUrl,
         uri: url,
         json: true,
         headers: headers
