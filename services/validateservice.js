@@ -46,7 +46,7 @@ function validate(httpClient, address) {
  * @throws {ValidateService.RevokationError} Will throw if address got revoked
 */
 ValidateService.prototype.validateCredential = function(credentialAddressString) {
-    return validate(credentialAddressString)
+    return validate(this.httpClient, credentialAddressString)
 }
 
 
@@ -69,5 +69,5 @@ ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
     } else {
         serialNumbers = tokenSerialNumbers
     }
-    return validate(serialNumbers)
+    return validate(this.httpClient, serialNumbers)
 }
