@@ -12,12 +12,11 @@ const Utils       = require('../utils')
 
 function getAuthHeader(url, appId, appSecret) {
     const payload = {
-        typ: 'JWT',
-        cty: 'JWT',
         iss: appId,
         aud: url
     }
-    return 'Bearer ' + Utils.createHmacJws(payload, appSecret)
+    const header = {typ: 'JWT'}
+    return 'Bearer ' + Utils.createHmacJws(payload, appSecret, header)
 }
 
 
@@ -25,7 +24,7 @@ httpUtils.prototype.get = function(path, params) {
     const url = path + '?' + Querystring.stringify(params)
     const headers = {}
     if(this.appId && this.appSecret) {
-        headers['Authorization'] = getAuthHeader(url, this.appId, this.appSecret)
+        headers['Authorization'] = getAuthHeader(this.backendUrl + url, this.appId, this.appSecret)
     }
 
     return RP.get({
