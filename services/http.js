@@ -13,9 +13,9 @@ const Utils       = require('../utils')
 function getAuthHeader(url, appId, appSecret) {
     const payload = {
         iss: appId,
-        aud: url
+        aud: url,
     }
-    const header = {typ: 'JWT'}
+    const header = {typ: 'JWT', iss: appId}
     return 'Bearer ' + Utils.createHmacJws(payload, appSecret, header)
 }
 
