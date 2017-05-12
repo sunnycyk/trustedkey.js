@@ -107,7 +107,7 @@ utils.verifyJws = function(jws, secretCallback) {
                 return utils.verifyJws(message.toString(), secretCallback)
             }
             else {
-                return message
+                return JSON.parse(message.toString())
             }
         }
     }
