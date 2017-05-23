@@ -10,16 +10,17 @@ const WalletService             = require('./walletservice')
  *
  * @exports services
  * @constructor
- * @param {String} backendUrl - The base backend URL
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
+ * @param {String} issuerBaseUrl - The base issuer backend URL
+ * @param {String} walletBaseUrl - The base wallet backend URL
 */
-const services = module.exports = function(backendUrl, appId, appSecret) {
-    this.credentialRegistryService = new CredentialRegistryService(backendUrl, appId, appSecret)
-    this.tokenIssuerService = new TokenIssuerService(backendUrl, appId, appSecret)
-    this.trustedKeyIssuerService = new TrustedKeyIssuerService(backendUrl, appId, appSecret)
-    this.validateService = new ValidateService(backendUrl, appId, appSecret)
-    this.walletService = new WalletService(backendUrl, appId, appSecret)
+const services = module.exports = function(appId, appSecret, issuerBaseUrl, walletBaseUrl) {
+    this.credentialRegistryService = new CredentialRegistryService(issuerBaseUrl, appId, appSecret)
+    this.tokenIssuerService = new TokenIssuerService(issuerBaseUrl, appId, appSecret)
+    this.trustedKeyIssuerService = new TrustedKeyIssuerService(issuerBaseUrl, appId, appSecret)
+    this.validateService = new ValidateService(issuerBaseUrl, appId, appSecret)
+    this.walletService = new WalletService(walletBaseUrl, appId, appSecret)
 }
 
 
