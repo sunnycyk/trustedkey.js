@@ -34,3 +34,20 @@ httpUtils.prototype.get = function(path, params) {
         headers: headers
     })
 }
+
+
+
+httpUtils.prototype.post = function(path, params) {
+    const url = path + '?' + Querystring.stringify(params)
+    const headers = {}
+    if(this.appId && this.appSecret) {
+        headers['Authorization'] = getAuthHeader(this.backendUrl + url, this.appId, this.appSecret)
+    }
+
+    return RP.post({
+        baseUrl: this.backendUrl,
+        uri: url,
+        json: true,
+        headers: headers
+    })
+}
