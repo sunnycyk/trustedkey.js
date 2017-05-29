@@ -93,7 +93,7 @@ utils.verifyJws = function(jws, secretCallback) {
         // ECDSA-SHA256
         const claims = JSON.parse(message)
         // Subject public key is stored in 'sub' claim
-        if (utils.checkECDSA("secp256r1", signeddata, secretCallback(claims), signature.toString('hex'))) {
+        if (utils.checkECDSA("secp256r1", signeddata, secretCallback(jose, claims), signature.toString('hex'))) {
             return claims
         }
         return false
@@ -109,6 +109,17 @@ utils.verifyJws = function(jws, secretCallback) {
             else {
                 return JSON.parse(message.toString())
             }
+        }
+    }
+    else if (jose.alg === 'RS256') {
+        // TODO
+        return false
+    }
+    else if (jose.alg === 'none') {
+        // NONE, only allow if callback returns empty string
+        const claims = JSON.parse(message)
+        if (signature === '' && secretCallback(jose, claims) === '') {
+            return claims
         }
     }
 
