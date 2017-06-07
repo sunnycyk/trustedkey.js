@@ -31,10 +31,7 @@ function validate(httpClient, address) {
     return httpClient.get('isRevoked', {
         address: address
     }).then(r => {
-        if (r.data.isRevoked !== false) {
-            throw new ValidateService.RevokationError("Address got revoked: " + address)
-        }
-        return true
+        return !r.data.isRevoked
     })
 }
 
@@ -43,7 +40,7 @@ function validate(httpClient, address) {
  * Validate the given credential by calling into the smart contract.
  *
  * @param {String} credentialAddressString - Credential to check.
- * @throws {ValidateService.RevokationError} Will throw if address got revoked
+ * @returns {boolean} Status indicating valid address
 */
 ValidateService.prototype.validateCredential = function(credentialAddressString) {
     return validate(this.httpClient, credentialAddressString)
@@ -54,7 +51,7 @@ ValidateService.prototype.validateCredential = function(credentialAddressString)
  * Validate given token(s) by calling into the smart contract.
  *
  * @param {string} tokenSerialNumbers - Array of token serial numbers.
- * @throws {ValidateService.RevokationError} Will throw if address got revoked
+ * @returns {boolean} Status indicating valid address
 */
 ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
     var serialNumbers
