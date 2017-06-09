@@ -161,3 +161,20 @@ utils.userPubKeyHexToAddress = function(pubkeyhex) {
     var digest = hash.update(blob).digest()
     return "0x" + digest.toString('hex').substr(2*12)
 }
+
+
+/**
+ * Wrap the call and change the callback into a promise resolve or reject.
+ */
+utils.promisify = function(call) {
+    return function() {
+        // Save the 'this' reference for use inside the promise
+        var self = this;
+        var args = Array.prototype.slice.call(arguments);
+        return new Promise( (resolve,reject) => {
+            // Append the callback that either rejects or resolves the promise
+            args.push( (err,result) => err?reject(err):resolve(result) );
+            call.apply(self, args);
+        })
+    }
+}
