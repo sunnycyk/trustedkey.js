@@ -15,7 +15,7 @@ function getAuthHeader(url, appId, appSecret) {
         iss: appId,
         aud: url,
     }
-    const header = {typ: 'JWT', iss: appId}
+    const header = {typ: 'JWT', iss: appId, exp: Utils.getUnixTime()+300}
     return 'Bearer ' + Utils.createHmacJws(payload, appSecret, header)
 }
 
@@ -34,8 +34,6 @@ httpUtils.prototype.get = function(path, params) {
         headers: headers
     })
 }
-
-
 
 httpUtils.prototype.post = function(path, params) {
     const url = path + '?' + Querystring.stringify(params)
