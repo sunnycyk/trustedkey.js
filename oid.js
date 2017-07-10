@@ -19,11 +19,18 @@ module.exports = {
     documentID: "1.3.6.1.4.1.53318295.2",
 
     /**
-     * The OID in dotted notation for an identity document's type, for example "Passport".
+     * The OID in dotted notation for an identity document's type, for example "Michigan (MI) Driver License".
      * @constant
      * @default
      */
     documentType: "1.3.6.1.4.1.53318295.1",
+
+    /**
+     * The OID in dotted notation for an identity document's class, for example "Passport", "Drivers License".
+     * @constant
+     * @default
+     */
+    documentClass: "1.3.6.1.4.1.53318295.6",
 
     /**
      * The OID in dotted notation for an identity document's photo.
