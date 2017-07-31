@@ -1,6 +1,6 @@
 {
   "name": "trustedkey-js",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "private": true,
   "files": [
     "microutils.js",
@@ -10,7 +10,7 @@
     "services"
   ],
   "dependencies": {
-    "jsrsasign": "github:enumatech/jsrsasign#for_npm",
+    "jsrsasign": "git+https://github.com/enumatech/jsrsasign.git#for_npm",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.3"
   },
