@@ -7,6 +7,7 @@
 const Crypto    = require('crypto')
 const Assert    = require('assert')
 const Jsrsasign = require('jsrsasign')
+const URL       = require('url')
 
 /**
  * Static Trustedkey utility functions
@@ -14,6 +15,20 @@ const Jsrsasign = require('jsrsasign')
  * @exports utils
 */
 const utils = module.exports = {}
+
+
+/**
+ * Add new query parameters to an existing URL.
+ * @param {String} path - the current url (may be relative)
+ * @param {Object} params - object with new query parameters
+ * @returns {String} new URL with the query parameters merged
+ */
+utils.mergeQueryParams = function(path, params) {
+    const url = URL.parse(path, true)
+    Object.assign(url.query, params)
+    delete url.search   // force recreation from .query
+    return url.format()
+}
 
 
 /**
@@ -132,8 +147,9 @@ utils.verifyJws = function(jws, secretCallback) {
         if (jose.alg === 'ES256') {
             // ECDSA-SHA256
             const payload = JSON.parse(message)
-            // OLD: Subject public key is stored in 'sub' claim
-            if (utils.checkECDSA("secp256r1", signeddata, secret||payload.sub, signature)) {
+            // OLD: Subject public key was stored in 'sub' claim
+            var pubkeyhex = secret || payload.sub || utils.jwkToHex(jose.jwk)
+            if (utils.checkECDSA("secp256r1", signeddata, pubkeyhex, signature)) {
                 return payload
             }
         }
