@@ -9,12 +9,17 @@
     "errors.js",
     "services"
   ],
+  "scripts": {
+    "lint": "node node_modules/eslint/bin/eslint.js --color ."
+  },
   "dependencies": {
     "jsrsasign": "git+https://github.com/enumatech/jsrsasign.git#for_npm",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.3"
   },
   "devDependencies": {
+    "eslint": "^4.3.0",
+    "eslint-plugin-hapi": "^4.0.0",
     "jsdoc": "^3.4.3"
   }
 }
