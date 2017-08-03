@@ -1,9 +1,23 @@
 const RP          = require('request-promise-native')
+const Assert      = require('assert')
 
 const Utils       = require('../utils')
 
 
+/**
+ * Utility class with wrappers for calling authenticated API endpoints.
+ *
+ * @constructor
+ * @param {String} backendUrl - The base backend URL
+ * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
+ */
 const httpUtils = module.exports = function(backendUrl, appId, appSecret) {
+
+    Assert.strictEqual(typeof backendUrl, "string", `backendUrl must be of type "string"`)
+    Assert.strictEqual(typeof appId, "string", `backendUrl must be of type "string"`)
+    Assert.strictEqual(typeof appSecret, "string", `backendUrl must be of type "string"`)
+
     this.backendUrl = backendUrl
     this.appId = appId
     this.appSecret = appSecret

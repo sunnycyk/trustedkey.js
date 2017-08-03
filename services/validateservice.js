@@ -1,3 +1,4 @@
+const Assert = require('assert')
 const HttpUtils = require('./http')
 
 
@@ -14,24 +15,32 @@ const ValidateService = module.exports = function(backendUrl, appId, appSecret) 
 }
 
 
-/**
- * Custom error thrown on revoked credentials
- *
- * @param {String} message - Error message
-*/
-ValidateService.RevokationError = function(message) {
-    Error.captureStackTrace(this)
-    this.message = message
-    this.name = "ApplicationError"
-}
-ValidateService.RevokationError.prototype = Object.create(Error.prototype)
-
-
 function validate(httpClient, address) {
+
+    Assert.strictEqual(typeof address, "string", `address must be of type "string"`)
+
     return httpClient.get('isRevoked', {
         address: address
     }).then(r => {
         return !r.data.isRevoked
+    })
+}
+
+
+/**
+ * Check the status of the specified blockchain transaction ID.
+ *
+ * @param {String} txid - Transaction ID to check.
+ * @returns {Promise} Transaction status object
+*/
+ValidateService.prototype.getTransactionStatus = function(txid) {
+
+    Assert.strictEqual(typeof txid, "string", `txid must be of type "string"`)
+
+    return this.httpClient.get('getTransactionStatus', {
+        txid: txid
+    }).then(r => {
+        return r.data
     })
 }
 

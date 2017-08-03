@@ -54,6 +54,9 @@ utils.sha256 = function(blob, encoding) {
  * @returns {String} 0x prefixed address
  */
 utils.serialToAddress = function(serialhex) {
+
+    Assert.strictEqual(typeof serialhex, "string", `serialhex must be of type "string"`)
+
     const paddedSerial = String('00000000000000000000000000000000000000'+serialhex).slice(-40)
     return "0x" + paddedSerial
 }
@@ -136,6 +139,8 @@ utils.createEcdsaJws = function(message, credential, header) {
  * @returns {boolean}
  */
 utils.verifyJws = function(jws, secretCallback) {
+
+    Assert.strictEqual(typeof jws, "string", `jws must be of type "string"`)
 
     const parts = jws.split(/\./g)
     if (parts.length !== 3) {       // JWE has 5 parts
@@ -261,6 +266,8 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
  */
 utils.checkECDSA = function(curveName, message, pubkey, signature) {
 
+    Assert.strictEqual(typeof curveName, "string", `curveName must be of type "string"`)
+
     // Verify a digest value
     var digest = utils.sha256(message, 'hex')
 
@@ -283,6 +290,8 @@ utils.checkECDSA = function(curveName, message, pubkey, signature) {
  * @returns {String} User address with leading 0x
  */
 utils.userPubKeyHexToAddress = function(pubkeyhex) {
+
+    Assert.strictEqual(typeof pubkeyhex, "string", `pubkeyhex must be of type "string"`)
     // Sign a digest value
     // Get the uncompressed public key without prefix, take the sha256 hash, and skip the first 12 bytes
     var blob = new Buffer(pubkeyhex.substr(2), 'hex')
@@ -315,4 +324,38 @@ utils.promisify = function(call) {
  */
 utils.generateNonce = function(encoding) {
     return Crypto.randomBytes(32).toString(encoding || 'base64')
+}
+
+
+/**
+ * Wait for specified number of milliseconds (ms).
+ * @param {Number} ms Number of milliseconds to wait.
+ * @return {Promise}
+ */
+utils.wait = function(duration_ms) {
+    return new Promise( (resolve, reject) => {
+        return setTimeout(resolve, duration_ms)
+    })
+}
+
+
+/**
+ * Wait until the callback returns a truthy value (or timeout).
+ * @param {Number} ms Number of milliseconds to wait.
+ * @param {function} callback Callback to invoke (once a second).
+ * @return {Promise}
+ */
+utils.waitUntil = function(ms, callback) {
+
+    Assert.strictEqual(typeof ms, "number", `ms must be of type "number"`)
+    Assert.strictEqual(typeof callback, "function", `callback must be of type "function"`)
+    return utils.wait(ms > 1000 ? 1000 : ms)
+        .then(_ => callback())
+        .then(done => {
+            ms -= 1000
+            if (!done && ms > 0) {
+                return utils.waitUntil(ms, callback)
+            }
+            return done
+        })
 }
