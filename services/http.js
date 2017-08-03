@@ -1,13 +1,14 @@
 const RP          = require('request-promise-native')
-const URL         = require('url')
 
 const Utils       = require('../utils')
+
 
 const httpUtils = module.exports = function(backendUrl, appId, appSecret) {
     this.backendUrl = backendUrl
     this.appId = appId
     this.appSecret = appSecret
 }
+
 
 function getAuthHeader(url, appId, appSecret) {
     const payload = {
@@ -20,17 +21,9 @@ function getAuthHeader(url, appId, appSecret) {
 }
 
 
-function mergeParams(path, params) {
-    const url = URL.parse(path, true)
-    Object.assign(url.query, params)
-    delete url.search   // force recreation from .query
-    return  url.format()
-}
-
-
 httpUtils.prototype.get = function(path, params) {
 
-    const url = mergeParams(path, params)
+    const url = Utils.mergeQueryParams(path, params||null)
     const headers = {}
     if(this.appId && this.appSecret) {
         headers['Authorization'] = getAuthHeader(this.backendUrl + url, this.appId, this.appSecret)
@@ -47,7 +40,7 @@ httpUtils.prototype.get = function(path, params) {
 
 httpUtils.prototype.post = function(path, params) {
 
-    const url = mergeParams(path, params)
+    const url = Utils.mergeQueryParams(path, params||null)
     const headers = {}
     if(this.appId && this.appSecret) {
         headers['Authorization'] = getAuthHeader(this.backendUrl + url, this.appId, this.appSecret)
