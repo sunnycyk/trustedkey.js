@@ -24,6 +24,10 @@ const utils = module.exports = {}
  * @returns {String} new URL with the query parameters merged
  */
 utils.mergeQueryParams = function(path, params) {
+
+    Assert.strictEqual(typeof path, "string", `path must be of type "string"`)
+    Assert.strictEqual(typeof params, "object", `params must be of type "object"`)
+
     const url = URL.parse(path, true)
     Object.assign(url.query, params)
     delete url.search   // force recreation from .query
@@ -196,7 +200,7 @@ utils.verifyJws = function(jws, secretCallback) {
 utils.jwkToHex = function(jwk) {
 
     if (jwk.crv === "P-256" && jwk.kty === "EC") {
-        Assert.strictEqual(typeof jwk.d, "undefined")
+        Assert.strictEqual(typeof jwk.d, "undefined", `jwk.d must be of type "undefined"`)
         // Convert x,y coordinates from JWK to hex encoded public key
         const hex = "04" + Buffer.from(jwk.x, "base64").toString("hex") + Buffer.from(jwk.y, "base64").toString("hex")
         Assert.strictEqual(hex.length, 130)
@@ -233,7 +237,7 @@ utils.hexToJwk = function(pubKeyHex) {
 utils.jwkToPem = function(jwk) {
 
     if (jwk.crv === "P-256" && jwk.kty === "EC") {
-        Assert.strictEqual(typeof jwk.d, "undefined")
+        Assert.strictEqual(typeof jwk.d, "undefined", `jwk.d must be of type "undefined"`)
         // Convert x,y coordinates from JWK to base64 encoded public key
         const all = Buffer.concat([Buffer.from(jwk.x, "base64"), Buffer.from(jwk.y, "base64")]).toString("base64")
         Assert.strictEqual(all.length, 88)
@@ -293,12 +297,12 @@ utils.userPubKeyHexToAddress = function(pubkeyhex) {
 utils.promisify = function(call) {
     return function() {
         // Save the 'this' reference for use inside the promise
-        var self = this;
-        var args = Array.prototype.slice.call(arguments);
+        var self = this
+        var args = Array.prototype.slice.call(arguments)
         return new Promise( (resolve,reject) => {
             // Append the callback that either rejects or resolves the promise
-            args.push( (err,a,b,c,d) => err?reject(err):resolve(a,b,c,d) );
-            call.apply(self, args);
+            args.push( (err,a,b,c,d) => err?reject(err):resolve(a,b,c,d) )
+            call.apply(self, args)
         })
     }
 }
