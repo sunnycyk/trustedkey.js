@@ -359,3 +359,14 @@ utils.waitUntil = function(ms, callback) {
             return done
         })
 }
+
+
+/**
+ * Generate a new key pair.
+ * @param {string} curveName The name of the EC curve. (optional)
+ * @return {Object}
+ */
+utils.generateKeyPair = function(curveName) {
+
+    return Jsrsasign.KEYUTIL.generateKeypair("EC", curveName||"secp256r1").prvKeyObj
+}
