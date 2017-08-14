@@ -29,7 +29,7 @@ utils.mergeQueryParams = function(path, params) {
     Assert.strictEqual(typeof params, "object", `params must be of type "object"`)
 
     const url = URL.parse(path, true)
-    Object.keys(params)
+    Object.keys(params||{})
         .filter(key => params[key] !== undefined)
         .forEach(key => url.query[key] = params[key])
     delete url.search   // force recreation from .query

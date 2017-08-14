@@ -37,7 +37,7 @@ function getAuthHeader(url, appId, appSecret) {
 
 httpUtils.prototype.get = function(path, params) {
 
-    const url = Utils.mergeQueryParams(path, params||null)
+    const url = Utils.mergeQueryParams(path, params||{})
     const headers = {}
     if(this.appId && this.appSecret) {
         headers['Authorization'] = getAuthHeader(this.backendUrl + url, this.appId, this.appSecret)
@@ -54,7 +54,7 @@ httpUtils.prototype.get = function(path, params) {
 
 httpUtils.prototype.post = function(path, params) {
 
-    const url = Utils.mergeQueryParams(path, params||null)
+    const url = Utils.mergeQueryParams(path, params||{})
     const headers = {}
     if(this.appId && this.appSecret) {
         headers['Authorization'] = getAuthHeader(this.backendUrl + url, this.appId, this.appSecret)
