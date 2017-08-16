@@ -1,5 +1,6 @@
 const Assert = require('assert')
-const HttpUtils = require('./http')
+const Utils = require('../utils')
+const RP = require('request-promise-native')
 
 
 /**
@@ -7,11 +8,14 @@ const HttpUtils = require('./http')
  *
  * @constructor
  * @param {String} backendUrl - The base backend URL
- * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
- * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const ValidateService = module.exports = function(backendUrl, appId, appSecret) {
-    this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
+const ValidateService = module.exports = function(backendUrl) {
+    this.httpClient = {
+        get: function(url, params) {
+            const uri = Utils.mergeQueryParams(url, params||{})
+            return RP({baseUrl: backendUrl, url: uri, json: true})
+        }
+    }
 }
 
 
@@ -76,4 +80,19 @@ ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
         serialNumbers = tokenSerialNumbers
     }
     return validate(this.httpClient, serialNumbers)
+}
+
+
+/**
+ * Get extensive key information for given address.
+ *
+ * @param {string} address - blockchain address of token/credential to query
+ * @returns {object} KeyInfo structure from smart contract
+*/
+ValidateService.prototype.keyInfo = function(address) {
+
+    Assert.strictEqual(typeof address, "string", `address must be of type "string"`)
+
+    return this.httpClient.get('keyInfo', {address: address})
+        .then(r => r.data.keyInfo)
 }
