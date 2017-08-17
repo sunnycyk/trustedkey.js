@@ -135,10 +135,9 @@ utils.createEcdsaJws = function(message, credential, header) {
 /**
  * Verify a JSON Web Signature
  *
- * @param {object} message - Message can be string or object. Objects will be JSON stringified
- * @param {String} secret - HMAC shared secret
- * @param {object} header - JOSE header
- * @returns {boolean}
+ * @param {String} jws the JWT or JWT as string
+ * @param {String|Promise|function} secret HMAC shared secret or public key
+ * @returns {Object} the parsed claims or `null`
  */
 utils.verifyJws = function(jws, secretCallback) {
 
@@ -146,7 +145,7 @@ utils.verifyJws = function(jws, secretCallback) {
 
     const parts = jws.split(/\./g)
     if (parts.length !== 3) {       // JWE has 5 parts
-        return false
+        return null
     }
 
     const jose = JSON.parse(Buffer.from(parts[0], "base64"))
@@ -186,7 +185,7 @@ utils.verifyJws = function(jws, secretCallback) {
                 return JSON.parse(message)
             }
         }
-        return false
+        return null
     }
 
     const secret = typeof secretCallback === "function" ? secretCallback(jose) : secretCallback
