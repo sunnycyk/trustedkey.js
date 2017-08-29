@@ -321,10 +321,11 @@ utils.promisify = function(call) {
 /**
  * Generate a 32-byte random nonce.
  * @param {String} encoding - Encoding for result (default base64)
+ * @param {Number} length - Number of bytes for the result (default 32)
  * @returns {String} The encoding of the nonce
  */
-utils.generateNonce = function(encoding) {
-    return Crypto.randomBytes(32).toString(encoding || 'base64')
+utils.generateNonce = function(encoding, length) {
+    return Crypto.randomBytes(length || 32).toString(encoding || 'base64')
 }
 
 
@@ -370,4 +371,22 @@ utils.waitUntil = function(ms, callback) {
 utils.generateKeyPair = function(curveName) {
 
     return Jsrsasign.KEYUTIL.generateKeypair("EC", curveName||"secp256r1").prvKeyObj
+}
+
+
+/**
+ * HMAC-based One-time Password Algorithm
+ * @param {string|Buffer} key The shared key for the HMAC.
+ * @param {string|Buffer} message The message (64-bit counter or 32-bit time/30)
+ * @return {string} six digit HOTP code
+ */
+utils.oneTimePassword = function(key, message) {
+
+    const hash = Crypto.createHmac('sha1', key).update(message).digest()
+    const offset = hash[hash.length - 1] & 15
+    //4 bytes starting at the offset, remove the most significant bit
+    const truncatedHash = hash.readInt32BE(offset) & 0x7FFFFFFF     // big endian
+    const code = truncatedHash % 1000000
+    //pad code with 0 until length of code is 6;
+    return String("00000" + code).slice(-6)
 }
