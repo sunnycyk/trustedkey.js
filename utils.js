@@ -383,7 +383,7 @@ utils.generateKeyPair = function(curveName) {
 utils.oneTimePassword = function(key, message) {
 
     const hash = Crypto.createHmac('sha1', key).update(message).digest()
-    const offset = hash[hash.length - 1] & 15
+    const offset = hash[hash.length - 1] & 0xf
     //4 bytes starting at the offset, remove the most significant bit
     const truncatedHash = hash.readInt32BE(offset) & 0x7FFFFFFF     // big endian
     const code = truncatedHash % 1000000
