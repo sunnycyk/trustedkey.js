@@ -94,5 +94,5 @@ ValidateService.prototype.keyInfo = function(address) {
     Assert.strictEqual(typeof address, "string", `address must be of type "string"`)
 
     return this.httpClient.get('keyInfo', {address: address})
-        .then(r => r.data.keyInfo)
+        .then(r => r.data)
 }
