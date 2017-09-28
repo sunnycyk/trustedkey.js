@@ -7,10 +7,6 @@ function checkSuccess(jsonData) {
         throw new Error('API returned JSON without data')
     }
 
-    if(!jsonData.data.result) {
-        throw new Error('Api returned result "false"')
-    }
-
     return jsonData
 }
 
@@ -52,7 +48,8 @@ WalletService.prototype.request = function(address, nonce, callbackUrl, document
  * Grab the next login/signing request for the default registered credential.
 */
 WalletService.prototype.getPendingSignatureRequest = function() {
-    return this.httpClient.get('getPendingRequest').then(checkSuccess)
+    return this.httpClient.get('getPendingRequest')
+        .then(checkSuccess)
 }
 
 
@@ -86,6 +83,7 @@ WalletService.prototype.registerDevice = function(deviceTokenString) {
  *
  * @param {String} address - Device to notify
  * @param {String} nonce -
+ * @param {String} message -
  */
 WalletService.prototype.notify = function(address, nonce, message) {
     return this.httpClient.get('notify', {
