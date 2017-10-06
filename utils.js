@@ -136,7 +136,7 @@ utils.createEcdsaJws = function(message, credential, header) {
  * Verify a JSON Web Signature
  *
  * @param {String} jws the JWT or JWT as string
- * @param {String|Promise|function} secret HMAC shared secret or public key
+ * @param {String|Promise|function} secretCallback HMAC shared secret or public key
  * @returns {Object} the parsed claims or `null`
  */
 utils.verifyJws = function(jws, secretCallback) {
@@ -303,6 +303,8 @@ utils.userPubKeyHexToAddress = function(pubkeyhex) {
 
 /**
  * Wrap the call and change the callback into a promise resolve or reject.
+ * @param {function} call A function that takes a callback as last parameter
+ * @returns {function} Wrapper function that returns a promise
  */
 utils.promisify = function(call) {
     return function() {
@@ -331,8 +333,8 @@ utils.generateNonce = function(encoding, length) {
 
 /**
  * Wait for specified number of milliseconds (ms).
- * @param {Number} ms Number of milliseconds to wait.
- * @return {Promise}
+ * @param {Number} duration_ms Number of milliseconds to wait.
+ * @return {Promise} Promise that resolves in due time.
  */
 utils.wait = function(duration_ms) {
     return new Promise( (resolve, reject) => {
@@ -345,7 +347,7 @@ utils.wait = function(duration_ms) {
  * Wait until the callback returns a truthy value (or timeout).
  * @param {Number} ms Number of milliseconds to wait.
  * @param {function} callback Callback to invoke (once a second).
- * @return {Promise}
+ * @return {Promise} Promise that resolves when the callback is truthy
  */
 utils.waitUntil = function(ms, callback) {
 
@@ -366,7 +368,7 @@ utils.waitUntil = function(ms, callback) {
 /**
  * Generate a new key pair.
  * @param {string} curveName The name of the EC curve. (optional)
- * @return {Object}
+ * @return {Object} New jsrsasign key object of given curve
  */
 utils.generateKeyPair = function(curveName) {
 

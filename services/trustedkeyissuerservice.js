@@ -18,6 +18,8 @@ TrustedKeyIssuerService.prototype = Object.create(TokenIssuerService.prototype)
 
 /**
  * Request mock tokens, for testing during development only. See `requestTokens`.
+ * @param {string} requestIdString: A unique ID for this request (for example, an UUID) for retries and notifications.
+ * @returns {Promise} JSON result from API
 */
 TrustedKeyIssuerService.prototype.requestMockTokens = function(requestIdString) {
     return this.httpClient.get('registerIdentity', {
@@ -35,14 +37,15 @@ TrustedKeyIssuerService.prototype.requestMockTokens = function(requestIdString) 
  * Upon success, the request has been accepted and the app will be notified when done.
  * Upon failure, the request can be retried by providing the same requestID.
  *
- * @param requestIdString: A unique ID for this request (for example, an UUID) for retries and notifications.
- * @param catfishAirTransactionIDString: A transaction ID, obtained from the AuthenticID REST API.
- * @param catfishAirVersionNumber: The version of the CatfishAIR REST API to use.
+ * @param {string} requestIdString: A unique ID for this request (for example, an UUID) for retries and notifications.
+ * @param {string} catfishAirTransactionIDString: A transaction ID, obtained from the AuthenticID REST API.
+ * @param {string?} catfishAirVersionNumber: The version of the CatfishAIR REST API to use.
+ * @returns {Promise} JSON result from API
 */
-TrustedKeyIssuerService.prototype.requestTokens = function(requestIDString, catfishAirTransactionIDString, catfishAirVersionNumber) {
+TrustedKeyIssuerService.prototype.requestTokens = function(requestIdString, catfishAirTransactionIDString, catfishAirVersionNumber) {
     return this.httpClient.get('registerAuthenticId', {
         transactionid: catfishAirTransactionIDString,
         version: catfishAirVersionNumber,
-        requestid: requestIDString
+        requestid: requestIdString
     })
 }

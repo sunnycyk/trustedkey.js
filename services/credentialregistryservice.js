@@ -22,7 +22,8 @@ const CredentialRegistryService = module.exports = function(backendUrl, appId, a
  *
  * @param {string} delegateAddressString: The hex-encoded blockchain address of the registered delegate credential.
  * @param {Object} keyPair: Jsrsasign keypair object
- * @returns {Promise}
+ * @param {string?} address: When revoking a token, its address
+ * @returns {Promise} returning JSON from API
  */
 CredentialRegistryService.prototype.revokeCredential = function(delegateAddressString, keyPair, address) {
 

@@ -26,6 +26,7 @@ const DocsigService = module.exports = function(backendUrl, appId, appSecret, do
  * @param {String} callbackUrl - Url where signed PDF will be uploaded with PUT
  * @param {String} documentUrl - Url where document can be downloaded
  * @param {String} objectIds - Array of objectIds to request from signatory
+ * @returns {String} JSON response from API
  */
 DocsigService.prototype.documentSignRequest = function(signatoryEmail, callbackUrl, documentUrl, objectIds) {
     const appId = this._docsigAppId

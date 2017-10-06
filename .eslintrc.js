@@ -11,6 +11,7 @@ module.exports = {
         "sourceType": "module"
     },
     "rules": {
+        "valid-jsdoc": [2],
         "no-multiple-empty-lines": [
           "error",
           { "max": 2, "maxBOF": 0, "maxEOF": 1 }
