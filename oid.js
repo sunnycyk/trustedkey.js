@@ -37,7 +37,21 @@ module.exports = {
      * @constant
      * @default
      */
-    documentImage: "1.3.6.1.4.1.53318295.3",
+    documentImageFront: "1.3.6.1.4.1.53318295.3",
+
+    /**
+     * The OID in dotted notation for an identity document's photo.
+     * @constant
+     * @default
+     */
+    documentImageBack: "1.3.6.1.4.1.53318295.7",
+
+    /**
+     * The OID in dotted notation for an identity document's photo (headshot).
+     * @constant
+     * @default
+     */
+    documentImageHead: "1.3.6.1.4.1.53318295.8",
 
     /**
      * The OID in dotted notation for an identity document's issuer.
