@@ -68,6 +68,13 @@ module.exports = {
     documentResult: "1.3.6.1.4.1.53318295.5",
 
     /**
+     * The OID in dotted notation for the original documents issue date.
+     * @constant
+     * @default
+     */
+    documentIssueDate: "1.3.6.1.4.1.53318295.9",
+
+    /**
      * The OID in dotted notation for the gender (F/M) on an identity document.
      * @constant
      * @default
