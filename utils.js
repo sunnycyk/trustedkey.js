@@ -392,3 +392,30 @@ utils.oneTimePassword = function(key, message) {
     //pad code with 0 until length of code is 6;
     return String("00000" + code).slice(-6)
 }
+
+
+/**
+ * Decode a string with HEX-encoded data into a plain binary string.
+ * @param {string} hex String with HEX-encoded data
+ * @returns {string} String with binary encoded data
+ */
+utils.parseHexString = function(hex) {
+
+    return decodeURIComponent(hex.replace(/(..)/g,"%$1"))
+}
+
+
+/**
+ * Parse ASN.1 YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ into a Date object.
+ * @param {string} date ASN.1 YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ date string.
+ * @returns {Date} New date object
+ */
+utils.parseX509Date = function(date) {
+    var match = /^([0-9]{2,4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})Z$/.exec(date)
+    if (match === null) {
+        return null
+    }
+    //- Where YY is less than 50, the year shall be interpreted as 20YY.
+    const year = match[1].length === 2 && match[1] < 50 ? 2000 + parseInt(match[1]) : match[1]
+    return new Date(Date.UTC(year, match[2]-1, match[3], match[4], match[5], match[6]))
+}
