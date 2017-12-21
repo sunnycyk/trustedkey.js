@@ -75,6 +75,20 @@ module.exports = {
     documentIssueDate: "1.3.6.1.4.1.53318295.9",
 
     /**
+     * The OID in dotted notation for the original documents SHA256 digest.
+     * @constant
+     * @default
+     */
+    documentDigest: "1.3.6.1.4.1.53318295.10",
+
+    /**
+     * The OID in dotted notation for the documents Base64 thumbnail.
+     * @constant
+     * @default
+     */
+    documentThumb: "1.3.6.1.4.1.53318295.11",
+
+    /**
      * The OID in dotted notation for the gender (F/M) on an identity document.
      * @constant
      * @default
