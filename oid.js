@@ -164,4 +164,11 @@ module.exports = {
      * @default
      */
     postalAddress: "2.5.4.16",
+
+    /**
+     * The OID in dotted notation for a person's social profile URL.
+     * @constant
+     * @default
+     */
+    socialProfile: "1.3.6.1.4.1.53318295.12",
 }
