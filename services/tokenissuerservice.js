@@ -26,7 +26,7 @@ const TokenIssuerService = module.exports = function(backendUrl, appId, appSecre
  * Get the token(s) for the request identified by the given requestID.
  *
  * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestTokens` API.
- * @returns {Promise.Array.String} - Promise containing PEM array
+ * @returns {Promise<Array<String>>} - Promise containing PEM array
 */
 TokenIssuerService.prototype.getTokens = function(requestIdString) {
     return this.httpClient.get('getCertificates', {
@@ -44,7 +44,7 @@ TokenIssuerService.prototype.getTokens = function(requestIdString) {
             throw new Error(errInvalidPemData)
         }
 
-        var pemArray = json.data.pems.split('-----BEGIN')
+        var pemArray = json.data.pems.replace(/-\r?\n-/g, '-\n!-').split('!')
         if(pemArray.length === 0) {
             throw new Error(errInvalidPemArray)
         }
@@ -55,11 +55,32 @@ TokenIssuerService.prototype.getTokens = function(requestIdString) {
 
 
 /**
+ * Request image token(s).
+ *
+ * @param {Object} requestInfo - The requestInfo structure.
+ * @returns {Promise} Promise returning true if success
+*/
+TokenIssuerService.prototype.requestImageTokens = function(requestInfo) {
+    return this.httpClient.post('requestImageTokens', {}, requestInfo).then(json => {
+        if(!json.data) {
+            throw new Error(errJsonWithoutData)
+        }
+
+        if(!json.data.requestImageTokens) {
+            throw new Error(errFailed)
+        }
+
+        return true
+    })
+}
+
+
+/**
  * Delete the token(s) for the request identified by the given requestID.
  *
  * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestTokens` API.
  * @throws {Error} Throws Error if request failed
- * @returns {Promise} Promise returning null if success
+ * @returns {Promise} Promise returning true if success
 */
 TokenIssuerService.prototype.deleteTokens = function(requestIdString) {
     return this.httpClient.get(this.backendUrl, 'deleteRequest', {
@@ -73,7 +94,7 @@ TokenIssuerService.prototype.deleteTokens = function(requestIdString) {
             throw new Error(errFailed)
         }
 
-        return null
+        return true
     })
 }
 
@@ -82,7 +103,7 @@ TokenIssuerService.prototype.deleteTokens = function(requestIdString) {
  * Delete all the tokens for the default credential.
  *
  * @throws {Error} Throws Error if request failed
- * @returns {Promise} Promise returning null if success
+ * @returns {Promise} Promise returning true if success
 */
 TokenIssuerService.prototype.deleteAllTokens = function() {
     return this.httpClient.get(this.backendUrl, 'deleteAllRequests').then(json => {
@@ -94,6 +115,6 @@ TokenIssuerService.prototype.deleteAllTokens = function() {
             throw new Error(errFailed)
         }
 
-        return null
+        return true
     })
 }
