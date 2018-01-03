@@ -171,4 +171,11 @@ module.exports = {
      * @default
      */
     socialProfile: "1.3.6.1.4.1.53318295.12",
+
+    /**
+     * The OID in dotted notation for a completed course's name.
+     * @constant
+     * @default
+     */
+    courseName: "1.3.6.1.4.1.53318295.13",
 }
