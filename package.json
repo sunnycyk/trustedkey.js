@@ -20,6 +20,6 @@
   "devDependencies": {
     "eslint": "^4.3.0",
     "eslint-plugin-hapi": "^4.0.0",
-    "jsdoc": "^3.4.3"
+    "jsdoc": "^3.5.0"
   }
 }
