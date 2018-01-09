@@ -138,6 +138,27 @@ module.exports = {
     country: "2.5.4.6",
 
     /**
+     * The OID in dotted notation for the locality.
+     * @constant
+     * @default
+     */
+    locality: "2.5.4.7",
+
+    /**
+     * The OID in dotted notation for the postal code.
+     * @constant
+     * @default
+     */
+    postalCode: "2.5.4.17",
+
+    /**
+     * The OID in dotted notation for the state or province.
+     * @constant
+     * @default
+     */
+    stateOrProvinceName: "2.5.4.8",
+
+    /**
      * The OID in dotted notation for the organization's name.
      * @constant
      * @default
@@ -164,6 +185,13 @@ module.exports = {
      * @default
      */
     postalAddress: "2.5.4.16",
+
+    /**
+     * The OID in dotted notation for a person's street address.
+     * @constant
+     * @default
+     */
+    streetAddress: "2.5.4.9",
 
     /**
      * The OID in dotted notation for a person's social profile URL.
