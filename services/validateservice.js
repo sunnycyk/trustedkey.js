@@ -21,7 +21,7 @@ const ValidateService = module.exports = function(backendUrl) {
 
 function validate(httpClient, address) {
 
-    Assert.strictEqual(typeof address, "string", `address must be of type "string"`)
+    Assert.strictEqual(typeof address, "string", 'address must be of type `string`')
 
     return httpClient.get('isRevoked', {
         address: address
@@ -39,7 +39,7 @@ function validate(httpClient, address) {
 */
 ValidateService.prototype.getTransactionStatus = function(txid) {
 
-    Assert.strictEqual(typeof txid, "string", `txid must be of type "string"`)
+    Assert.strictEqual(typeof txid, "string", 'txid must be of type `string`')
 
     return this.httpClient.get('getTransactionStatus', {
         txid: txid
@@ -91,7 +91,7 @@ ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
 */
 ValidateService.prototype.keyInfo = function(address) {
 
-    Assert.strictEqual(typeof address, "string", `address must be of type "string"`)
+    Assert.strictEqual(typeof address, "string", 'address must be of type `string`')
 
     return this.httpClient.get('keyInfo', {address: address})
         .then(r => r.data)

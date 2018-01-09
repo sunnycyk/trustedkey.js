@@ -27,8 +27,9 @@ const CredentialRegistryService = module.exports = function(backendUrl, appId, a
  */
 CredentialRegistryService.prototype.revokeCredential = function(delegateAddressString, keyPair, address) {
 
-    Assert.strictEqual(typeof delegateAddressString, "string", `delegateAddressString must be of type "string"`)
-    Assert.strictEqual(typeof keyPair, "object", `keyPair must be of type "object"`)
+    Assert.strictEqual(typeof delegateAddressString, "string", 'delegateAddressString must be of type `string`')
+    Assert.strictEqual(typeof keyPair, "object", 'keyPair must be of type `object`')
+    Assert.strictEqual(0 in keyPair, false, 'keyPair should not be Buffer or Array-like')
 
     const addressWithout0x = delegateAddressString.replace('0x', '')
     var hash = Crypto.createHash('sha256')

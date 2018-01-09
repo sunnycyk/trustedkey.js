@@ -1,5 +1,6 @@
 const RP          = require('request-promise-native')
 const Assert      = require('assert')
+const URL         = require('url')
 
 const Utils       = require('../utils')
 
@@ -14,9 +15,9 @@ const Utils       = require('../utils')
  */
 const httpUtils = module.exports = function(backendUrl, appId, appSecret) {
 
-    Assert.strictEqual(typeof backendUrl, "string", `backendUrl must be of type "string"`)
-    Assert.strictEqual(typeof appId, "string", `backendUrl must be of type "string"`)
-    Assert.strictEqual(typeof appSecret, "string", `backendUrl must be of type "string"`)
+    Assert.strictEqual(typeof backendUrl, "string", 'backendUrl must be of type `string`')
+    // Assert.strictEqual(typeof appId, "string", 'appId must be of type `string`')
+    // Assert.strictEqual(typeof appSecret, "string", 'appSecret must be of type `string`')
 
     this.backendUrl = backendUrl
     this.appId = appId
@@ -38,19 +39,25 @@ function getAuthHeader(url, appId, appSecret, body) {
 }
 
 
+httpUtils.prototype.getHeaders = function(absoluteUrl, body) {
+
+    if (this.appId && this.appSecret) {
+        return {Authorization: getAuthHeader(absoluteUrl, this.appId, this.appSecret, body)}
+    }
+    else {
+        return {}
+    }
+}
+
+
 httpUtils.prototype.get = function(path, params) {
 
     const url = Utils.mergeQueryParams(path, params||{})
-    const headers = {}
-    if(this.appId && this.appSecret) {
-        headers['Authorization'] = getAuthHeader(this.backendUrl + url, this.appId, this.appSecret)
-    }
-
+    const absoluteUrl = URL.resolve(this.backendUrl, url)
     return RP.get({
-        baseUrl: this.backendUrl,
-        uri: url,
+        uri: absoluteUrl,
         json: true,
-        headers: headers
+        headers: this.getHeaders(absoluteUrl)
     })
 }
 
@@ -58,17 +65,13 @@ httpUtils.prototype.get = function(path, params) {
 httpUtils.prototype.post = function(path, params, jsonBody) {
 
     const url = Utils.mergeQueryParams(path, params||{})
+    const absoluteUrl = URL.resolve(this.backendUrl, url)
+    // Assume RP does the exact same serialization of the body
     const body = jsonBody === undefined ? "" : JSON.stringify(jsonBody)
-    const headers = {}
-    if(this.appId && this.appSecret) {
-        headers['Authorization'] = getAuthHeader(this.backendUrl + url, this.appId, this.appSecret, body)
-    }
-
     return RP.post({
-        baseUrl: this.backendUrl,
-        uri: url,
+        uri: absoluteUrl,
         json: true,
-        headers: headers,
+        headers: this.getHeaders(absoluteUrl, body),
         body: jsonBody
     })
 }

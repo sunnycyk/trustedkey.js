@@ -25,8 +25,8 @@ const utils = module.exports = {}
  */
 utils.mergeQueryParams = function(path, params) {
 
-    Assert.strictEqual(typeof path, "string", `path must be of type "string"`)
-    Assert.strictEqual(typeof params, "object", `params must be of type "object"`)
+    Assert.strictEqual(typeof path, "string", 'path must be of type `string`')
+    Assert.strictEqual(typeof params, "object", 'params must be of type `object`')
 
     const url = URL.parse(path, true)
     Object.keys(params||{})
@@ -57,7 +57,7 @@ utils.sha256 = function(blob, encoding) {
  */
 utils.serialToAddress = function(serialhex) {
 
-    Assert.strictEqual(typeof serialhex, "string", `serialhex must be of type "string"`)
+    Assert.strictEqual(typeof serialhex, "string", 'serialhex must be of type `string`')
 
     const paddedSerial = String('00000000000000000000000000000000000000'+serialhex).slice(-40)
     return "0x" + paddedSerial
@@ -141,7 +141,7 @@ utils.createEcdsaJws = function(message, credential, header) {
  */
 utils.verifyJws = function(jws, secretCallback) {
 
-    Assert.strictEqual(typeof jws, "string", `jws must be of type "string"`)
+    Assert.strictEqual(typeof jws, "string", 'jws must be of type `string`')
 
     const parts = jws.split(/\./g)
     if (parts.length !== 3) {       // JWE has 5 parts
@@ -206,7 +206,7 @@ utils.verifyJws = function(jws, secretCallback) {
 utils.jwkToHex = function(jwk) {
 
     if (jwk.crv === "P-256" && jwk.kty === "EC") {
-        Assert.strictEqual(typeof jwk.d, "undefined", `jwk.d must be of type "undefined"`)
+        Assert.strictEqual(typeof jwk.d, "undefined", 'jwk.d must be of type `undefined`')
         // Convert x,y coordinates from JWK to hex encoded public key
         const hex = "04" + Buffer.from(jwk.x, "base64").toString("hex") + Buffer.from(jwk.y, "base64").toString("hex")
         Assert.strictEqual(hex.length, 130)
@@ -243,7 +243,7 @@ utils.hexToJwk = function(pubKeyHex) {
 utils.jwkToPem = function(jwk) {
 
     if (jwk.crv === "P-256" && jwk.kty === "EC") {
-        Assert.strictEqual(typeof jwk.d, "undefined", `jwk.d must be of type "undefined"`)
+        Assert.strictEqual(typeof jwk.d, "undefined", 'jwk.d must be of type `undefined`')
         // Convert x,y coordinates from JWK to base64 encoded public key
         const all = Buffer.concat([Buffer.from(jwk.x, "base64"), Buffer.from(jwk.y, "base64")]).toString("base64")
         Assert.strictEqual(all.length, 88)
@@ -267,7 +267,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
  */
 utils.checkECDSA = function(curveName, message, pubkey, signature) {
 
-    Assert.strictEqual(typeof curveName, "string", `curveName must be of type "string"`)
+    Assert.strictEqual(typeof curveName, "string", 'curveName must be of type `string`')
 
     // Verify a digest value
     var digest = utils.sha256(message, 'hex')
@@ -292,7 +292,7 @@ utils.checkECDSA = function(curveName, message, pubkey, signature) {
  */
 utils.userPubKeyHexToAddress = function(pubkeyhex) {
 
-    Assert.strictEqual(typeof pubkeyhex, "string", `pubkeyhex must be of type "string"`)
+    Assert.strictEqual(typeof pubkeyhex, "string", 'pubkeyhex must be of type `string`')
     // Sign a digest value
     // Get the uncompressed public key without prefix, take the sha256 hash, and skip the first 12 bytes
     var blob = new Buffer(pubkeyhex.substr(2), 'hex')
@@ -351,8 +351,8 @@ utils.wait = function(duration_ms) {
  */
 utils.waitUntil = function(ms, callback) {
 
-    Assert.strictEqual(typeof ms, "number", `ms must be of type "number"`)
-    Assert.strictEqual(typeof callback, "function", `callback must be of type "function"`)
+    Assert.strictEqual(typeof ms, "number", 'ms must be of type `number`')
+    Assert.strictEqual(typeof callback, "function", 'callback must be of type `function`')
     return utils.wait(ms > 1000 ? 1000 : ms)
         .then(_ => callback())
         .then(done => {
