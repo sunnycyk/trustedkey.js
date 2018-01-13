@@ -206,4 +206,11 @@ module.exports = {
      * @default
      */
     courseName: "1.3.6.1.4.1.53318295.13",
+
+    /**
+     * The OID in dotted notation for a completed course's contents.
+     * @constant
+     * @default
+     */
+    courseContents: "1.3.6.1.4.1.53318295.14",
 }
