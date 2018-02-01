@@ -61,6 +61,18 @@ describe("Utils", _ => {
     })
   })
 
+  describe("dateToString", _ => {
+    it("turns current Date into string", () => {
+      Assert.strictEqual(typeof Utils.dateToString(new Date), "string")
+    })
+    it("turns past Date into short string", () => {
+      Assert.strictEqual(Utils.dateToString(new Date(Date.UTC(1970,0,1,0,2,3))), "700101000203Z")
+    })
+    it("turns future Date into long string", () => {
+      Assert.strictEqual(Utils.dateToString(new Date(Date.UTC(2080,0,1,0,0,0))), "20800101000000Z")
+    })
+  })
+
   describe("http", _ => {
     let app, http, server
     const secret = "secret"
@@ -149,4 +161,5 @@ describe("Utils", _ => {
       Assert.strictEqual(await http.get("http://localhost:"+server.address().port+"/get"), "gotten")
     })
   })
+
 })

@@ -8,6 +8,7 @@ const Crypto    = require('crypto')
 const Assert    = require('assert')
 const Jsrsasign = require('jsrsasign')
 const URL       = require('url')
+const Moment    = require('moment')
 
 /**
  * Static Trustedkey utility functions
@@ -322,8 +323,8 @@ utils.promisify = function(call) {
 
 /**
  * Generate a 32-byte random nonce.
- * @param {String} encoding - Encoding for result (default base64)
- * @param {Number} length - Number of bytes for the result (default 32)
+ * @param {String?} encoding - Encoding for result (default base64)
+ * @param {Number?} length - Number of bytes for the result (default 32)
  * @returns {String} The encoding of the nonce
  */
 utils.generateNonce = function(encoding, length) {
@@ -367,7 +368,7 @@ utils.waitUntil = function(ms, callback) {
 
 /**
  * Generate a new key pair.
- * @param {string} curveName The name of the EC curve. (optional)
+ * @param {string?} curveName The name of the EC curve. (optional)
  * @return {Object} New jsrsasign key object of given curve
  */
 utils.generateKeyPair = function(curveName) {
@@ -401,6 +402,7 @@ utils.oneTimePassword = function(key, message) {
  */
 utils.parseHexString = function(hex) {
 
+    Assert.strictEqual(typeof hex, "string", 'hex must be of type `string`')
     return decodeURIComponent(hex.replace(/(..)/g,"%$1"))
 }
 
@@ -411,6 +413,9 @@ utils.parseHexString = function(hex) {
  * @returns {Date} New date object
  */
 utils.parseX509Date = function(date) {
+
+    Assert.strictEqual(typeof date, "string", 'date must be of type `string`')
+
     var match = /^([0-9]{2,4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})Z$/.exec(date)
     if (match === null) {
         return null
@@ -418,4 +423,20 @@ utils.parseX509Date = function(date) {
     //- Where YY is less than 50, the year shall be interpreted as 20YY.
     const year = match[1].length === 2 && match[1] < 50 ? 2000 + parseInt(match[1]) : match[1]
     return new Date(Date.UTC(year, match[2]-1, match[3], match[4], match[5], match[6]))
+}
+
+
+/**
+ * Create ASN.1 YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ into a string.
+ * @param {Date} date Date object.
+ * @returns {string} New ASN.1 YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ date string
+ */
+utils.dateToString = function(date) {
+
+    if (date.getFullYear() < 1950 || date.getFullYear() > 2049) {
+        return Moment(date).utc().format("YYYYMMDDHHmmss[Z]", date)
+    }
+    else {
+        return Moment(date).utc().format("YYMMDDHHmmss[Z]", date)
+    }
 }

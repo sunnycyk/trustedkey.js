@@ -1,6 +1,6 @@
 {
   "name": "trustedkey-js",
-  "version": "0.2.21",
+  "version": "0.2.22",
   "private": true,
   "files": [
     "microutils.js",
@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "jsrsasign": "^8.0.3",
+    "moment": "^2.20.1",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.3"
   },
@@ -23,7 +24,7 @@
     "eslint": "^4.3.0",
     "eslint-plugin-hapi": "^4.0.0",
     "express": "^4.16.2",
-    "mocha": "^4.1.0",
-    "jsdoc": "^3.5.0"
+    "jsdoc": "^3.5.0",
+    "mocha": "^4.1.0"
   }
 }
