@@ -7,6 +7,7 @@ devDependencies:
   body-parser: 1.18.2
   eslint: 4.14.0
   eslint-plugin-hapi: 4.1.0
+  eslint-plugin-mocha: 4.11.0
   express: 4.16.2
   jsdoc: 3.5.5
   mocha: 4.1.0
@@ -472,6 +473,14 @@ packages:
     dev: true
     resolution:
       integrity: sha512-z1yUoSWArx6pXaC0FoWRFpqjbHn8QWonJiTVhJmiC14jOAT7FZKdKWCkhM4jQrgrkEK9YEv3p2HuzSf5dtWmuQ==
+  /eslint-plugin-mocha/4.11.0:
+    dependencies:
+      ramda: 0.24.1
+    dev: true
+    peerDependencies:
+      eslint: ^2.0.0 || ^3.0.0 || ^4.0.0
+    resolution:
+      integrity: sha1-kRk6L1XiCl41l0BUoAidMBmO5Xg=
   /eslint-scope/3.7.1:
     dependencies:
       esrecurse: 4.2.0
@@ -1306,6 +1315,10 @@ packages:
       node: '>=0.6'
     resolution:
       integrity: sha512-eRzhrN1WSINYCDCbrz796z37LOe3m5tmW7RQf6oBntukAG1nmovJvhnwHHRMAfeoItc1m2Hk02WER2aQ/iqs+A==
+  /ramda/0.24.1:
+    dev: true
+    resolution:
+      integrity: sha1-w7d1UZfzW43DUCIoJixMkd22uFc=
   /range-parser/1.2.0:
     dev: true
     engines:
@@ -1779,6 +1792,7 @@ specifiers:
   body-parser: ^1.18.2
   eslint: ^4.3.0
   eslint-plugin-hapi: ^4.0.0
+  eslint-plugin-mocha: ^4.11.0
   express: ^4.16.2
   jsdoc: ^3.5.0
   jsrsasign: ^8.0.3
