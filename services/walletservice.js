@@ -32,15 +32,21 @@ const WalletService = module.exports = function(backendUrl, appId, appSecret) {
  * @param {String} callbackUrl - Callback URL
  * @param {String} documentUrl - Document URL
  * @param {String} objectIds - OIDs
+ * @param {String?} message - OIDs
+ * @param {String?} callbackType - OIDs
+ * @param {number?} timeout - OIDs
  * @returns {Promise} JSON result from API
  */
-WalletService.prototype.request = function(address, nonce, callbackUrl, documentUrl, objectIds) {
+WalletService.prototype.request = function(address, nonce, callbackUrl, documentUrl, objectIds, message, callbackType, timeout) {
     return this.httpClient.get('request', {
         address: address,
         nonce: nonce,
         callbackUrl: callbackUrl,
         documentUrl: documentUrl,
         objectIds: objectIds,
+        message: message,
+        callbackType: callbackType,
+        timeout: timeout,
     }).then(checkSuccess)
 }
 
