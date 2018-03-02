@@ -206,12 +206,15 @@ utils.verifyJws = function(jws, secretCallback) {
  */
 utils.jwkToHex = function(jwk) {
 
-    if (jwk.crv === "P-256" && jwk.kty === "EC") {
-        Assert.strictEqual(typeof jwk.d, "undefined", 'jwk.d must be of type `undefined`')
+    Assert.strictEqual(typeof jwk.d, "undefined", 'jwk.d must be of type `undefined`')
+    if (jwk.kty === "EC" && jwk.crv === "P-256") {
         // Convert x,y coordinates from JWK to hex encoded public key
-        const hex = "04" + Buffer.from(jwk.x, "base64").toString("hex") + Buffer.from(jwk.y, "base64").toString("hex")
+        const hex = "04" + Buffer.concat([Buffer.from(jwk.x, "base64"), Buffer.from(jwk.y, "base64")]).toString("hex")
         Assert.strictEqual(hex.length, 130)
         return hex
+    }
+    else if (jwk.kty === 'RSA' && jwk.e === 'AQAB') {
+        return Buffer.from(jwk.n, "base64").toString("hex")
     }
     Assert(false, "Unsupported JWK:"+jwk)
 }
@@ -219,12 +222,12 @@ utils.jwkToHex = function(jwk) {
 
 /**
  * Convert a hex public key into JWK
- * @param {String} pubKeyHex - hex encoded public key
+ * @param {String} pubKeyHex - hex encoded ECC public key
  * @return {String} JSON Web Key
  */
 utils.hexToJwk = function(pubKeyHex) {
     Assert.strictEqual(pubKeyHex.length, 130)
-    Assert(pubKeyHex.startsWith("04"))
+    Assert.ok(pubKeyHex.startsWith("04"), 'pubKeyHex must be an uncompressed ECC public key')
 
     const buffer = Buffer.from(pubKeyHex, 'hex')
     return {
@@ -237,21 +240,83 @@ utils.hexToJwk = function(pubKeyHex) {
 
 
 /**
+ * Convert a PEM encoded public key to JWK
+ * @param {string} pem Public key in PEM format
+ * @returns {string} JSON Web Key
+ */
+utils.pemToJwk = function(pem) {
+
+    const rsaSmall = pem.match(/^M..wDQYJKoZIhvcNAQEBBQADS.Aw([^-]+)/m)
+    if (rsaSmall) {
+        const pub = Buffer.from(rsaSmall[1], "base64")
+        const size = pub.readInt8(2)
+        const n = utils.base64url(pub.slice(4, 3+size))
+        const e = utils.base64url(pub.slice(5+size))
+        return {
+            "kty": "RSA",
+            "n": n,
+            "e": e
+        }
+    }
+
+    const rsa = pem.match(/^MI....ANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC([^-]+)/m)
+    if (rsa) {
+        const pub = Buffer.from(rsa[1], "base64")
+        const size = pub.readInt16BE(0)
+        const n = utils.base64url(pub.slice(3, 2+size))
+        const e = utils.base64url(pub.slice(4+size))
+        return {
+            "kty": "RSA",
+            "n": n,
+            "e": e
+        }
+    }
+
+    const ec = pem.match(/^M..wEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE([^-]+)/m)
+    if (ec) {
+        const pub = Buffer.from(ec[1], "base64")
+        const x = utils.base64url(pub.slice(0,32))
+        const y = utils.base64url(pub.slice(32,64))
+        return {
+            "kty": "EC",
+            "crv": "P-256",
+            "x": x,
+            "y": y
+        }
+    }
+
+    Assert(false, "Unsupported PEM:"+pem)
+}
+
+
+/**
  * Convert a JWK into a hex public key
  * @param {String} jwk - JSON Web Key for public EC key
  * @return {String} string with PEM public key
  */
 utils.jwkToPem = function(jwk) {
 
-    if (jwk.crv === "P-256" && jwk.kty === "EC") {
-        Assert.strictEqual(typeof jwk.d, "undefined", 'jwk.d must be of type `undefined`')
+    Assert.strictEqual(typeof jwk.d, "undefined", 'jwk.d must be of type `undefined`')
+    if (jwk.kty === "EC" && jwk.crv === "P-256") {
         // Convert x,y coordinates from JWK to base64 encoded public key
         const all = Buffer.concat([Buffer.from(jwk.x, "base64"), Buffer.from(jwk.y, "base64")]).toString("base64")
         Assert.strictEqual(all.length, 88)
         // Basic template for the PEM; we'll overwrite the coordinates in-place
         return `-----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
------END PUBLIC KEY-----`
+-----END PUBLIC KEY-----`.replace(/(.{64})/g,'$1\n')
+    }
+    else if (jwk.kty === "RSA") {
+        // Convert public key from JWK to base64 encoded public key
+        const pub = Buffer.from(jwk.n, "base64")
+        const exp = Buffer.from(jwk.e, "base64")
+        const pubHex = "0" + (pub.length+1).toString(16) + "00"
+        const expHex = "020" + exp.length
+        const all = Buffer.concat([Buffer.from(pubHex, "hex"), pub, Buffer.from(expHex, "hex"), exp]).toString("base64")
+        // Basic template for the PEM; we'll overwrite the coordinates in-place
+        return `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC${all}
+-----END PUBLIC KEY-----`.replace(/(.{64})/g,'$1\n')
     }
     Assert(false, "Unsupported JWK:"+jwk)
 }
@@ -288,13 +353,15 @@ utils.checkECDSA = function(curveName, message, pubkey, signature) {
 /**
  * Convert a user public key to blockchain address
  *
- * @param {String} pubkeyhex - User public key (hex encoded)
+ * @param {String} pubkeyhex - User ECC public key (hex encoded)
  * @returns {String} User address with leading 0x
  */
 utils.userPubKeyHexToAddress = function(pubkeyhex) {
 
     Assert.strictEqual(typeof pubkeyhex, "string", 'pubkeyhex must be of type `string`')
-    // Sign a digest value
+    Assert.ok(pubkeyhex.startsWith('04'), 'pubkeyhex must be an uncompressed ECC public key')
+    Assert.strictEqual(pubkeyhex.length, 130)
+
     // Get the uncompressed public key without prefix, take the sha256 hash, and skip the first 12 bytes
     var blob = new Buffer(pubkeyhex.substr(2), 'hex')
     var digest = utils.sha256(blob, 'hex')

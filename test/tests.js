@@ -19,6 +19,84 @@ describe("OID", _ => {
 
 describe("Utils", _ => {
 
+    const jwkEC = {"kty":"EC","crv":"P-256","x": "P77Gc65MCzCAFSL3ym4jzVkBHPFRk2wREBVmi94ga74","y": "qjzjb7UInV3zDzN0wwkCaVqtyOLGaCmLBdLee9SXKQw"}
+    const pemEC = `-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEP77Gc65MCzCAFSL3ym4jzVkBHPFR
+k2wREBVmi94ga76qPONvtQidXfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
+-----END PUBLIC KEY-----`
+    const jwkRSA = {"kty":"RSA","n":"zghKyUzealTP0yG2JlTcBSeYkA_WNKLCMZTQRbtEr9K11oaDsDmUSY-s3clehbbZ9SWNy9xydQfzb0BMdY2-omWT6kodYX8f-6p-4OCno3LHE5yM4UOkEZnc1lOz5VzUa-deMEwkLJXiquE1wQbnA6yaQIdy8vADNhIDhQKxIRFOFDbk1S01sEl-Oc3VFcY0VsoapCVpAEfr1LDCetOe6RxsvFDFex09nuvW5ehFbjioOvY6_jG-1ZcTKBasDVMWFLoECzlYfPBQfBiip2rWUzWW9chCnB0-b29Qg4R9n1glTVqqNQj0F9grWetJXw2NXQOVMKn-w81WzwH4s3IZQw","e":"AQAB"}
+    const pemRSA = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzghKyUzealTP0yG2JlTc
+BSeYkA/WNKLCMZTQRbtEr9K11oaDsDmUSY+s3clehbbZ9SWNy9xydQfzb0BMdY2+
+omWT6kodYX8f+6p+4OCno3LHE5yM4UOkEZnc1lOz5VzUa+deMEwkLJXiquE1wQbn
+A6yaQIdy8vADNhIDhQKxIRFOFDbk1S01sEl+Oc3VFcY0VsoapCVpAEfr1LDCetOe
+6RxsvFDFex09nuvW5ehFbjioOvY6/jG+1ZcTKBasDVMWFLoECzlYfPBQfBiip2rW
+UzWW9chCnB0+b29Qg4R9n1glTVqqNQj0F9grWetJXw2NXQOVMKn+w81WzwH4s3IZ
+QwIDAQAB
+-----END PUBLIC KEY-----`
+
+    describe("jwkToHex", () => {
+        it("converts RSA key", () => {
+            const hex = 'ce084ac94cde6a54cfd321b62654dc052798900fd634a2c23194d045bb44afd2b5d68683b03994498facddc95e85b6d9f5258dcbdc727507f36f404c758dbea26593ea4a1d617f1ffbaa7ee0e0a7a372c7139c8ce143a41199dcd653b3e55cd46be75e304c242c95e2aae135c106e703ac9a408772f2f0033612038502b121114e1436e4d52d35b0497e39cdd515c63456ca1aa425690047ebd4b0c27ad39ee91c6cbc50c57b1d3d9eebd6e5e8456e38a83af63afe31bed597132816ac0d531614ba040b39587cf0507c18a2a76ad6533596f5c8429c1d3e6f6f5083847d9f58254d5aaa3508f417d82b59eb495f0d8d5d039530a9fec3cd56cf01f8b3721943'
+            Assert.strictEqual(Utils.jwkToHex(jwkRSA), hex)
+        })
+        it("converts EC key", () => {
+            const hex = '043fbec673ae4c0b30801522f7ca6e23cd59011cf151936c111015668bde206bbeaa3ce36fb5089d5df30f3374c30902695aadc8e2c668298b05d2de7bd497290c'
+            Assert.strictEqual(Utils.jwkToHex(jwkEC), hex)
+        })
+        it("throws on invalid jwk", () => {
+            Assert.throws(() => Utils.jwkToHex({kty:"RSA"}), /Unsupported/)
+            Assert.throws(() => Utils.jwkToHex({}), /Unsupported/)
+        })
+        it("throws on RSA jwk with PK", () => {
+            Assert.throws(() => Utils.jwkToHex(Object.assign({d:"s83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE"}, jwkEC)))
+            Assert.throws(() => Utils.jwkToHex(Object.assign({d:"s83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE"}, jwkRSA)))
+        })
+    })
+
+    describe("pemToJwk", () => {
+        it("converts RSA key", () => {
+            Assert.deepStrictEqual(Utils.pemToJwk(pemRSA), jwkRSA)
+        })
+        it("converts EC key", () => {
+            Assert.deepStrictEqual(Utils.pemToJwk(pemEC), jwkEC)
+        })
+        it("converts small RSA key", () => {
+            Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
+MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMiwb6VuAvJwHJyRZq1PJO8PpaaYjOXp
+iUpBdB8ZntA5vj9KB/ke4HU3gO/hqLEXZ7JkBW6O+ID0ZWlubkqkD7UCAwEAAQ==
+-----END PUBLIC KEY-----`),
+            {
+                "kty": "RSA",
+                "n": "yLBvpW4C8nAcnJFmrU8k7w-lppiM5emJSkF0Hxme0Dm-P0oH-R7gdTeA7-GosRdnsmQFbo74gPRlaW5uSqQPtQ",
+                "e": "AQAB"
+            })
+        })
+        it("converts small RSA key, e=3", () => {
+            Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
+MFowDQYJKoZIhvcNAQEBBQADSQAwRgJBAM0cWN/vHXq5p6kIGCQ68JALYAUlUI/2
+RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
+-----END PUBLIC KEY-----`),
+            {
+                "kty": "RSA",
+                "n": "zRxY3-8dermnqQgYJDrwkAtgBSVQj_ZFwBHg2s7ZMhvb4fleljpouLbuh51dcuroR9gYR9IvFDyOmQsV4bkEiQ",
+                "e": "Aw"
+            })
+        })
+        it("throws on invalid PEM", () => {
+            Assert.throws(() => Utils.pemToJwk(``), /Unsupported/)
+        })
+    })
+
+    describe("jwkToPem", () => {
+        it("converts RSA key", () => {
+            Assert.strictEqual(Utils.jwkToPem(jwkRSA), pemRSA)
+        })
+        it("converts EC key", () => {
+            Assert.strictEqual(Utils.jwkToPem(jwkEC), pemEC)
+        })
+    })
+
     describe("mergeQueryParams", _ => {
         it("accepts null arg", () => {
             Assert.strictEqual(Utils.mergeQueryParams("abc", null), "abc")
