@@ -239,6 +239,29 @@ utils.hexToJwk = function(pubKeyHex) {
 }
 
 
+function createDerChunk(tag, ...nested) {
+    let header
+    const size = nested.reduce((p,b) => p+b.length, 0)
+    if (size < 0x80) {
+        header = Buffer.alloc(2)
+        header.writeUInt8(size, 1)
+    }
+    else if (size < 0x100) {
+        header = Buffer.alloc(3)
+        header.writeUInt8(0x81, 1)
+        header.writeUInt8(size, 2)
+    }
+    else {
+        Assert.ok(size <= 0xffff, "Invalid PEM size: "+size)
+        header = Buffer.alloc(4)
+        header.writeUInt8(0x82, 1)
+        header.writeUInt16BE(size, 2)
+    }
+    header.writeUInt8(tag)
+    return Buffer.concat([header, ...nested])
+}
+
+
 function readDerChunk(buffer, offset=1) {
     let size = buffer.readUInt8(offset++)
     if (size === 0x81) {
@@ -323,12 +346,15 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
         // Convert public key from JWK to base64 encoded public key
         const pub = Buffer.from(jwk.n, "base64")
         const exp = Buffer.from(jwk.e, "base64")
-        const pubHex = "0" + (pub.length+1).toString(16) + "00"
-        const expHex = "020" + exp.length
-        const all = Buffer.concat([Buffer.from(pubHex, "hex"), pub, Buffer.from(expHex, "hex"), exp]).toString("base64")
+        const pubDer = createDerChunk(0x02, Buffer.alloc(1), pub)
+        const expDer = createDerChunk(0x02, exp)
+        const key = createDerChunk(0x30, pubDer, expDer)
+        const pkey = createDerChunk(0x03, Buffer.alloc(1), key)
+        const der = createDerChunk(0x30, Buffer.from("300d06092a864886f70d0101010500", "hex"), pkey)
+        const all = der.toString("base64")
         // Basic template for the PEM; we'll overwrite the coordinates in-place
         return `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC${all}
+${all}
 -----END PUBLIC KEY-----`.replace(/(.{64})/g,'$1\n')
     }
     Assert(false, "Unsupported JWK:"+jwk)
