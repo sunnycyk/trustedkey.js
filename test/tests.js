@@ -57,6 +57,16 @@ QwIDAQAB
     describe("pemToJwk", () => {
         it("converts RSA key", () => {
             Assert.deepStrictEqual(Utils.pemToJwk(pemRSA), jwkRSA)
+            Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDNXFJO5cFMie4oQraVqnniopSW
+V9hCut6WluPVbHblvqyH90dCqfZo+M6uABxixrxyWE/U6KJlAAnoSTW0qEuuAYlH
+ZPFsmMv+kw7D1ZBoPBDsPvua0djiiVSyMzaaZHV/d2vABchUoCdp/CVPjpsSqnjH
+xcbCgN76nCO1NGBgbQIDAQAB
+-----END PUBLIC KEY-----`), {
+                "e": "AQAB",
+                "kty": "RSA",
+                "n": "zVxSTuXBTInuKEK2lap54qKUllfYQrrelpbj1Wx25b6sh_dHQqn2aPjOrgAcYsa8clhP1OiiZQAJ6Ek1tKhLrgGJR2TxbJjL_pMOw9WQaDwQ7D77mtHY4olUsjM2mmR1f3drwAXIVKAnafwlT46bEqp4x8XGwoDe-pwjtTRgYG0"
+            })
         })
         it("converts EC key", () => {
             Assert.deepStrictEqual(Utils.pemToJwk(pemEC), jwkEC)

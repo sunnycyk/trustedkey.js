@@ -239,53 +239,66 @@ utils.hexToJwk = function(pubKeyHex) {
 }
 
 
+function readDerChunk(buffer, offset=1) {
+    let size = buffer.readUInt8(offset++)
+    if (size === 0x81) {
+        size = buffer.readUInt8(offset++)
+        Assert.ok(size >= 0x80, "Invalid PEM size: "+size)
+    }
+    else if (size === 0x82) {
+        size = buffer.readUInt16BE(offset)
+        Assert.ok(size >= 0x100, "Invalid PEM size: "+size)
+        offset += 2
+    }
+    else {
+        Assert.ok(size < 0x80, "Invalid PEM size: "+size)
+    }
+    return buffer.slice(offset, offset+size)
+}
+
+
 /**
- * Convert a PEM encoded public key to JWK
+ * Convert a PEM encoded public key to JWK, with minimal checking.
  * @param {string} pem Public key in PEM format
  * @returns {string} JSON Web Key
  */
 utils.pemToJwk = function(pem) {
 
-    const rsaSmall = pem.match(/^M..wDQYJKoZIhvcNAQEBBQADS.Aw([^-]+)/m)
-    if (rsaSmall) {
-        const pub = Buffer.from(rsaSmall[1], "base64")
-        const size = pub.readInt8(2)
-        const n = utils.base64url(pub.slice(4, 3+size))
-        const e = utils.base64url(pub.slice(5+size))
+    const base64 = pem.match(/^-----BEGIN PUBLIC KEY-----([^-]+)-----END PUBLIC KEY-----/)
+    if (!base64) {
+        Assert(false, "Unsupported PEM:"+pem)
+    }
+    const der = Buffer.from(base64[1], 'base64')
+    const main = readDerChunk(der)
+    const type = readDerChunk(main)
+    const pub = readDerChunk(main, type.length+3)
+    switch(type.toString("hex")) {
+    case "06092a864886f70d0101010500": {
+        // RSA
+        const key = readDerChunk(pub, 2)
+        const n = readDerChunk(key).slice(1)
+        const lenSize = n.length >= 0x100 ? 3 : (n.length >= 0x80 ? 2 : 1)
+        const e = readDerChunk(key, n.length + lenSize + 3)
         return {
             "kty": "RSA",
-            "n": n,
-            "e": e
+            "n": utils.base64url(n),
+            "e": utils.base64url(e)
         }
     }
-
-    const rsa = pem.match(/^MI....ANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC([^-]+)/m)
-    if (rsa) {
-        const pub = Buffer.from(rsa[1], "base64")
-        const size = pub.readInt16BE(0)
-        const n = utils.base64url(pub.slice(3, 2+size))
-        const e = utils.base64url(pub.slice(4+size))
-        return {
-            "kty": "RSA",
-            "n": n,
-            "e": e
-        }
-    }
-
-    const ec = pem.match(/^M..wEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE([^-]+)/m)
-    if (ec) {
-        const pub = Buffer.from(ec[1], "base64")
-        const x = utils.base64url(pub.slice(0,32))
-        const y = utils.base64url(pub.slice(32,64))
+    case "06072a8648ce3d020106082a8648ce3d030107": {
+        //EC
+        const x = pub.slice(2,34)
+        const y = pub.slice(34,66)
         return {
             "kty": "EC",
             "crv": "P-256",
-            "x": x,
-            "y": y
+            "x": utils.base64url(x),
+            "y": utils.base64url(y)
         }
     }
-
-    Assert(false, "Unsupported PEM:"+pem)
+    default:
+        Assert(false, "Unsupported PEM type:"+type.toString("hex"))
+    }
 }
 
 

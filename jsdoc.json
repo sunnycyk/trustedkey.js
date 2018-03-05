@@ -2,7 +2,8 @@
     "source": {
         "exclude": [
             "node_modules",
-            "docs"
+            "docs",
+            "test"
         ]
     },
     "templates": {
