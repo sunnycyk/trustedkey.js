@@ -94,12 +94,14 @@ WalletService.prototype.registerDevice = function(deviceTokenString) {
  * @param {String} address - Device to notify
  * @param {String} nonce - Request nonce
  * @param {String} message - Notification message
+ * @param {String?} appId - App-ID of receiving app
  * @returns {Promise} JSON result from API
  */
-WalletService.prototype.notify = function(address, nonce, message) {
+WalletService.prototype.notify = function(address, nonce, message, appId) {
     return this.httpClient.get('notify', {
         address: address,
         nonce: nonce,
         message: message,
+        appId: appId,
     }).then(checkSuccess)
 }
