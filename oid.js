@@ -213,4 +213,11 @@ module.exports = {
      * @default
      */
     courseContents: "1.3.6.1.4.1.53318295.14",
+
+    /**
+     * The OID in dotted notation for a claim that the user is at least 21 years old.
+     * @constant
+     * @default
+     */
+    age21orUp: "1.3.6.1.4.1.53318295.21",
 }
