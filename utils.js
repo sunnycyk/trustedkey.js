@@ -429,8 +429,8 @@ utils.promisify = function(call) {
 
 /**
  * Generate a 32-byte random nonce.
- * @param {String?} encoding - Encoding for result (default base64)
- * @param {Number?} length - Number of bytes for the result (default 32)
+ * @param {String} [encoding] - Encoding for result (default base64)
+ * @param {Number} [length] - Number of bytes for the result (default 32)
  * @returns {String} The encoding of the nonce
  */
 utils.generateNonce = function(encoding, length) {
@@ -474,7 +474,7 @@ utils.waitUntil = function(ms, callback) {
 
 /**
  * Generate a new key pair.
- * @param {string?} curveName The name of the EC curve. (optional)
+ * @param {string} [curveName] The name of the EC curve. (optional)
  * @return {Object} New jsrsasign key object of given curve
  */
 utils.generateKeyPair = function(curveName) {

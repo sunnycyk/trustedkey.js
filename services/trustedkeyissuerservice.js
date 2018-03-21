@@ -39,7 +39,7 @@ TrustedKeyIssuerService.prototype.requestMockTokens = function(requestIdString) 
  *
  * @param {string} requestIdString: A unique ID for this request (for example, an UUID) for retries and notifications.
  * @param {string} catfishAirTransactionIDString: A transaction ID, obtained from the AuthenticID REST API.
- * @param {string?} catfishAirVersionNumber: The version of the CatfishAIR REST API to use.
+ * @param {string} [catfishAirVersionNumber]: The version of the CatfishAIR REST API to use.
  * @returns {Promise} JSON result from API
 */
 TrustedKeyIssuerService.prototype.requestTokens = function(requestIdString, catfishAirTransactionIDString, catfishAirVersionNumber) {
