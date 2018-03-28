@@ -100,7 +100,7 @@ module.exports = {
      * @constant
      * @default
      */
-    email: "1.2.840.113549.1.9.1",
+    emailAddress: "1.2.840.113549.1.9.1",
 
     /**
      * The OID in dotted notation for a person's full name.
@@ -219,5 +219,5 @@ module.exports = {
      * @constant
      * @default
      */
-    age21orUp: "1.3.6.1.4.1.53318295.21",
+    age21OrUp: "1.3.6.1.4.1.53318295.21",
 }
