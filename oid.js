@@ -215,6 +215,13 @@ module.exports = {
     courseContents: "1.3.6.1.4.1.53318295.14",
 
     /**
+     * The OID in dotted notation for the user's public key.
+     * @constant
+     * @default
+     */
+    publicKey: "1.3.6.1.4.1.53318295.15",
+
+    /**
      * The OID in dotted notation for a claim that the user is at least 21 years old.
      * @constant
      * @default
