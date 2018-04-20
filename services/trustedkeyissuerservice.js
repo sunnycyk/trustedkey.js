@@ -1,27 +1,27 @@
-const TokenIssuerService = require('./tokenissuerservice.js')
+const ClaimIssuerService = require('./claimissuerservice.js')
 
 
 /**
  * Trusted Key issuer API implementation
  *
  * @constructor
- * @augments {TokenIssuerService}
+ * @augments {ClaimIssuerService}
  * @param {String} backendUrl - The base backend URL
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
 const TrustedKeyIssuerService = module.exports = function(backendUrl, appId, appSecret) {
-    TokenIssuerService.call(this, backendUrl, appId, appSecret)
+    ClaimIssuerService.call(this, backendUrl, appId, appSecret)
 }
-TrustedKeyIssuerService.prototype = Object.create(TokenIssuerService.prototype)
+TrustedKeyIssuerService.prototype = Object.create(ClaimIssuerService.prototype)
 
 
 /**
- * Request mock tokens, for testing during development only. See `requestTokens`.
+ * Request mock claims, for testing during development only. See `requestClaims`.
  * @param {string} requestIdString: A unique ID for this request (for example, an UUID) for retries and notifications.
  * @returns {Promise} JSON result from API
 */
-TrustedKeyIssuerService.prototype.requestMockTokens = function(requestIdString) {
+TrustedKeyIssuerService.prototype.requestMockClaims = function(requestIdString) {
     return this.httpClient.get('registerIdentity', {
         requestid: requestIdString
     })
@@ -29,7 +29,7 @@ TrustedKeyIssuerService.prototype.requestMockTokens = function(requestIdString) 
 
 
 /**
- * Request tokens for the credentials with the Trusted Key Demo Issuer. The Trusted Key Demo Issuer
+ * Request claims for the credentials with the Trusted Key Demo Issuer. The Trusted Key Demo Issuer
  * uses AuthenticID as the source of the personal information and as such requires the
  * caller to provide a valid AuthenticID transaction ID. This is usually obtained by a
  * previous call to the AuthenticID REST API.
@@ -42,7 +42,7 @@ TrustedKeyIssuerService.prototype.requestMockTokens = function(requestIdString) 
  * @param {string} [catfishAirVersionNumber]: The version of the CatfishAIR REST API to use.
  * @returns {Promise} JSON result from API
 */
-TrustedKeyIssuerService.prototype.requestTokens = function(requestIdString, catfishAirTransactionIDString, catfishAirVersionNumber) {
+TrustedKeyIssuerService.prototype.requestAuthenticIDClaims = function(requestIdString, catfishAirTransactionIDString, catfishAirVersionNumber) {
     return this.httpClient.get('registerAuthenticId', {
         transactionid: catfishAirTransactionIDString,
         version: catfishAirVersionNumber,

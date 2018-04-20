@@ -4,7 +4,7 @@ const RP = require('request-promise-native')
 
 
 /**
- * An implementation of a the validation API, used to check to validity of credentials and tokens.
+ * An implementation of a the validation API, used to check to validity of credentials and claims.
  *
  * @constructor
  * @param {String} backendUrl - The base backend URL
@@ -61,15 +61,15 @@ ValidateService.prototype.validateCredential = function(credentialAddressString)
 
 
 /**
- * Validate given token(s) by calling into the smart contract.
+ * Validate given claim(s) by calling into the smart contract.
  *
- * @param {string} tokenSerialNumbers - Array of token serial numbers.
+ * @param {string} claimSerialNumbers - Array of claim serial numbers.
  * @returns {boolean} Status indicating valid address
 */
-ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
+ValidateService.prototype.validateClaims = function(claimSerialNumbers) {
     var serialNumbers
-    if(typeof tokenSerialNumbers !== 'string') {
-        serialNumbers = tokenSerialNumbers.map(serialNo => {
+    if(typeof claimSerialNumbers !== 'string') {
+        serialNumbers = claimSerialNumbers.map(serialNo => {
             if(serialNo.match(/^0x/)) {
                 return serialNo
             } else {
@@ -77,7 +77,7 @@ ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
             }
         }).join(',')
     } else {
-        serialNumbers = tokenSerialNumbers
+        serialNumbers = claimSerialNumbers
     }
     return validate(this.httpClient, serialNumbers)
 }
@@ -86,7 +86,7 @@ ValidateService.prototype.validateTokens = function(tokenSerialNumbers) {
 /**
  * Get extensive key information for given address.
  *
- * @param {string} address - blockchain address of token/credential to query
+ * @param {string} address - blockchain address of claim/credential to query
  * @returns {object} KeyInfo structure from smart contract
 */
 ValidateService.prototype.keyInfo = function(address) {

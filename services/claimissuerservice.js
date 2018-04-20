@@ -4,9 +4,9 @@ const HttpUtils = require('./http')
 // Error strings
 const errPending = "The operation is pending."
 const errFailed  = "failed"
-const errJsonWithoutData = "Unexpected: IssuerApi.getTokens returned invalid data object."
-const errInvalidPemArray = "Unexpected: IssuerApi.getTokens pemArray had < 2 elements."
-const errInvalidPemData = "Unexpected: IssuerApi.getTokens PEM data was invalid."
+const errJsonWithoutData = "Unexpected: IssuerApi.getClaims returned invalid data object."
+const errInvalidPemArray = "Unexpected: IssuerApi.getClaims pemArray had < 2 elements."
+const errInvalidPemData = "Unexpected: IssuerApi.getClaims PEM data was invalid."
 
 
 /**
@@ -17,19 +17,19 @@ const errInvalidPemData = "Unexpected: IssuerApi.getTokens PEM data was invalid.
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const TokenIssuerService = module.exports = function(backendUrl, appId, appSecret) {
+const ClaimIssuerService = module.exports = function(backendUrl, appId, appSecret) {
     this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
 
 
 /**
- * Get the token(s) for the request identified by the given requestID.
+ * Get the claim(s) for the request identified by the given requestID.
  *
- * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestTokens` API.
+ * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestClaims` API.
  * @returns {Promise<Array<String>>} - Promise containing PEM array
 */
-TokenIssuerService.prototype.getTokens = function(requestIdString) {
-    return this.httpClient.get('getCertificates', {
+ClaimIssuerService.prototype.getClaims = function(requestIdString) {
+    return this.httpClient.get('getTokens', {
         requestid: requestIdString
     }).then(json => {
         if(!json.data) {
@@ -55,12 +55,12 @@ TokenIssuerService.prototype.getTokens = function(requestIdString) {
 
 
 /**
- * Request image token(s).
+ * Request image claim(s).
  *
  * @param {Object} requestInfo - The requestInfo structure.
  * @returns {Promise} Promise returning true if success
 */
-TokenIssuerService.prototype.requestImageTokens = function(requestInfo) {
+ClaimIssuerService.prototype.requestImageClaims = function(requestInfo) {
     return this.httpClient.post('requestImageTokens', {}, requestInfo).then(json => {
         if(!json.data) {
             throw new Error(errJsonWithoutData)
@@ -76,13 +76,13 @@ TokenIssuerService.prototype.requestImageTokens = function(requestInfo) {
 
 
 /**
- * Delete the token(s) for the request identified by the given requestID.
+ * Delete the claim(s) for the request identified by the given requestID.
  *
- * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestTokens` API.
+ * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestClaims` API.
  * @throws {Error} Throws Error if request failed
  * @returns {Promise} Promise returning true if success
 */
-TokenIssuerService.prototype.deleteTokens = function(requestIdString) {
+ClaimIssuerService.prototype.deleteClaims = function(requestIdString) {
     return this.httpClient.get(this.backendUrl, 'deleteRequest', {
         requestid: requestIdString
     }).then(json => {
@@ -100,12 +100,12 @@ TokenIssuerService.prototype.deleteTokens = function(requestIdString) {
 
 
 /**
- * Delete all the tokens for the default credential.
+ * Delete all the claims for the default credential.
  *
  * @throws {Error} Throws Error if request failed
  * @returns {Promise} Promise returning true if success
 */
-TokenIssuerService.prototype.deleteAllTokens = function() {
+ClaimIssuerService.prototype.deleteAllClaims = function() {
     return this.httpClient.get(this.backendUrl, 'deleteAllRequests').then(json => {
         if(!json.data) {
             throw new Error(errJsonWithoutData)

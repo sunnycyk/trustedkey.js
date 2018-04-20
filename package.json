@@ -1,7 +1,6 @@
 {
   "name": "trustedkey-js",
-  "version": "0.2.29",
-  "private": true,
+  "version": "0.3.0",
   "files": [
     "microutils.js",
     "oid.js",

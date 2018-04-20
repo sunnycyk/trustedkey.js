@@ -12,7 +12,7 @@ function checkSuccess(jsonData) {
 
 
 /**
- * The API calls for implementing an identity credential/token wallet.
+ * The API calls for implementing an identity claim/credential wallet.
  *
  * @constructor
  * @param {String} backendUrl - The base backend URL

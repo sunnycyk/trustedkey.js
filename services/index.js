@@ -1,5 +1,5 @@
 const CredentialRegistryService = require('./credentialregistryservice')
-const TokenIssuerService        = require('./tokenissuerservice')
+const ClaimIssuerService        = require('./claimissuerservice')
 const TrustedKeyIssuerService   = require('./trustedkeyissuerservice')
 const ValidateService           = require('./validateservice')
 const WalletService             = require('./walletservice')
@@ -17,7 +17,7 @@ const WalletService             = require('./walletservice')
 */
 const services = module.exports = function(appId, appSecret, issuerBaseUrl, walletBaseUrl) {
     this.credentialRegistryService = new CredentialRegistryService(issuerBaseUrl, appId, appSecret)
-    this.tokenIssuerService = new TokenIssuerService(issuerBaseUrl, appId, appSecret)
+    this.claimIssuerService = new ClaimIssuerService(issuerBaseUrl, appId, appSecret)
     this.trustedKeyIssuerService = new TrustedKeyIssuerService(issuerBaseUrl, appId, appSecret)
     this.validateService = new ValidateService(issuerBaseUrl, appId, appSecret)
     this.walletService = new WalletService(walletBaseUrl, appId, appSecret)
@@ -32,11 +32,11 @@ const services = module.exports = function(appId, appSecret, issuerBaseUrl, wall
 services.credentialRegistryService = undefined
 
 /**
- * TokenIssuerService instance
+ * ClaimIssuerService instance
  *
- * @type {TokenIssuerService}
+ * @type {ClaimIssuerService}
 */
-services.tokenIssuerService = undefined
+services.claimIssuerService = undefined
 
 /**
  * TrustedKeyIssuerService instance
