@@ -35,6 +35,17 @@ UzWW9chCnB0+b29Qg4R9n1glTVqqNQj0F9grWetJXw2NXQOVMKn+w81WzwH4s3IZ
 QwIDAQAB
 -----END PUBLIC KEY-----`
 
+    context("address", () => {
+        it("Passes for valid addresses", () => {
+            Assert.strictEqual(Utils.isAddress("0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4"), true)
+            Assert.strictEqual(Utils.isAddress("0xE3b0c44298fC1c149afbf4D8996fb92427ae41e4"), true)
+        })
+        it("Fails for invalid addresses", () => {
+            Assert.strictEqual(Utils.isAddress("asdf"), false)
+            Assert.strictEqual(Utils.isAddress("0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"), false)
+        })
+    })
+
     describe("jwkToHex", () => {
         it("converts RSA key", () => {
             const hex = 'ce084ac94cde6a54cfd321b62654dc052798900fd634a2c23194d045bb44afd2b5d68683b03994498facddc95e85b6d9f5258dcbdc727507f36f404c758dbea26593ea4a1d617f1ffbaa7ee0e0a7a372c7139c8ce143a41199dcd653b3e55cd46be75e304c242c95e2aae135c106e703ac9a408772f2f0033612038502b121114e1436e4d52d35b0497e39cdd515c63456ca1aa425690047ebd4b0c27ad39ee91c6cbc50c57b1d3d9eebd6e5e8456e38a83af63afe31bed597132816ac0d531614ba040b39587cf0507c18a2a76ad6533596f5c8429c1d3e6f6f5083847d9f58254d5aaa3508f417d82b59eb495f0d8d5d039530a9fec3cd56cf01f8b3721943'
@@ -249,5 +260,4 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
             Assert.strictEqual(await http.get("http://localhost:"+server.address().port+"/get"), "gotten")
         })
     })
-
 })

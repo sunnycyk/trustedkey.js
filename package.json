@@ -1,6 +1,6 @@
 {
   "name": "trustedkey-js",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "files": [
     "microutils.js",
     "oid.js",

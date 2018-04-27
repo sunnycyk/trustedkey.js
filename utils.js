@@ -546,3 +546,14 @@ utils.dateToString = function(date) {
         return Moment(date).utc().format("YYMMDDHHmmss[Z]", date)
     }
 }
+
+
+/**
+ * Check whether the given string is a valid blockchain address.
+ * @param {string} str The string to check for 0x-prefixed address
+ * @returns {boolean} `true` if the string is a valid address; false otherwise.
+ */
+utils.isAddress = function(str) {
+    Assert.strictEqual(typeof str, "string", 'str must be of type `string`')
+    return /^0x[0-9a-fA-F]{40}$/.test(str)
+}
