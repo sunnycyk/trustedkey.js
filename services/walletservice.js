@@ -105,3 +105,22 @@ WalletService.prototype.notify = function(address, nonce, message, appId) {
         appId: appId,
     }).then(checkSuccess)
 }
+
+
+/**
+ * Send signature request to a device
+ *
+ * @param {String} address - Device or user to notify
+ * @param {String} nonce - Request nonce
+ * @param {String} callbackUrl - Callback URL
+ * @param {Object} [options] - Optional request options
+ * @returns {Promise} JSON result from API
+ */
+WalletService.prototype.request = function(address, nonce, callbackUrl, options) {
+    const required = {
+        address: address,
+        nonce: nonce,
+        callbackUrl: callbackUrl,
+    }
+    return this.httpClient.get('request', Object.assign(required, options||{})).then(checkSuccess)
+}
