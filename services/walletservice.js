@@ -108,12 +108,23 @@ WalletService.prototype.notify = function(address, nonce, message, appId) {
 
 
 /**
+  @typedef RequestOptions
+  @type {object}
+  @property {string} [username] - Username of the account trying to log in (if known)
+  @property {string} [documentUrl] - The URL to a document for PDF signing
+  @property {string} [objectIds] - A comma-separated list of OIDs
+  @property {string} [message] - An optional text message for transaction authorization
+  @property {string} [callbackType] - The type of callback, one of "POST", "SYSTEM", or "JSON"
+  @property {string} [timeout] - The timeout for the request in minutes
+ */
+
+/**
  * Send signature request to a device
  *
- * @param {String} address - Device or user to notify
- * @param {String} nonce - Request nonce
- * @param {String} callbackUrl - Callback URL
- * @param {Object} [options] - Optional request options
+ * @param {string} address - Device or user to notify
+ * @param {string} nonce - Request nonce
+ * @param {string} callbackUrl - Callback URL
+ * @param {RequestOptions} [options] - Optional request options
  * @returns {Promise} JSON result from API
  */
 WalletService.prototype.request = function(address, nonce, callbackUrl, options) {
