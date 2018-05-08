@@ -53,11 +53,19 @@ ClaimIssuerService.prototype.getClaims = function(requestIdString) {
     })
 }
 
+/**
+  @typedef RequestInfo
+  @type {object}
+  @property {string} requestid - A unique ID for this request (for example, an UUID) for retries and notifications.
+  @property {string} expiry - The expiry date and time for the issued claims.
+  @property {object} attributes - A map with OID:value pairs.
+  @property {Array} [images] - An array with images, each with a `["name":"filename","data":"base64-jpeg"]` map.
+*/
 
 /**
- * Request image claim(s).
+ * Request claims with the specified attributes and optional document images.
  *
- * @param {Object} requestInfo - The requestInfo structure.
+ * @param {RequestInfo} requestInfo - The RequestInfo structure.
  * @returns {Promise} Promise returning true if success
 */
 ClaimIssuerService.prototype.requestImageClaims = function(requestInfo) {
