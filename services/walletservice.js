@@ -112,10 +112,10 @@ WalletService.prototype.notify = function(address, nonce, message, appId) {
   @type {object}
   @property {string} [username] - Username of the account trying to log in (if known)
   @property {string} [documentUrl] - The URL to a document for PDF signing
-  @property {string} [objectIds] - A comma-separated list of OIDs
+  @property {Array|string} [objectIds] - A comma-separated list of OIDs
   @property {string} [message] - An optional text message for transaction authorization
   @property {string} [callbackType] - The type of callback, one of "POST", "SYSTEM", or "JSON"
-  @property {string} [timeout] - The timeout for the request in minutes
+  @property {number|string} [timeout] - The timeout for the request in minutes
  */
 
 /**
@@ -132,6 +132,10 @@ WalletService.prototype.request = function(address, nonce, callbackUrl, options)
         address: address,
         nonce: nonce,
         callbackUrl: callbackUrl,
+    }
+    if (options && options.objectIds instanceof Array) {
+        // Convert Array to comma-separated string
+        options = Object.assign({}, options, {objectIds: options.objectIds.join()})
     }
     return this.httpClient.get('request', Object.assign(required, options||{})).then(checkSuccess)
 }
