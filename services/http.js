@@ -39,6 +39,13 @@ function getAuthHeader(url, appId, appSecret, body) {
 }
 
 
+/**
+ * Get the headers for the request
+ *
+ * @param {string} absoluteUrl - the absolute URL for the request
+ * @param {string} [body] - optional HTTP body
+ * @returns {object} Object with headers for the request; empty object if no auth is needed
+ */
 httpUtils.prototype.getHeaders = function(absoluteUrl, body) {
 
     if (this.appId && this.appSecret) {
@@ -50,10 +57,22 @@ httpUtils.prototype.getHeaders = function(absoluteUrl, body) {
 }
 
 
+/**
+ * Build a URL with optional query string
+ *
+ * @param {string} path - the endpoint to build
+ * @param {*} [params] - optional parameters to add to the query string
+ * @returns {string} the absolute URL
+ */
+httpUtils.prototype.buildUrl = function(path, params) {
+    const url = Utils.mergeQueryParams(path, params||{})
+    return URL.resolve(this.backendUrl, url)
+}
+
+
 httpUtils.prototype.get = function(path, params) {
 
-    const url = Utils.mergeQueryParams(path, params||{})
-    const absoluteUrl = URL.resolve(this.backendUrl, url)
+    const absoluteUrl = this.buildUrl(path, params)
     return RP.get({
         uri: absoluteUrl,
         json: true,
@@ -64,8 +83,7 @@ httpUtils.prototype.get = function(path, params) {
 
 httpUtils.prototype.post = function(path, params, jsonBody) {
 
-    const url = Utils.mergeQueryParams(path, params||{})
-    const absoluteUrl = URL.resolve(this.backendUrl, url)
+    const absoluteUrl = this.buildUrl(path, params)
     // Assume RP does the exact same serialization of the body
     const body = jsonBody === undefined ? "" : JSON.stringify(jsonBody)
     return RP.post({

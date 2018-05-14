@@ -202,12 +202,20 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
             app.post("/post", (req,res) => res.send("posted"))
             server = app.listen(0, (err,p) => {
                 Assert.strictEqual(err, undefined)
-                http = new Http("http://localhost:"+server.address().port, appid, secret)
+                http = new Http(`http://localhost:${server.address().port}`, appid, secret)
                 done()
             })
         })
-        afterEach(() => {
-            server.close()
+        afterEach(done => {
+            server.close(done)
+        })
+        it("can build URL without params", () => {
+            const h = http.buildUrl("/test")
+            Assert.strictEqual(h, `http://localhost:${server.address().port}/test`)
+        })
+        it("can build URL with params", () => {
+            const h = http.buildUrl("/test", {a:2})
+            Assert.strictEqual(h, `http://localhost:${server.address().port}/test?a=2`)
         })
         it("can create JWT header without body", async () => {
             const h = http.getHeaders("url")
