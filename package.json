@@ -2,11 +2,16 @@
   "name": "trustedkey-js",
   "version": "0.3.4",
   "files": [
-    "microutils.js",
     "oid.js",
     "utils.js",
-    "errors.js",
-    "services"
+    "services/docsig.js",
+    "services/validateservice.js",
+    "services/index.js",
+    "services/credentialregistryservice.js",
+    "services/trustedkeyissuerservice.js",
+    "services/walletservice.js",
+    "services/http.js",
+    "services/claimissuerservice.js"
   ],
   "scripts": {
     "lint": "node_modules/.bin/eslint --color .",
