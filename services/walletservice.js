@@ -1,15 +1,14 @@
 const HttpUtils = require('./http')
-const RP        = require('request-promise-native')
+const RP = require('request-promise-native')
 
 // Common JSON sanity check callback
-function checkSuccess(jsonData) {
-    if(!jsonData.data) {
-        throw new Error('API returned JSON without data')
-    }
+function checkSuccess (jsonData) {
+  if (!jsonData.data) {
+    throw new Error('API returned JSON without data')
+  }
 
-    return jsonData
+  return jsonData
 }
-
 
 /**
  * The API calls for implementing an identity claim/credential wallet.
@@ -19,10 +18,9 @@ function checkSuccess(jsonData) {
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const WalletService = module.exports = function(backendUrl, appId, appSecret) {
-    this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
+const WalletService = module.exports = function (backendUrl, appId, appSecret) {
+  this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
-
 
 /**
  * @typedef AuthorizeOptions
@@ -40,73 +38,69 @@ const WalletService = module.exports = function(backendUrl, appId, appSecret) {
 /**
  * Create a new OAuth/OpenID-Connect authorization request
  *
- * @param {String} redirect_uri - Redirection URI to which the response will be sent
+ * @param {String} redirectUri - Redirection URI to which the response will be sent
  * @param {String} state - Opaque value used to maintain state between the request and the callback
  * @param {AuthorizeOptions} [options] - Additional authorization options
  * @returns {String} URL for OAuth/OpenID-Connect authorization request
  */
-WalletService.prototype.buildAuthorizeUrl = function(redirect_uri, state, options) {
-    const required = {
-        client_id: this.httpClient.appId,
-        redirect_uri: redirect_uri,
-        state: state,
-        response_type: 'code',
-        scope: 'openid',
-    }
-    if (options && options.claims instanceof Object) {
-        options.claims = JSON.stringify(options.claims)
-    }
-    return this.httpClient.buildUrl('/oauth/authorize', Object.assign(required, options||{}))
+WalletService.prototype.buildAuthorizeUrl = function (redirectUri, state, options) {
+  const required = {
+    client_id: this.httpClient.appId,
+    redirect_uri: redirectUri,
+    state: state,
+    response_type: 'code',
+    scope: 'openid'
+  }
+  if (options && options.claims instanceof Object) {
+    options.claims = JSON.stringify(options.claims)
+  }
+  return this.httpClient.buildUrl('/oauth/authorize', Object.assign(required, options || {}))
 }
-
 
 /**
  * Get an OAuth access_token from an OAuth authorization code
  *
- * @param {String} redirect_uri - Redirection URI to which the response will be sent
+ * @param {String} redirectUri - Redirection URI to which the response will be sent
  * @param {String} code - the authorization code received from `/authorize`
  * @returns {Promise} JSON result from API
  */
-WalletService.prototype.token = function(redirect_uri, code) {
-    const required = {
-        client_id: this.httpClient.appId,
-        client_secret: this.httpClient.appSecret,
-        redirect_uri: redirect_uri,
-        code: code,
-        grant_type: 'authorization_code',
-    }
-    const url = this.httpClient.buildUrl('/oauth/token')
-    return RP.post(url, {
-        json: true,
-        form: required
-    })
+WalletService.prototype.token = function (redirectUri, code) {
+  const required = {
+    client_id: this.httpClient.appId,
+    client_secret: this.httpClient.appSecret,
+    redirect_uri: redirectUri,
+    code: code,
+    grant_type: 'authorization_code'
+  }
+  const url = this.httpClient.buildUrl('/oauth/token')
+  return RP.post(url, {
+    json: true,
+    form: required
+  })
 }
-
 
 /**
  * Get a user-information object associated with an access token
  *
- * @param {String} access_token - Access Token received from `/token`
+ * @param {String} accessToken - Access Token received from `/token`
  * @returns {Promise} JSON result from API
  */
-WalletService.prototype.userInfo = function(access_token) {
-    const url = this.httpClient.buildUrl('/oauth/user')
-    return RP.get(url, {
-        headers: { authorization: 'Bearer ' + access_token },
-        json: true
-    })
+WalletService.prototype.userInfo = function (accessToken) {
+  const url = this.httpClient.buildUrl('/oauth/user')
+  return RP.get(url, {
+    headers: {authorization: 'Bearer ' + accessToken},
+    json: true
+  })
 }
-
 
 /**
  * Grab the next login/signing request for the default registered credential.
  * @returns {Promise} JSON result from API
 */
-WalletService.prototype.getPendingSignatureRequest = function() {
-    return this.httpClient.get('getPendingRequest')
-        .then(checkSuccess)
+WalletService.prototype.getPendingSignatureRequest = function () {
+  return this.httpClient.get('getPendingRequest')
+    .then(checkSuccess)
 }
-
 
 /**
  * Remove the pending request identified by its nonce.
@@ -114,12 +108,11 @@ WalletService.prototype.getPendingSignatureRequest = function() {
  * @param {String} nonceString - The unique nonce for the login request, as received from the notification or pending request.
  * @returns {Promise} JSON result from API
 */
-WalletService.prototype.removeSignatureRequest = function(nonceString) {
-    return this.httpClient.get('removePendingRequest', {
-        nonce: nonceString
-    }).then(checkSuccess)
+WalletService.prototype.removeSignatureRequest = function (nonceString) {
+  return this.httpClient.get('removePendingRequest', {
+    nonce: nonceString
+  }).then(checkSuccess)
 }
-
 
 /**
  * Register this device with the notification service. This enables the app to receive
@@ -128,12 +121,11 @@ WalletService.prototype.removeSignatureRequest = function(nonceString) {
  * @param {String} deviceTokenString The device's token for receiving notifications
  * @returns {Promise} JSON result from API
 */
-WalletService.prototype.registerDevice = function(deviceTokenString) {
-    return this.httpClient.get('registerDevice', {
-        devicetoken: deviceTokenString
-    }).then(checkSuccess)
+WalletService.prototype.registerDevice = function (deviceTokenString) {
+  return this.httpClient.get('registerDevice', {
+    devicetoken: deviceTokenString
+  }).then(checkSuccess)
 }
-
 
 /**
  * Send notification to a device
@@ -144,15 +136,14 @@ WalletService.prototype.registerDevice = function(deviceTokenString) {
  * @param {String} [appId] - App-ID of receiving app
  * @returns {Promise} JSON result from API
  */
-WalletService.prototype.notify = function(address, nonce, message, appId) {
-    return this.httpClient.get('notify', {
-        address: address,
-        nonce: nonce,
-        message: message,
-        appId: appId,
-    }).then(checkSuccess)
+WalletService.prototype.notify = function (address, nonce, message, appId) {
+  return this.httpClient.get('notify', {
+    address: address,
+    nonce: nonce,
+    message: message,
+    appId: appId
+  }).then(checkSuccess)
 }
-
 
 /**
  * @typedef RequestOptions
@@ -174,15 +165,15 @@ WalletService.prototype.notify = function(address, nonce, message, appId) {
  * @param {RequestOptions} [options] - Optional request options
  * @returns {Promise} JSON result from API
  */
-WalletService.prototype.request = function(address, nonce, callbackUrl, options) {
-    const required = {
-        address: address,
-        nonce: nonce,
-        callbackUrl: callbackUrl,
-    }
-    if (options && options.objectIds instanceof Array) {
-        // Convert Array to comma-separated string
-        options = Object.assign({}, options, {objectIds: options.objectIds.join()})
-    }
-    return this.httpClient.get('request', Object.assign(required, options||{})).then(checkSuccess)
+WalletService.prototype.request = function (address, nonce, callbackUrl, options) {
+  const required = {
+    address: address,
+    nonce: nonce,
+    callbackUrl: callbackUrl
+  }
+  if (options && options.objectIds instanceof Array) {
+    // Convert Array to comma-separated string
+    options = Object.assign({}, options, {objectIds: options.objectIds.join()})
+  }
+  return this.httpClient.get('request', Object.assign(required, options || {})).then(checkSuccess)
 }

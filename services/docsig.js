@@ -1,4 +1,4 @@
-const Utils      = require('../utils')
+const Utils = require('../utils')
 const HttpUtils = require('./http')
 
 /**
@@ -12,12 +12,11 @@ const HttpUtils = require('./http')
  * @param {String} docsigAppId - Docsig application ID
  * @param {String} docsigAppSecret - Docsig shared secret
  */
-const DocsigService = module.exports = function(backendUrl, appId, appSecret, docsigAppId, docsigAppSecret) {
-    this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
-    this._docsigAppId = docsigAppId
-    this._docsigAppSecret = docsigAppSecret
+const DocsigService = module.exports = function (backendUrl, appId, appSecret, docsigAppId, docsigAppSecret) {
+  this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
+  this._docsigAppId = docsigAppId
+  this._docsigAppSecret = docsigAppSecret
 }
-
 
 /**
  * Submit a document to be signed
@@ -28,19 +27,19 @@ const DocsigService = module.exports = function(backendUrl, appId, appSecret, do
  * @param {String} objectIds - Array of objectIds to request from signatory
  * @returns {String} JSON response from API
  */
-DocsigService.prototype.documentSignRequest = function(signatoryEmail, callbackUrl, documentUrl, objectIds) {
-    const appId = this._docsigAppId
-    const appSecret = this._docsigAppSecret
+DocsigService.prototype.documentSignRequest = function (signatoryEmail, callbackUrl, documentUrl, objectIds) {
+  const appId = this._docsigAppId
+  const appSecret = this._docsigAppSecret
 
-    const payload = {
-        iss: appId,
-        signatory: signatoryEmail,
-        callbackUrl: callbackUrl,
-        documentUrl: documentUrl,
-        objectIds: objectIds
-    }
-    const header = {typ: 'JWT', iss: appId}
-    const jwt = Utils.createHmacJws(payload, appSecret, header)
+  const payload = {
+    iss: appId,
+    signatory: signatoryEmail,
+    callbackUrl: callbackUrl,
+    documentUrl: documentUrl,
+    objectIds: objectIds
+  }
+  const header = {typ: 'JWT', iss: appId}
+  const jwt = Utils.createHmacJws(payload, appSecret, header)
 
-    return this.httpClient.post('newDocumentSignRequest?jwt=' + jwt)
+  return this.httpClient.post('newDocumentSignRequest?jwt=' + jwt)
 }

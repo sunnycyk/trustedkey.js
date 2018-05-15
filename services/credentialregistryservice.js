@@ -1,6 +1,6 @@
 const HttpUtils = require('./http')
-const Crypto    = require('crypto')
-const Assert    = require('assert')
+const Crypto = require('crypto')
+const Assert = require('assert')
 
 /**
  * Utility class with wrappers for the various Credential Registry API endpoints.
@@ -10,10 +10,9 @@ const Assert    = require('assert')
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const CredentialRegistryService = module.exports = function(backendUrl, appId, appSecret) {
-    this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
+const CredentialRegistryService = module.exports = function (backendUrl, appId, appSecret) {
+  this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
-
 
 /**
  * Revoke our default credential by sending a request to the blockchain. The receiver must have been registered as
@@ -25,20 +24,19 @@ const CredentialRegistryService = module.exports = function(backendUrl, appId, a
  * @param {string} [address]: When revoking a claim, its address
  * @returns {Promise} returning JSON from API
  */
-CredentialRegistryService.prototype.revokeCredential = function(delegateAddressString, keyPair, address) {
+CredentialRegistryService.prototype.revokeCredential = function (delegateAddressString, keyPair, address) {
+  Assert.strictEqual(typeof delegateAddressString, 'string', 'delegateAddressString must be of type `string`')
+  Assert.strictEqual(typeof keyPair, 'object', 'keyPair must be of type `object`')
+  Assert.strictEqual(0 in keyPair, false, 'keyPair should not be Buffer or Array-like')
 
-    Assert.strictEqual(typeof delegateAddressString, "string", 'delegateAddressString must be of type `string`')
-    Assert.strictEqual(typeof keyPair, "object", 'keyPair must be of type `object`')
-    Assert.strictEqual(0 in keyPair, false, 'keyPair should not be Buffer or Array-like')
+  const addressWithout0x = delegateAddressString.replace('0x', '')
+  var hash = Crypto.createHash('sha256')
+  var digest = hash.update(addressWithout0x, 'hex').update(address ? 'indirect' : 'revocation').digest('hex')
+  var sig = keyPair.signWithMessageHash(digest)
 
-    const addressWithout0x = delegateAddressString.replace('0x', '')
-    var hash = Crypto.createHash('sha256')
-    var digest = hash.update(addressWithout0x, 'hex').update(address?"indirect":"revocation").digest('hex')
-    var sig = keyPair.signWithMessageHash(digest)
-
-    return this.httpClient.get('revoke', {
-        signature: sig,
-        pubkey: keyPair.pubKeyHex,
-        address: address
-    })
+  return this.httpClient.get('revoke', {
+    signature: sig,
+    pubkey: keyPair.pubKeyHex,
+    address: address
+  })
 }

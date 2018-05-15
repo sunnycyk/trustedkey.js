@@ -1,6 +1,5 @@
 const ClaimIssuerService = require('./claimissuerservice.js')
 
-
 /**
  * Trusted Key issuer API implementation
  *
@@ -10,23 +9,21 @@ const ClaimIssuerService = require('./claimissuerservice.js')
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const TrustedKeyIssuerService = module.exports = function(backendUrl, appId, appSecret) {
-    ClaimIssuerService.call(this, backendUrl, appId, appSecret)
+const TrustedKeyIssuerService = module.exports = function (backendUrl, appId, appSecret) {
+  ClaimIssuerService.call(this, backendUrl, appId, appSecret)
 }
 TrustedKeyIssuerService.prototype = Object.create(ClaimIssuerService.prototype)
-
 
 /**
  * Request mock claims, for testing during development only. See `requestClaims`.
  * @param {string} requestIdString: A unique ID for this request (for example, an UUID) for retries and notifications.
  * @returns {Promise} JSON result from API
 */
-TrustedKeyIssuerService.prototype.requestMockClaims = function(requestIdString) {
-    return this.httpClient.get('registerIdentity', {
-        requestid: requestIdString
-    })
+TrustedKeyIssuerService.prototype.requestMockClaims = function (requestIdString) {
+  return this.httpClient.get('registerIdentity', {
+    requestid: requestIdString
+  })
 }
-
 
 /**
  * Request claims for the credentials with the Trusted Key Demo Issuer. The Trusted Key Demo Issuer
@@ -42,10 +39,10 @@ TrustedKeyIssuerService.prototype.requestMockClaims = function(requestIdString) 
  * @param {string} [catfishAirVersionNumber]: The version of the CatfishAIR REST API to use.
  * @returns {Promise} JSON result from API
 */
-TrustedKeyIssuerService.prototype.requestAuthenticIDClaims = function(requestIdString, catfishAirTransactionIDString, catfishAirVersionNumber) {
-    return this.httpClient.get('registerAuthenticId', {
-        transactionid: catfishAirTransactionIDString,
-        version: catfishAirVersionNumber,
-        requestid: requestIdString
-    })
+TrustedKeyIssuerService.prototype.requestAuthenticIDClaims = function (requestIdString, catfishAirTransactionIDString, catfishAirVersionNumber) {
+  return this.httpClient.get('registerAuthenticId', {
+    transactionid: catfishAirTransactionIDString,
+    version: catfishAirVersionNumber,
+    requestid: requestIdString
+  })
 }
