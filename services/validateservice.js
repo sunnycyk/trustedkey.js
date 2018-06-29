@@ -56,21 +56,15 @@ ValidateService.prototype.validateCredential = function (credentialAddressString
 /**
  * Validate given claim(s) by calling into the smart contract.
  *
- * @param {string} claimSerialNumbers - Array of claim serial numbers.
- * @returns {boolean} Status indicating valid address
+ * @param {String|Array} claimSerialNumbers - Array of claim serial numbers.
+ * @returns {Promise.<boolean>} Status indicating valid address
 */
 ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
   var serialNumbers
-  if (typeof claimSerialNumbers !== 'string') {
-    serialNumbers = claimSerialNumbers.map(serialNo => {
-      if (serialNo.match(/^0x/)) {
-        return serialNo
-      } else {
-        return '0x' + serialNo
-      }
-    }).join(',')
+  if (claimSerialNumbers instanceof Array) {
+    serialNumbers = claimSerialNumbers.map(Utils.serialToAddress).join(',')
   } else {
-    serialNumbers = claimSerialNumbers
+    serialNumbers = Utils.serialToAddress(claimSerialNumbers)
   }
   return validate(this.httpClient, serialNumbers)
 }
@@ -78,12 +72,13 @@ ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
 /**
  * Get extensive key information for given address.
  *
- * @param {string} address - blockchain address of claim/credential to query
+ * @param {String|Array} address - blockchain address(es) of claim/credential to query
  * @returns {object} KeyInfo structure from smart contract
 */
 ValidateService.prototype.keyInfo = function (address) {
-  Assert.strictEqual(typeof address, 'string', 'address must be of type `string`')
-
+  if (address instanceof Array) {
+    address = address.join(',')
+  }
   return this.httpClient.get('keyInfo', {address: address})
     .then(r => r.data)
 }
