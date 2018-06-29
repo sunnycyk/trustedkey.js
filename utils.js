@@ -56,7 +56,7 @@ utils.sha256 = function (blob, encoding) {
 utils.serialToAddress = function (serialhex) {
   Assert.strictEqual(typeof serialhex, 'string', 'serialhex must be of type `string`')
 
-  const paddedSerial = String('00000000000000000000000000000000000000' + serialhex).slice(-40)
+  const paddedSerial = String('000000000000000000000000000000000000000' + serialhex).slice(-40)
   return '0x' + paddedSerial
 }
 

@@ -37,6 +37,17 @@ UzWW9chCnB0+b29Qg4R9n1glTVqqNQj0F9grWetJXw2NXQOVMKn+w81WzwH4s3IZ
 QwIDAQAB
 -----END PUBLIC KEY-----`
 
+  context('serial', () => {
+    it('Converts serialNo to address', () => {
+      Assert.strictEqual(Utils.serialToAddress('e3b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4')
+      Assert.strictEqual(Utils.serialToAddress('b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0x00b0c44298fc1c149afbf4c8996fb92427ae41e4')
+      Assert.strictEqual(Utils.serialToAddress('4'), '0x0000000000000000000000000000000000000004')
+    })
+    it('Is a NOP for addresses', () => {
+      Assert.strictEqual(Utils.serialToAddress('0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4')
+    })
+  })
+
   context('address', () => {
     it('Passes for valid addresses', () => {
       Assert.strictEqual(Utils.isAddress('0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4'), true)
