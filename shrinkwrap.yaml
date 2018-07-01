@@ -1,5 +1,5 @@
 dependencies:
-  jsrsasign: 8.0.6
+  jsrsasign: 8.0.12
   moment: 2.21.0
   request: 2.83.0
   request-promise-native: 1.0.5
@@ -1487,10 +1487,10 @@ packages:
       '0': node >=0.6.0
     resolution:
       integrity: sha1-MT5mvB5cwG5Di8G3SZwuXFastqI=
-  /jsrsasign/8.0.6:
+  /jsrsasign/8.0.12:
     dev: false
     resolution:
-      integrity: sha1-RYbwCCPjAuWZokSke+IMYardD88=
+      integrity: sha1-Iqu5ZW00owuVMENnIINeicLlwxY=
   /jsx-ast-utils/2.0.1:
     dependencies:
       array-includes: 3.0.3
@@ -2556,7 +2556,7 @@ specifiers:
   eslint-plugin-standard: ^3.1.0
   express: ^4.16.2
   jsdoc: ^3.5.0
-  jsrsasign: ^8.0.3
+  jsrsasign: ^8.0.12
   mocha: ^4.1.0
   moment: ^2.20.1
   request: ^2.79.0

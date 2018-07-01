@@ -4,7 +4,7 @@ const RP = require('request-promise-native')
 // Common JSON sanity check callback
 function checkSuccess (jsonData) {
   if (!jsonData.data) {
-    throw new Error('API returned JSON without data')
+    throw Error('API returned JSON without data')
   }
 
   return jsonData

@@ -200,7 +200,7 @@ utils.jwkToHex = function (jwk) {
   } else if (jwk.kty === 'RSA' && jwk.e === 'AQAB') {
     return Buffer.from(jwk.n, 'base64').toString('hex')
   }
-  Assert(false, 'Unsupported JWK:' + jwk)
+  throw Error('Unsupported JWK:' + jwk)
 }
 
 /**
@@ -264,7 +264,7 @@ function readDerChunk (buffer, offset = 1) {
 utils.pemToJwk = function (pem) {
   const base64 = pem.match(/^-----BEGIN PUBLIC KEY-----([^-]+)-----END PUBLIC KEY-----/)
   if (!base64) {
-    Assert(false, 'Unsupported PEM:' + pem)
+    throw Error('Unsupported PEM:' + pem)
   }
   const der = Buffer.from(base64[1], 'base64')
   const main = readDerChunk(der)
@@ -295,7 +295,7 @@ utils.pemToJwk = function (pem) {
       }
     }
     default:
-      Assert(false, 'Unsupported PEM type:' + type.toString('hex'))
+      throw Error('Unsupported PEM type:' + type.toString('hex'))
   }
 }
 
@@ -329,7 +329,7 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
 ${all}
 -----END PUBLIC KEY-----`.replace(/(.{64})/g, '$1\n')
   }
-  Assert(false, 'Unsupported JWK:' + jwk)
+  throw Error('Unsupported JWK:' + jwk)
 }
 
 /**
@@ -424,7 +424,7 @@ utils.waitUntil = function (ms, callback) {
   Assert.strictEqual(typeof ms, 'number', 'ms must be of type `number`')
   Assert.strictEqual(typeof callback, 'function', 'callback must be of type `function`')
   return utils.wait(ms > 1000 ? 1000 : ms)
-    .then(_ => callback())
+    .then(() => callback())
     .then(done => {
       ms -= 1000
       if (!done && ms > 0) {
@@ -440,7 +440,7 @@ utils.waitUntil = function (ms, callback) {
  * @return {Object} New jsrsasign key object of given curve
  */
 utils.generateKeyPair = function (curveName) {
-  return Jsrsasign.KEYUTIL.generateKeypair('EC', curveName || 'secp256r1').prvKeyObj
+  return Jsrsasign.KEYUTIL.generateKeypair(curveName > 0 ? 'RSA' : 'EC', curveName || 'secp256r1').prvKeyObj
 }
 
 /**
@@ -472,7 +472,7 @@ utils.parseHexString = function (hex) {
 /**
  * Parse ASN.1 YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ into a Date object.
  * @param {string} date ASN.1 YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ date string.
- * @returns {Date} New date object
+ * @returns {Date?} New date object or `null` for invalid dates
  */
 utils.parseX509Date = function (date) {
   Assert.strictEqual(typeof date, 'string', 'date must be of type `string`')
@@ -507,4 +507,89 @@ utils.dateToString = function (date) {
 utils.isAddress = function (str) {
   Assert.strictEqual(typeof str, 'string', 'str must be of type `string`')
   return /^0x[0-9a-fA-F]{40}$/.test(str)
+}
+
+/**
+ * @param {string} pem PEM string
+ * @returns {Jsrsasign.X509} certificate
+ */
+function readPEM (pem) {
+  Assert.strictEqual(typeof pem, 'string', 'pem must be of type `string`')
+  // Ignore PEM headers (if present)
+  const base64 = pem.match(/^-----BEGIN CERTIFICATE-----([^-]+)-----END CERTIFICATE-----/)
+  // Load the certificate from PEM string
+  var cert = new Jsrsasign.X509()
+  cert.readCertHex(Buffer.from(base64 ? base64[1] : pem, 'base64').toString('hex'))
+  return cert
+}
+
+/**
+ * @param {Jsrsasign.X509} cert certificate
+ * @param {Jsrsasign.X509} caCert CA certificate
+ * @returns {boolean} success or failure
+ */
+function verifySignature (cert, caCert) {
+  try {
+    return cert.verifySignature(caCert.getPublicKey())
+  } catch (err) {
+    return false
+  }
+}
+
+/**
+ * @typedef Attribute
+ * @type {object}
+ * @property {string} oid The OID path for this attribute
+ * @property {string} value The value of this attribute
+ *
+ * @typedef Claim
+ * @type {object}
+ * @property {string} subjectaddress
+ * @property {string} serialNo
+ * @property {string} issuer
+ * @property {Date} notBefore
+ * @property {Date} notAfter
+ * @property {[Attribute]} attributes The array of attributes of this claim
+ **/
+
+/**
+ * Parse a PEM encoded X509 certificate.
+ * @param {string} pem The X509 certificate in PEM format
+ * @param {[string]} [chain] The X509 certificates of the CA chain
+ * @returns {Claim} The parsed X509 certificate
+ */
+utils.parsePem = function (pem, chain) {
+  // Load the certificate from PEM string
+  var cert = readPEM(pem)
+
+  // Validate certificate chain (issuer whitelist)
+  if (chain && !chain.some(caPem => verifySignature(cert, readPEM(caPem)))) {
+    throw Error('Signature verification failed')
+  }
+
+  const serialNo = utils.serialToAddress(cert.getSerialNumberHex())
+  const issuer = cert.getIssuerString()
+
+  const subjectPubkey = cert.getPublicKey().pubKeyHex
+  const subjectaddress = subjectPubkey !== undefined ? utils.userPubKeyHexToAddress(subjectPubkey) : undefined
+
+  const notAfter = utils.parseX509Date(cert.getNotAfter())
+  const notBefore = utils.parseX509Date(cert.getNotBefore())
+
+  // Extract the token information from the DName
+  const attributes = []
+  try {
+    for (let d = 0; ; d++) {
+      const tlv = Jsrsasign.ASN1HEX.getTLVbyList(cert.hex, 0, [0, 5, d])
+      const oidHex = Jsrsasign.ASN1HEX.getVbyList(tlv, 0, [0, 0])
+      if (oidHex === '') break
+      const valueHex = Jsrsasign.ASN1HEX.getVbyList(tlv, 0, [0, 1])
+      const value = utils.parseHexString(valueHex)
+
+      const oid = Jsrsasign.ASN1HEX.hextooidstr(oidHex)
+      attributes.push({oid, value})
+    }
+  } catch (err) {}
+
+  return {subjectaddress, serialNo, notBefore, notAfter, attributes, issuer}
 }

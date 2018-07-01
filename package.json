@@ -1,6 +1,6 @@
 {
   "name": "trustedkey-js",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "files": [
     "oid.js",
     "utils.js",
@@ -17,7 +17,7 @@
     "test": "npx standard && npx mocha test"
   },
   "dependencies": {
-    "jsrsasign": "^8.0.3",
+    "jsrsasign": "^8.0.12",
     "moment": "^2.20.1",
     "request": "^2.79.0",
     "request-promise-native": "^1.0.3"
