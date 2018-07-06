@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 const Assert = require('assert')
 const Utils = require('../utils')
+const FS = require('fs')
 
 describe('Utils', () => {
   const jwkEC = {'kty': 'EC', 'crv': 'P-256', 'x': 'P77Gc65MCzCAFSL3ym4jzVkBHPFRk2wREBVmi94ga74', 'y': 'qjzjb7UInV3zDzN0wwkCaVqtyOLGaCmLBdLee9SXKQw'}
@@ -167,6 +168,11 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
     })
   })
 
+  it('has path to tkroot', () => {
+    const tkroot = Utils.getRootPemPath()
+    Assert.ok(/^\/.+\/tkroot.pem$/.test(tkroot), 'Not an absolute path to tkroot.pem')
+  })
+
   context('parsePem', () => {
     const CommonName = `-----BEGIN CERTIFICATE-----
 MIIC+zCCAeWgAwIBAgIUPVlIf+L8kP4jMojpa4ga/Jra+n0wCwYJKoZIhvcNAQEL
@@ -260,6 +266,49 @@ jCBI1DO2Fg2FVAssiLbDnWdoRs1O8UjynCijjIQaLlW7/w8gzrgboiZY4zEDyhTE
 
     it('parse PEM and succeed with multiple issuers', () => {
       Assert.doesNotThrow(() => Utils.parsePem(CommonName, [CommonName, Issuer]))
+    })
+
+    it('parse issuer PEM', () => {
+      const parsed = Utils.parsePem(Issuer)
+      Assert.deepStrictEqual(parsed, {
+        'attributes': [
+          {
+            'oid': '2.5.4.6',
+            'value': 'US'
+          },
+          {
+            'oid': '2.5.4.8',
+            'value': 'Washington'
+          },
+          {
+            'oid': '2.5.4.7',
+            'value': 'Seattle'
+          },
+          {
+            'oid': '2.5.4.10',
+            'value': 'Trusted Key Solutions Inc.'
+          },
+          {
+            'oid': '2.5.4.3',
+            'value': 'Trusted Key Demo Authority'
+          }
+        ],
+        'issuer': '/C=US/ST=Washington/L=Seattle/O=Trusted Key Solutions Inc./CN=Trusted Key CA (4096 bit)',
+        'notAfter': new Date('2017-09-14T10:18:01.000Z'),
+        'notBefore': new Date('2016-09-14T10:18:01.000Z'),
+        'serialNo': '0x000000000000000000000000ca095a3f84a4cb75',
+        'subjectaddress': undefined
+      })
+    })
+
+    it('parse tkroot', () => {
+      const tkroot = FS.readFileSync(Utils.getRootPemPath(), 'ascii')
+      Assert.doesNotThrow(() => Utils.parsePem(tkroot))
+    })
+
+    it('validate issuer PEM', () => {
+      const tkroot = FS.readFileSync(Utils.getRootPemPath(), 'ascii')
+      Assert.doesNotThrow(() => Utils.parsePem(Issuer, [tkroot]))
     })
   })
 })

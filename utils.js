@@ -593,3 +593,11 @@ utils.parsePem = function (pem, chain) {
 
   return {subjectaddress, serialNo, notBefore, notAfter, attributes, issuer}
 }
+
+/**
+ * Return the absolute path to the Trusted Key root CA certificate.
+ * @returns {string} Absolute path to the Trusted Key root CA certificate
+ */
+utils.getRootPemPath = function () {
+  return require('path').join(__dirname, 'tkroot.pem')
+}
