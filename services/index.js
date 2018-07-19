@@ -4,6 +4,8 @@ const TrustedKeyIssuerService = require('./trustedkeyissuerservice')
 const ValidateService = require('./validateservice')
 const WalletService = require('./walletservice')
 
+module.exports = services
+
 /**
  * Convienience wrapper to instantiate all services in a single namespace
  *
@@ -14,7 +16,7 @@ const WalletService = require('./walletservice')
  * @param {String} issuerBaseUrl - The base issuer backend URL
  * @param {String} walletBaseUrl - The base wallet backend URL
 */
-const services = module.exports = function (appId, appSecret, issuerBaseUrl, walletBaseUrl) {
+function services (appId, appSecret, issuerBaseUrl, walletBaseUrl) {
   this.credentialRegistryService = new CredentialRegistryService(issuerBaseUrl, appId, appSecret)
   this.claimIssuerService = new ClaimIssuerService(issuerBaseUrl, appId, appSecret)
   this.trustedKeyIssuerService = new TrustedKeyIssuerService(issuerBaseUrl, appId, appSecret)

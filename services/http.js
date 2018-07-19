@@ -4,6 +4,8 @@ const URL = require('url')
 
 const Utils = require('../utils')
 
+module.exports = httpUtils
+
 /**
  * Utility class with wrappers for calling authenticated API endpoints.
  *
@@ -12,7 +14,7 @@ const Utils = require('../utils')
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const httpUtils = module.exports = function (backendUrl, appId, appSecret) {
+function httpUtils (backendUrl, appId, appSecret) {
   Assert.strictEqual(typeof backendUrl, 'string', 'backendUrl must be of type `string`')
   // Assert.strictEqual(typeof appId, "string", 'appId must be of type `string`')
   // Assert.strictEqual(typeof appSecret, "string", 'appSecret must be of type `string`')

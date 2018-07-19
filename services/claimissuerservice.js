@@ -7,6 +7,7 @@ const errJsonWithoutData = 'Unexpected: IssuerApi.getClaims returned invalid dat
 const errInvalidPemArray = 'Unexpected: IssuerApi.getClaims pemArray had < 2 elements.'
 const errInvalidPemData = 'Unexpected: IssuerApi.getClaims PEM data was invalid.'
 
+module.exports = ClaimIssuerService
 /**
  * A base implementation of the issuer API. Specific issuer APIs will derive from this.
  *
@@ -15,7 +16,7 @@ const errInvalidPemData = 'Unexpected: IssuerApi.getClaims PEM data was invalid.
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const ClaimIssuerService = module.exports = function (backendUrl, appId, appSecret) {
+function ClaimIssuerService (backendUrl, appId, appSecret) {
   this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
 
@@ -23,7 +24,7 @@ const ClaimIssuerService = module.exports = function (backendUrl, appId, appSecr
  * Get the claim(s) for the request identified by the given requestID.
  *
  * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestClaims` API.
- * @returns {Promise<Array<String>>} - Promise containing PEM array
+ * @returns {Promise.<Array.<String>>} - Promise containing PEM array
 */
 ClaimIssuerService.prototype.getClaims = function (requestIdString) {
   return this.httpClient.get('getTokens', {
@@ -51,17 +52,19 @@ ClaimIssuerService.prototype.getClaims = function (requestIdString) {
 }
 
 /**
+ * @typedef {string} Dotted
+ *
  * @typedef ImageInfo
  * @type {object}
  * @property {string} name - A unique file name for this image.
  * @property {string} data - The base64 encoded image data.
- * @property {string} [oid] - An optional OID for this image.
+ * @property {Dotted} [oid] - An optional OID for this image.
  *
  * @typedef RequestInfo
  * @type {object}
  * @property {string} pubkey - The HEX-encoded ES256 public key of the subject.
  * @property {string} expiry - The expiry date and time for the issued claims.
- * @property {object} attributes - A map with `"OID":"value"` pairs.
+ * @property {Object.<Dotted,string>} attributes - A map with `"OID":"value"` pairs.
  * @property {string} [requestid] - A unique ID for this request (for example, an UUID) for retries and notifications.
  * @property {Array.<ImageInfo>} [images] - An array with images, each with a `ImageInfo` map.
 */
@@ -70,7 +73,7 @@ ClaimIssuerService.prototype.getClaims = function (requestIdString) {
  * Request claims with the specified attributes and optional document images.
  *
  * @param {RequestInfo} requestInfo - The RequestInfo structure.
- * @returns {Promise} Promise returning true if success
+ * @returns {Promise.<boolean>} Promise returning true if success
 */
 ClaimIssuerService.prototype.requestImageClaims = function (requestInfo) {
   return this.httpClient.post('requestImageTokens', {}, requestInfo).then(json => {
@@ -91,7 +94,7 @@ ClaimIssuerService.prototype.requestImageClaims = function (requestInfo) {
  *
  * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestClaims` API.
  * @throws {Error} Throws Error if request failed
- * @returns {Promise} Promise returning true if success
+ * @returns {Promise.<boolean>} Promise returning true if success
 */
 ClaimIssuerService.prototype.deleteClaims = function (requestIdString) {
   return this.httpClient.get(this.backendUrl, 'deleteRequest', {
@@ -113,7 +116,7 @@ ClaimIssuerService.prototype.deleteClaims = function (requestIdString) {
  * Delete all the claims for the default credential.
  *
  * @throws {Error} Throws Error if request failed
- * @returns {Promise} Promise returning true if success
+ * @returns {Promise.<boolean>} Promise returning true if success
 */
 ClaimIssuerService.prototype.deleteAllClaims = function () {
   return this.httpClient.get(this.backendUrl, 'deleteAllRequests').then(json => {

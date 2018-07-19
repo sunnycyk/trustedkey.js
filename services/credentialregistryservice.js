@@ -2,6 +2,8 @@ const HttpUtils = require('./http')
 const Crypto = require('crypto')
 const Assert = require('assert')
 
+module.exports = CredentialRegistryService
+
 /**
  * Utility class with wrappers for the various Credential Registry API endpoints.
  *
@@ -10,7 +12,7 @@ const Assert = require('assert')
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const CredentialRegistryService = module.exports = function (backendUrl, appId, appSecret) {
+function CredentialRegistryService (backendUrl, appId, appSecret) {
   this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
 
@@ -22,7 +24,7 @@ const CredentialRegistryService = module.exports = function (backendUrl, appId, 
  * @param {string} delegateAddressString: The hex-encoded blockchain address of the registered delegate credential.
  * @param {Object} keyPair: Jsrsasign keypair object
  * @param {string} [address]: When revoking a claim, its address
- * @returns {Promise} returning JSON from API
+ * @returns {Promise.<object>} returning JSON from API
  */
 CredentialRegistryService.prototype.revokeCredential = function (delegateAddressString, keyPair, address) {
   Assert.strictEqual(typeof delegateAddressString, 'string', 'delegateAddressString must be of type `string`')

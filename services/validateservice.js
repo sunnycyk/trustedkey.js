@@ -2,13 +2,15 @@ const Assert = require('assert')
 const Utils = require('../utils')
 const RP = require('request-promise-native')
 
+module.exports = ValidateService
+
 /**
  * An implementation of a the validation API, used to check to validity of credentials and claims.
  *
  * @constructor
  * @param {String} backendUrl - The base backend URL
  */
-const ValidateService = module.exports = function (backendUrl) {
+function ValidateService (backendUrl = 'https://issuer.trustedkey.com') {
   this.httpClient = {
     get: function (url, params) {
       const uri = Utils.mergeQueryParams(url, params || {})
@@ -31,7 +33,7 @@ function validate (httpClient, address) {
  * Check the status of the specified blockchain transaction ID.
  *
  * @param {String} txid - Transaction ID to check.
- * @returns {Promise} Transaction status object
+ * @returns {Promise.<string>} Transaction status
 */
 ValidateService.prototype.getTransactionStatus = function (txid) {
   Assert.strictEqual(typeof txid, 'string', 'txid must be of type `string`')
@@ -39,7 +41,7 @@ ValidateService.prototype.getTransactionStatus = function (txid) {
   return this.httpClient.get('getTransactionStatus', {
     txid: txid
   }).then(r => {
-    return r.data
+    return r.data.getTransactionStatus
   })
 }
 
@@ -47,7 +49,7 @@ ValidateService.prototype.getTransactionStatus = function (txid) {
  * Validate the given credential by calling into the smart contract.
  *
  * @param {String} credentialAddressString - Credential to check.
- * @returns {boolean} Status indicating valid address
+ * @returns {Promise.<boolean>} Status indicating valid address
 */
 ValidateService.prototype.validateCredential = function (credentialAddressString) {
   return validate(this.httpClient, credentialAddressString)
@@ -56,7 +58,7 @@ ValidateService.prototype.validateCredential = function (credentialAddressString
 /**
  * Validate given claim(s) by calling into the smart contract.
  *
- * @param {String|Array} claimSerialNumbers - Array of claim serial numbers.
+ * @param {String|Array.<string>} claimSerialNumbers - Array of claim serial numbers.
  * @returns {Promise.<boolean>} Status indicating valid address
 */
 ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
@@ -70,10 +72,23 @@ ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
 }
 
 /**
+ * @typedef KeyInfo
+ * @type {object}
+ * @property {boolean} isRevoked - whether the address was revoked
+ * @property {number} timestamp - the unix-epoch timestamp of the last operation
+ * @property {string} revokedBy - the address of the revoker
+ * @property {string} replaces - the address of the credential that is replaced by this
+ * @property {string} recovery - the address of the registered recovery key
+ * @property {string} rootAddress - the root address of this credential
+ *
+ * @typedef {Object.<string,KeyInfo>} KeyInfoMap
+ */
+
+/**
  * Get extensive key information for given address.
  *
- * @param {String|Array} address - blockchain address(es) of claim/credential to query
- * @returns {object} KeyInfo structure from smart contract
+ * @param {String|Array.<string>} address - blockchain address(es) of claim/credential to query
+ * @returns {Promise.<KeyInfoMap>} KeyInfoMap structure from smart contract
 */
 ValidateService.prototype.keyInfo = function (address) {
   if (address instanceof Array) {

@@ -1,6 +1,8 @@
 const HttpUtils = require('./http')
 const RP = require('request-promise-native')
 
+module.exports = WalletService
+
 // Common JSON sanity check callback
 function checkSuccess (jsonData) {
   if (!jsonData.data) {
@@ -18,11 +20,16 @@ function checkSuccess (jsonData) {
  * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
  * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
  */
-const WalletService = module.exports = function (backendUrl, appId, appSecret) {
+function WalletService (backendUrl, appId, appSecret) {
   this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
 }
 
 /**
+ * @typedef ClaimOptions
+ * @type {object}
+ *
+ * @typedef {{userInfo: Object.<string,ClaimOptions?>}} ClaimsOptions
+ *
  * @typedef AuthorizeOptions
  * @type {object}
  * @property {string} [scope] - space delimited OpenID-Connect scopes; defaults to `openid`
@@ -32,7 +39,7 @@ const WalletService = module.exports = function (backendUrl, appId, appSecret) {
  * @property {string} [display] - specifies how to displays the user interface pages
  * @property {string} [prompt] - space delimited values that specifies whether to prompt for reauthentication
  * @property {string} [login_hint] - the login identifier the End-User might use to log in
- * @property {object|string} [claims] - JSON with the specific Claims be returned
+ * @property {ClaimsOptions|string} [claims] - JSON with the specific Claims be returned
  */
 
 /**
@@ -62,7 +69,7 @@ WalletService.prototype.buildAuthorizeUrl = function (redirectUri, state, option
  *
  * @param {String} redirectUri - Redirection URI to which the response will be sent
  * @param {String} code - the authorization code received from `/authorize`
- * @returns {Promise} JSON result from API
+ * @returns {Promise.<object>} JSON result from API
  */
 WalletService.prototype.token = function (redirectUri, code) {
   const required = {
@@ -83,7 +90,7 @@ WalletService.prototype.token = function (redirectUri, code) {
  * Get a user-information object associated with an access token
  *
  * @param {String} accessToken - Access Token received from `/token`
- * @returns {Promise} JSON result from API
+ * @returns {Promise.<object>} JSON result from API
  */
 WalletService.prototype.userInfo = function (accessToken) {
   const url = this.httpClient.buildUrl('/oauth/user')
@@ -95,7 +102,7 @@ WalletService.prototype.userInfo = function (accessToken) {
 
 /**
  * Grab the next login/signing request for the default registered credential.
- * @returns {Promise} JSON result from API
+ * @returns {Promise.<object>} JSON result from API
 */
 WalletService.prototype.getPendingSignatureRequest = function () {
   return this.httpClient.get('getPendingRequest')
@@ -106,7 +113,7 @@ WalletService.prototype.getPendingSignatureRequest = function () {
  * Remove the pending request identified by its nonce.
  *
  * @param {String} nonceString - The unique nonce for the login request, as received from the notification or pending request.
- * @returns {Promise} JSON result from API
+ * @returns {Promise.<object>} JSON result from API
 */
 WalletService.prototype.removeSignatureRequest = function (nonceString) {
   return this.httpClient.get('removePendingRequest', {
@@ -119,7 +126,7 @@ WalletService.prototype.removeSignatureRequest = function (nonceString) {
  * remote notification for notification sent to the default registered credential.
  *
  * @param {String} deviceTokenString The device's token for receiving notifications
- * @returns {Promise} JSON result from API
+ * @returns {Promise.<object>} JSON result from API
 */
 WalletService.prototype.registerDevice = function (deviceTokenString) {
   return this.httpClient.get('registerDevice', {
@@ -134,7 +141,7 @@ WalletService.prototype.registerDevice = function (deviceTokenString) {
  * @param {String} nonce - Request nonce
  * @param {String} message - Notification message
  * @param {String} [walletId] - Wallet-ID of the receiving Wallet App
- * @returns {Promise} JSON result from API
+ * @returns {Promise.<object>} JSON result from API
  */
 WalletService.prototype.notify = function (address, nonce, message, walletId) {
   return this.httpClient.get('notify', {
@@ -150,7 +157,7 @@ WalletService.prototype.notify = function (address, nonce, message, walletId) {
  * @type {object}
  * @property {string} [username] - Username of the account trying to log in (if known)
  * @property {string} [documentUrl] - The URL to a document for PDF signing
- * @property {Array|string} [objectIds] - A comma-separated list of OIDs
+ * @property {string|Array.<Dotted>} [objectIds] - A comma-separated list of OIDs
  * @property {string} [message] - An optional text message for transaction authorization
  * @property {string} [callbackType] - The type of callback, one of "POST", "SYSTEM", or "JSON"
  * @property {number|string} [timeout] - The timeout for the request in minutes
@@ -163,7 +170,7 @@ WalletService.prototype.notify = function (address, nonce, message, walletId) {
  * @param {string} nonce - Request nonce
  * @param {string} callbackUrl - Callback URL
  * @param {RequestOptions} [options] - Optional request options
- * @returns {Promise} JSON result from API
+ * @returns {Promise.<object>} JSON result from API
  */
 WalletService.prototype.request = function (address, nonce, callbackUrl, options) {
   const required = {

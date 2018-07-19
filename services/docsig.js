@@ -1,6 +1,8 @@
 const Utils = require('../utils')
 const HttpUtils = require('./http')
 
+module.exports = DocsigService
+
 /**
  * Submit
  *
@@ -12,7 +14,7 @@ const HttpUtils = require('./http')
  * @param {String} docsigAppId - Docsig application ID
  * @param {String} docsigAppSecret - Docsig shared secret
  */
-const DocsigService = module.exports = function (backendUrl, appId, appSecret, docsigAppId, docsigAppSecret) {
+function DocsigService (backendUrl, appId, appSecret, docsigAppId, docsigAppSecret) {
   this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
   this._docsigAppId = docsigAppId
   this._docsigAppSecret = docsigAppSecret
@@ -24,8 +26,8 @@ const DocsigService = module.exports = function (backendUrl, appId, appSecret, d
  * @param {String} signatoryEmail - Signatory email address
  * @param {String} callbackUrl - Url where signed PDF will be uploaded with PUT
  * @param {String} documentUrl - Url where document can be downloaded
- * @param {String} objectIds - Array of objectIds to request from signatory
- * @returns {String} JSON response from API
+ * @param {Array.<Dotted>} objectIds - Array of objectIds to request from signatory
+ * @returns {Promise.<Object>} JSON response from API
  */
 DocsigService.prototype.documentSignRequest = function (signatoryEmail, callbackUrl, documentUrl, objectIds) {
   const appId = this._docsigAppId

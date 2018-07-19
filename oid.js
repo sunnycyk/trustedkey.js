@@ -5,7 +5,10 @@
 //
 
 /**
+ * @typedef {string} Dotted
+ *
  * Some well-known OIDs, for convenience.
+ * @type {Object.<string,Dotted>}
  *
  * @exports oid
  */
