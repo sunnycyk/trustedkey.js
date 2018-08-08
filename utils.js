@@ -549,13 +549,13 @@ function verifySignature (cert, caCert) {
  * @property {string} issuer
  * @property {Date} notBefore
  * @property {Date} notAfter
- * @property {[Attribute]} attributes The array of attributes of this claim
+ * @property {Array.<Attribute>} attributes The array of attributes of this claim
  **/
 
 /**
  * Parse a PEM encoded X509 certificate.
  * @param {string} pem The X509 certificate in PEM format
- * @param {[string]} [chain] The X509 certificates of the CA chain
+ * @param {Array.<string>} [chain] The X509 certificates of the CA chain
  * @returns {Claim} The parsed X509 certificate
  */
 utils.parsePem = function (pem, chain) {
