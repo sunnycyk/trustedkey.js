@@ -311,4 +311,24 @@ jCBI1DO2Fg2FVAssiLbDnWdoRs1O8UjynCijjIQaLlW7/w8gzrgboiZY4zEDyhTE
       Assert.doesNotThrow(() => Utils.parsePem(Issuer, [tkroot]))
     })
   })
+
+  context('wait*', () => {
+    it('wait', async () => {
+      const now = new Date()
+      await Utils.wait(50)
+      Assert.ok(new Date().getTime() - now >= 50)
+    })
+
+    it('waitUntil immediate', async () => {
+      const now = new Date()
+      Assert.strictEqual(await Utils.waitUntil(500, () => 2), 2)
+      Assert.ok(new Date().getTime() - now < 500)
+    })
+
+    it('waitUntil timeout', async () => {
+      const now = new Date()
+      Assert.strictEqual(await Utils.waitUntil(50, () => false), false)
+      Assert.ok(new Date().getTime() - now >= 50)
+    })
+  })
 })

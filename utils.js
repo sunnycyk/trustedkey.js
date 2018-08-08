@@ -418,19 +418,21 @@ utils.wait = function (durationMS) {
  * Wait until the callback returns a truthy value (or timeout).
  * @param {Number} ms Number of milliseconds to wait.
  * @param {function} callback Callback to invoke (once a second).
+ * @param {Number} [step] Number of milliseconds to wait per try.
  * @return {Promise} Promise that resolves when the callback is truthy
  */
-utils.waitUntil = function (ms, callback) {
+utils.waitUntil = function (ms, callback, step = 1000) {
   Assert.strictEqual(typeof ms, 'number', 'ms must be of type `number`')
   Assert.strictEqual(typeof callback, 'function', 'callback must be of type `function`')
-  return utils.wait(ms > 1000 ? 1000 : ms)
-    .then(() => callback())
+  Assert.ok(step > 0, 'step must be of type `number` > 0')
+  return Promise.resolve()
+    .then(callback)
     .then(done => {
-      ms -= 1000
-      if (!done && ms > 0) {
-        return utils.waitUntil(ms, callback)
+      if (done || ms <= 0) {
+        return done
       }
-      return done
+      return utils.wait(Math.min(step, ms))
+        .then(() => utils.waitUntil(ms - step, callback, step))
     })
 }
 
