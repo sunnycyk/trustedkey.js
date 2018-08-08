@@ -1,6 +1,6 @@
 {
   "name": "trustedkey-js",
-  "version": "0.3.11",
+  "version": "0.3.12",
   "files": [
     "claims.js",
     "oid.js",

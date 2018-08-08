@@ -18,6 +18,7 @@ module.exports = {
   profile: OID.socialProfile,
   picture: OID.documentImageHead, // FIXME: should return URL
   email: OID.emailAddress,
+  email_verified: OID.emailAddress,
   address: OID.postalAddress,
   phone_number: OID.telephoneNumber,
   phone_number_verified: OID.telephoneNumber,
