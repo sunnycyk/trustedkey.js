@@ -16,7 +16,7 @@
     "services/claimissuerservice.js"
   ],
   "scripts": {
-    "test": "npx standard && npx mocha test"
+    "test": "standard && mocha test"
   },
   "dependencies": {
     "jsrsasign": "^8.0.12",
