@@ -546,9 +546,12 @@ function verifySignature (cert, caCert) {
  *
  * @typedef Claim
  * @type {object}
- * @property {string} subjectaddress
+ * @property {string} subjectaddress The public key hash
  * @property {string} serialNo
- * @property {string} issuer
+ * @property {string} issuer The X.500 issuer name
+ * @property {Array.<string>} ocsp Array of OCSP responders
+ * @property {Array.<string>} caissuer Array of issuers
+ * @property {Array.<string>} crl Array of CRL distribution URIs
  * @property {Date} notBefore
  * @property {Date} notAfter
  * @property {Array.<Attribute>} attributes The array of attributes of this claim
@@ -571,6 +574,8 @@ utils.parsePem = function (pem, chain) {
 
   const serialNo = utils.serialToAddress(cert.getSerialNumberHex())
   const issuer = cert.getIssuerString()
+  const ocsp = cert.getExtAIAInfo() || {caissuer: [], ocsp: []}
+  const crl = cert.getExtCRLDistributionPointsURI() || []
 
   const subjectPubkey = cert.getPublicKey().pubKeyHex
   const subjectaddress = subjectPubkey !== undefined ? utils.userPubKeyHexToAddress(subjectPubkey) : undefined
@@ -593,7 +598,7 @@ utils.parsePem = function (pem, chain) {
     }
   } catch (err) {}
 
-  return {subjectaddress, serialNo, notBefore, notAfter, attributes, issuer}
+  return {subjectaddress, serialNo, notBefore, notAfter, attributes, issuer, ...ocsp, crl}
 }
 
 /**

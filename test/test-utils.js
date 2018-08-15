@@ -175,72 +175,65 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
 
   context('parsePem', () => {
     const CommonName = `-----BEGIN CERTIFICATE-----
-MIIC+zCCAeWgAwIBAgIUPVlIf+L8kP4jMojpa4ga/Jra+n0wCwYJKoZIhvcNAQEL
-MH4xCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpXYXNoaW5ndG9uMRAwDgYDVQQHEwdT
-ZWF0dGxlMSMwIQYDVQQKExpUcnVzdGVkIEtleSBTb2x1dGlvbnMgSW5jLjEjMCEG
-A1UEAxMaVHJ1c3RlZCBLZXkgRGVtbyBBdXRob3JpdHkwHhcNMTYxMDI1MDMxODA5
-WhcNMTYxMTAxMDAwMDAwWjA8MSMwIQYKKwYBBAGZtqUXAQwTV0EgRHJpdmVyJ3Mg
-TGljZW5zZTEVMBMGA1UEAwwMUm9iZXJ0YSBXb25nMFkwEwYHKoZIzj0CAQYIKoZI
-zj0DAQcDQgAES9YTcTzRKCY590x1jXa0bdaDrsiw/NcBjOGQcl1VWMeU5VgvudG2
-vzaW+5Ju6FnyDwkYF+vTUPYxjcJa/Fr65aOBgTB/MAkGA1UdEwQCMAAwCwYDVR0P
-BAQDAgbAMB8GA1UdIwQYMBaAFO68m9/ft3F1ynsyqyGq9TqLsfaiMEQGA1UdHwQ9
-MDswOaA3oDWGM2V0aGVyZXVtOjB4NzFlNGM5MTRkZGM4ZDAxMjdmNGIyZGU3ZjVl
-ZTBkMDU4YzYwMTg5MDALBgkqhkiG9w0BAQsDggEBAHetkZo9pjY22WHs5fpaDIjx
-beHtscgOV47diVQiZqVVep9XjZ1NLQ6InZ+Iu6IwCuBPHYY13ItiLFVXexCPUNfY
-L2ugY2vY3Rx5ywC2DPY8U5w3n72zkW7gQpi1J/xxq4gBTQ0p1Y0oLRz2U1z7UXwo
-l1d6MfN+5n3I4xZ9EQ04UD6AzVq7TL3pz6rTVWz4f3geJVOLZ3/hk4MBBX8BzHiG
-HQ4PIlgKkxOnoxz2G2rxFF+eZi9W4upvT4umwijgTRMSq7lE1nyZ3iejIeh1C/T/
-Zg1WLttDTehDBl89HjfY/b8HcPFQMqJJ3k0s9K2T1V/vXOCnDBOEFisi5/Km+jw=
+MIIC3zCCAkqgAwIBAgIUXirhK4wUAJPiLMOaKoNm7LPygJ0wCwYJKoZIhvcNAQEL
+MHIxCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdTZWF0dGxlMRAwDgYDVQQHDAdTZWF0
+dGxlMRkwFwYDVQQKDBBUcnVzdGVkIEtleSB0ZXN0MQswCQYDVQQLDAJJVDEXMBUG
+A1UEAwwOdHJ1c3RlZGtleS5jb20wHhcNMTgwODE1MDUyMzE5WhcNMTkwODE1MDUy
+MzE5WjB+MTIwMAYKKwYBBAGZtqUXAQwidGVzdDAuNTQ0MDI2NTY1MTI5MTk0MkBl
+eGFtcGxlLmNvbTEVMBMGCisGAQQBmbalFwYMBUVtYWlsMTEwLwYJKoZIhvcNAQkB
+DCJ0ZXN0MC41NDQwMjY1NjUxMjkxOTQyQGV4YW1wbGUuY29tMFkwEwYHKoZIzj0C
+AQYIKoZIzj0DAQcDQgAEdspUievqnYouHiMH59o3WBf0T0N8u1/o/T+1v0quVGp1
+8loTHIx4Z61y0oWpFZhB2s3KrKObWcqHLKPB8c7Pr6OBsDCBrTAfBgNVHSMEGDAW
+gBQejFCw55gOlNPaar6PfScFCRqe8jAMBgNVHRMBAf8EAjAAMEQGA1UdHwQ9MDsw
+OaA3oDWGM2V0aGVyZXVtOjB4NDg2MjRiZWFhZDE0ZWEzODZlMjE4NTgzOWFhMTBj
+MWZhZjZiOTczYTA2BggrBgEFBQcBAQQqMCgwJgYIKwYBBQUHMAGGGmh0dHA6Ly9v
+Y3NwLnRydXN0ZWRrZXkuY29tMAsGCSqGSIb3DQEBCwOBgQAmwx5os70/C15SA5HQ
+fOTUINYvhyedJDoeE/SoEXMIfweeTDCzQ/p6/QavYo1MdH2xXeiAoFHnA7kMZLr1
+JB/s48mt2utkQblZCGaEqdwJMWJtbqa0fP6Rrl7Gj1c/CetnYUHyqR7tXHBOefTB
+NBtwmvc2VcFjR3HVBpjtVtxnkA==
 -----END CERTIFICATE-----`
     const Issuer = `-----BEGIN CERTIFICATE-----
-MIIFgTCCA2mgAwIBAgIJAMoJWj+EpMt1MA0GCSqGSIb3DQEBBQUAMH0xCzAJBgNV
-BAYTAlVTMRMwEQYDVQQIEwpXYXNoaW5ndG9uMRAwDgYDVQQHEwdTZWF0dGxlMSMw
-IQYDVQQKExpUcnVzdGVkIEtleSBTb2x1dGlvbnMgSW5jLjEiMCAGA1UEAxMZVHJ1
-c3RlZCBLZXkgQ0EgKDQwOTYgYml0KTAeFw0xNjA5MTQxMDE4MDFaFw0xNzA5MTQx
-MDE4MDFaMH4xCzAJBgNVBAYTAlVTMRMwEQYDVQQIEwpXYXNoaW5ndG9uMRAwDgYD
-VQQHEwdTZWF0dGxlMSMwIQYDVQQKExpUcnVzdGVkIEtleSBTb2x1dGlvbnMgSW5j
-LjEjMCEGA1UEAxMaVHJ1c3RlZCBLZXkgRGVtbyBBdXRob3JpdHkwggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDOCErJTN5qVM/TIbYmVNwFJ5iQD9Y0osIx
-lNBFu0Sv0rXWhoOwOZRJj6zdyV6Fttn1JY3L3HJ1B/NvQEx1jb6iZZPqSh1hfx/7
-qn7g4KejcscTnIzhQ6QRmdzWU7PlXNRr514wTCQsleKq4TXBBucDrJpAh3Ly8AM2
-EgOFArEhEU4UNuTVLTWwSX45zdUVxjRWyhqkJWkAR+vUsMJ6057pHGy8UMV7HT2e
-69bl6EVuOKg69jr+Mb7VlxMoFqwNUxYUugQLOVh88FB8GKKnatZTNZb1yEKcHT5v
-b1CDhH2fWCVNWqo1CPQX2CtZ60lfDY1dA5Uwqf7DzVbPAfizchlDAgMBAAGjggEB
-MIH+MBIGA1UdEwEB/wQIMAYBAf8CAQAwFgYDVR0lAQH/BAwwCgYIKwYBBQUHAwIw
-HQYDVR0OBBYEFO68m9/ft3F1ynsyqyGq9TqLsfaiMIGwBgNVHSMEgagwgaWAFKWk
-kv2Io6I+s4NCUP/8txnVUzL8oYGBpH8wfTELMAkGA1UEBhMCVVMxEzARBgNVBAgT
-Cldhc2hpbmd0b24xEDAOBgNVBAcTB1NlYXR0bGUxIzAhBgNVBAoTGlRydXN0ZWQg
-S2V5IFNvbHV0aW9ucyBJbmMuMSIwIAYDVQQDExlUcnVzdGVkIEtleSBDQSAoNDA5
-NiBiaXQpggkAnFIAoCPisjswDQYJKoZIhvcNAQEFBQADggIBADeHZjPBIepD6u74
-PymvazA2moXp/qZvUyfr/velUUZCNi7B0ys2gDdfCtC0AmdbndbMvtmDDK9nzVFQ
-AXUINRyKTrtscsRGRarKEaqU9NCUQa2oxyVmSB/iBKxhndle0tnIHX8uplIhKoY5
-w84jA3qvahZkEiuf6UP2ZQ7mPc3XAS2LKggL7GVhlvjdU+XZnjSp6JSAJHgdCSkI
-GcNlOM89aeBlBEXG/v8aJ+IieKNcXiK6tdKNGrAvEjIP0xdTaONX2JdQKFyoVtCB
-vaarZ9kwmD6ClP450zRGNeRDDvzB0ml42SgXGCtHUb/to/vmY7lFNiRoa6Gz8aHC
-etcFlN1y4EPQ0hvHD/CTw9QbMmBuezsprcQS/gVqfjLO/VSoLrmx1wd2ZrhC5Att
-odq/9ZrQcGEBz7RNC3hedRPWyY8JrdK9/mKzMMnwfILgWEo0TNp0jZDwTeu/BG6d
-RcPIP35iSdW+xHzZic4/whYdYcJh9sc1JJqdMen881Y26fO4hA3HEnIH1RSBYyO+
-rCvubAggXGXVzyvo0IM3retxdXa7Rq9aGbmBVJURYiuLr0tsGOmtpwbb0xNTFiq0
-jCBI1DO2Fg2FVAssiLbDnWdoRs1O8UjynCijjIQaLlW7/w8gzrgboiZY4zEDyhTE
-0YkCpbL9wGc8WYfnPCKwmCPJi0/j
+MIIC9TCCAl6gAwIBAgIJAOlzOVIJxpMrMA0GCSqGSIb3DQEBCwUAMHIxCzAJBgNV
+BAYTAlVTMRAwDgYDVQQIDAdTZWF0dGxlMRAwDgYDVQQHDAdTZWF0dGxlMRkwFwYD
+VQQKDBBUcnVzdGVkIEtleSB0ZXN0MQswCQYDVQQLDAJJVDEXMBUGA1UEAwwOdHJ1
+c3RlZGtleS5jb20wHhcNMTgwODE0MjMwNjQzWhcNMTgwODE1MjMwNjQzWjByMQsw
+CQYDVQQGEwJVUzEQMA4GA1UECAwHU2VhdHRsZTEQMA4GA1UEBwwHU2VhdHRsZTEZ
+MBcGA1UECgwQVHJ1c3RlZCBLZXkgdGVzdDELMAkGA1UECwwCSVQxFzAVBgNVBAMM
+DnRydXN0ZWRrZXkuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYIP4g
+x5CpzYawSeEMgtqqmDginuynxo3kikWyup+fo3Fq9qNT5P9+yEbXkzWB9ExwQ6Dq
+TOqQGr2ErUp99fTuvbnfuXfICUgSH6brsM2siETLgZIH7A72zPRL8HOBC+2qaeGG
+1yppZrIJBcAsAK5WxSKVmDGZGGDzsmJF6xFnnQIDAQABo4GSMIGPMBIGA1UdEwEB
+/wQIMAYBAf8CAQAwCwYDVR0PBAQDAgIEMCwGCWCGSAGG+EIBDQQfFh1PcGVuU1NM
+IEdlbmVyYXRlZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUHoxQsOeYDpTT2mq+j30n
+BQkanvIwHwYDVR0jBBgwFoAUHoxQsOeYDpTT2mq+j30nBQkanvIwDQYJKoZIhvcN
+AQELBQADgYEAH7Go0o8PGkS2QUXMSiFAm2UKU0GUFI17B6D1zxRyDpo6BI0AkbVl
+7320vYzyGU8RpINRUb+A4zGvBKre32hOAIEluECNSQzwKdjibKzQ0FrLFj3UBeE8
+bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
 -----END CERTIFICATE-----`
 
     it('parse EC PEM and attributes', () => {
       const parsed = Utils.parsePem(CommonName)
       Assert.deepStrictEqual(parsed, {
-        subjectaddress: '0xb5171dd3f853683bf3f5eba793a7b4cbe0d35e06',
-        serialNo: '0x3d59487fe2fc90fe233288e96b881afc9adafa7d',
-        notAfter: new Date('2016-11-01T00:00:00.000Z'),
-        notBefore: new Date('2016-10-25T03:18:09.000Z'),
-        issuer: '/C=US/ST=Washington/L=Seattle/O=Trusted Key Solutions Inc./CN=Trusted Key Demo Authority',
-        attributes: [{
-          oid: '1.3.6.1.4.1.53318295.1',
-          value: "WA Driver's License"
+        'subjectaddress': '0xc0a4afdef2b560e61576117d4c8e6b38cdf68467',
+        'serialNo': '0x5e2ae12b8c140093e22cc39a2a8366ecb3f2809d',
+        'notAfter': new Date('2019-08-15T05:23:19.000Z'),
+        'notBefore': new Date('2018-08-15T05:23:19.000Z'),
+        'issuer': '/C=US/ST=Seattle/L=Seattle/O=Trusted Key test/OU=IT/CN=trustedkey.com',
+        'attributes': [{
+          'oid': '1.3.6.1.4.1.53318295.1',
+          'value': 'test0.5440265651291942@example.com'
         },
         {
-          oid: '2.5.4.3',
-          value: 'Roberta Wong'
-        }]
+          'oid': '1.3.6.1.4.1.53318295.6',
+          'value': 'Email'
+        },
+        {
+          'oid': '1.2.840.113549.1.9.1',
+          'value': 'test0.5440265651291942@example.com'
+        }],
+        'caissuer': [],
+        'crl': ['ethereum:0x48624beaad14ea386e2185839aa10c1faf6b973a'],
+        'ocsp': ['http://ocsp.trustedkey.com']
       })
     })
 
@@ -278,7 +271,7 @@ jCBI1DO2Fg2FVAssiLbDnWdoRs1O8UjynCijjIQaLlW7/w8gzrgboiZY4zEDyhTE
           },
           {
             'oid': '2.5.4.8',
-            'value': 'Washington'
+            'value': 'Seattle'
           },
           {
             'oid': '2.5.4.7',
@@ -286,18 +279,25 @@ jCBI1DO2Fg2FVAssiLbDnWdoRs1O8UjynCijjIQaLlW7/w8gzrgboiZY4zEDyhTE
           },
           {
             'oid': '2.5.4.10',
-            'value': 'Trusted Key Solutions Inc.'
+            'value': 'Trusted Key test'
+          },
+          {
+            'oid': '2.5.4.11',
+            'value': 'IT'
           },
           {
             'oid': '2.5.4.3',
-            'value': 'Trusted Key Demo Authority'
+            'value': 'trustedkey.com'
           }
         ],
-        'issuer': '/C=US/ST=Washington/L=Seattle/O=Trusted Key Solutions Inc./CN=Trusted Key CA (4096 bit)',
-        'notAfter': new Date('2017-09-14T10:18:01.000Z'),
-        'notBefore': new Date('2016-09-14T10:18:01.000Z'),
-        'serialNo': '0x000000000000000000000000ca095a3f84a4cb75',
-        'subjectaddress': undefined
+        'issuer': '/C=US/ST=Seattle/L=Seattle/O=Trusted Key test/OU=IT/CN=trustedkey.com',
+        'notAfter': new Date('2018-08-15T23:06:43.000Z'),
+        'notBefore': new Date('2018-08-14T23:06:43.000Z'),
+        'serialNo': '0x000000000000000000000000e973395209c6932b',
+        'subjectaddress': undefined,
+        'caissuer': [],
+        'crl': [],
+        'ocsp': []
       })
     })
 
@@ -306,9 +306,8 @@ jCBI1DO2Fg2FVAssiLbDnWdoRs1O8UjynCijjIQaLlW7/w8gzrgboiZY4zEDyhTE
       Assert.doesNotThrow(() => Utils.parsePem(tkroot))
     })
 
-    it('validate issuer PEM', () => {
-      const tkroot = FS.readFileSync(Utils.getRootPemPath(), 'ascii')
-      Assert.doesNotThrow(() => Utils.parsePem(Issuer, [tkroot]))
+    it('validate self-signed PEM', () => {
+      Assert.doesNotThrow(() => Utils.parsePem(Issuer, [Issuer]))
     })
   })
 
