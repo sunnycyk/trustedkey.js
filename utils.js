@@ -1,7 +1,7 @@
 //
 //  utils.js
 //
-//  Copyright © 2017 Trusted Key Solutions. All rights reserved.
+//  Copyright © 2018 Trusted Key Solutions. All rights reserved.
 //
 
 const Crypto = require('crypto')
@@ -20,7 +20,7 @@ const utils = module.exports = {}
 /**
  * Add new query parameters to an existing URL.
  * @param {String} path - the current url (may be relative)
- * @param {Object} params - object with new query parameters
+ * @param {Object?} [params] - object with new query parameters
  * @returns {String} new URL with the query parameters merged
  */
 utils.mergeQueryParams = function (path, params) {
@@ -39,12 +39,16 @@ utils.mergeQueryParams = function (path, params) {
  * Get the SHA256 of the specified blob
  *
  * @param {String|Buffer} blob - String or Buffer
- * @param {String} encoding - OPTIONAL
- * @returns {Buffer} Buffer with SHA256
+ * @param {String} [encoding] - Optional encoding for the final digest
+ * @returns {Buffer|String} Buffer or string with SHA256
  */
 utils.sha256 = function (blob, encoding) {
   var hash = Crypto.createHash('sha256')
   return hash.update(blob).digest(encoding)
+}
+
+function pad0 (string, len) {
+  return String('0'.repeat(len) + string).slice(-len)
 }
 
 /**
@@ -56,15 +60,14 @@ utils.sha256 = function (blob, encoding) {
 utils.serialToAddress = function (serialhex) {
   Assert.strictEqual(typeof serialhex, 'string', 'serialhex must be of type `string`')
 
-  const paddedSerial = String('000000000000000000000000000000000000000' + serialhex).slice(-40)
-  return '0x' + paddedSerial
+  return '0x' + pad0(serialhex, 40)
 }
 
 /**
  * Base64 encode URL string
  *
  * @param {String} data - URL string to encode
- * @param {String} encoding - (optional) encoding of data
+ * @param {String} [encoding] - Optional encoding of data
  * @returns {String} base64-encoded URL
  */
 utils.base64url = function (data, encoding) {
@@ -74,7 +77,7 @@ utils.base64url = function (data, encoding) {
 /**
  * Get UTC seconds since UNIX epoch or convert date into unix time
  *
- * @param {Date} date - Optional date object
+ * @param {Date} [date] - Optional date object
  * @returns {Number} Unix timestamp
  */
 utils.getUnixTime = function (date) {
@@ -84,13 +87,13 @@ utils.getUnixTime = function (date) {
 /**
  * Create a JSON Web Signature
  *
- * @param {object|String} message - Message can be string or object. Objects will be JSON stringified
+ * @param {object|String|Buffer} message - Message can be string or object. Objects will be JSON stringified
  * @param {String} secret - HMAC shared secret
  * @param {object} [header={alg: "HS256"}] - JOSE header OPTIONAL
  * @returns {String} Concatenated JWS HMAC
  */
 utils.createHmacJws = function (message, secret, header) {
-  if (typeof message !== 'string') {
+  if (typeof message !== 'string' && !(message instanceof Buffer)) {
     message = JSON.stringify(message)
   }
   if (typeof header === 'undefined') {
@@ -106,13 +109,13 @@ utils.createHmacJws = function (message, secret, header) {
 /**
  * Create a JSON Web Signature
  *
- * @param {object|String} message - Message can be string or object. Objects will be JSON stringified
+ * @param {object|String|Buffer} message - Message can be string or object. Objects will be JSON stringified
  * @param {object} credential - key pair
  * @param {object} [header={alg: "ES256"}] - JOSE header OPTIONAL
  * @returns {String} Concatenated JWS
  */
 utils.createEcdsaJws = function (message, credential, header) {
-  if (typeof message !== 'string') {
+  if (typeof message !== 'string' && !(message instanceof Buffer)) {
     message = JSON.stringify(message)
   }
   if (typeof header === 'undefined') {
@@ -122,8 +125,12 @@ utils.createEcdsaJws = function (message, credential, header) {
   const jose = JSON.stringify(header)
   const jws = utils.base64url(jose) + '.' + utils.base64url(message)
   // Sign a digest value
-  const sig = credential.signWithMessageHash(utils.sha256(jws, 'hex'))
-  return jws + '.' + utils.base64url(Buffer.from(sig, 'hex'))
+  const sigDer = credential.signWithMessageHash(utils.sha256(jws, 'hex'))
+  const seq = readDerChunk(Buffer.from(sigDer, 'hex'))
+  const r = readDerChunk(seq)
+  const s = readDerChunk(seq, r.length + 2)
+  const sig = Buffer.from(pad0(r.toString('hex'), 64) + pad0(s.toString('hex'), 64), 'hex')
+  return jws + '.' + utils.base64url(sig)
 }
 
 /**
@@ -131,12 +138,12 @@ utils.createEcdsaJws = function (message, credential, header) {
  *
  * @param {String} jws the JWT or JWT as string
  * @param {String|Promise|function} secretCallback HMAC shared secret or public key
- * @returns {Object} the parsed claims or `null`
+ * @returns {Object?} the parsed claims or `null`
  */
 utils.verifyJws = function (jws, secretCallback) {
   Assert.strictEqual(typeof jws, 'string', 'jws must be of type `string`')
 
-  const parts = jws.split(/\./g)
+  const parts = jws.split('.')
   if (parts.length !== 3) { // JWE has 5 parts
     return null
   }
@@ -149,32 +156,34 @@ utils.verifyJws = function (jws, secretCallback) {
   function verify (secret) {
     if (jose.alg === 'ES256') {
       // ECDSA-SHA256
-      const payload = JSON.parse(message)
-      // OLD: Subject public key was stored in 'sub' claim
-      var pubkeyhex = secret || payload.sub || utils.jwkToHex(jose.jwk)
-      if (utils.checkECDSA('secp256r1', signeddata, pubkeyhex, signature)) {
-        return payload
+      var pubkeyhex = secret.pubKeyHex || secret || utils.jwkToHex(jose.jwk)
+      if (!utils.checkECDSA('secp256r1', signeddata, pubkeyhex, signature)) {
+        return null
       }
     } else if (jose.alg === 'HS256') {
       // HMAC-SHA256
       const hmac = Crypto.createHmac('sha256', secret)
-      if (hmac.update(signeddata).digest().equals(signature)) {
-        // Verify any nested JWT
-        if (jose.cty === 'JWT') {
-          return utils.verifyJws(message, secretCallback)
-        } else {
-          return JSON.parse(message)
-        }
+      if (!hmac.update(signeddata).digest().equals(signature)) {
+        return null
       }
-    } else if (jose.alg === 'RS256') {
-      // TODO
     } else if (jose.alg === 'none') {
       // NONE, only allow if callback returns empty string
-      if (signature === '' && secret === '') {
-        return JSON.parse(message)
+      if (signature.length !== 0 || secret.length !== 0) {
+        return null
       }
+    } else {
+      // TODO: support RS256
+      throw new Error('Unsupported JWS: ' + jws)
     }
-    return null
+
+    // Verify any nested JWT
+    if (jose.cty === 'JWT') {
+      return utils.verifyJws(message, secretCallback)
+    } else if (jose.typ === 'JWT') {
+      return JSON.parse(message)
+    } else {
+      return message
+    }
   }
 
   const secret = typeof secretCallback === 'function' ? secretCallback(jose) : secretCallback
@@ -241,7 +250,8 @@ function createDerChunk (tag, ...nested) {
   return Buffer.concat([header, ...nested])
 }
 
-function readDerChunk (buffer, offset = 1) {
+function readDerChunk (buffer, offset = 0) {
+  offset++
   let size = buffer.readUInt8(offset++)
   if (size === 0x81) {
     size = buffer.readUInt8(offset++)
@@ -269,14 +279,14 @@ utils.pemToJwk = function (pem) {
   const der = Buffer.from(base64[1], 'base64')
   const main = readDerChunk(der)
   const type = readDerChunk(main)
-  const pub = readDerChunk(main, type.length + 3)
+  const pub = readDerChunk(main, type.length + 2)
   switch (type.toString('hex')) {
     case '06092a864886f70d0101010500': {
       // RSA
-      const key = readDerChunk(pub, 2)
+      const key = readDerChunk(pub, 1)
       const n = readDerChunk(key).slice(1)
       const lenSize = n.length >= 0x100 ? 3 : (n.length >= 0x80 ? 2 : 1)
-      const e = readDerChunk(key, n.length + lenSize + 3)
+      const e = readDerChunk(key, n.length + lenSize + 2)
       return {
         'kty': 'RSA',
         'n': utils.base64url(n),
@@ -349,9 +359,18 @@ utils.checkECDSA = function (curveName, message, pubkey, signature) {
 
   if (pubkey.kty) {
     pubkey = utils.jwkToHex(pubkey)
+  } else if (pubkey.pubKeyHex) {
+    pubkey = pubkey.pubKeyHex
   }
   if (signature instanceof Buffer) {
     signature = signature.toString('hex')
+  }
+
+  // Convert r||s signatures to proper DER
+  if (signature.length === 128 && !/^303e02/i.test(signature)) {
+    const r = Buffer.from(signature.substr(0, 64), 'hex')
+    const s = Buffer.from(signature.substr(64), 'hex')
+    signature = createDerChunk(0x30, createDerChunk(0x02, r), createDerChunk(0x02, s)).toString('hex')
   }
 
   var curve = new Jsrsasign.KJUR.crypto.ECDSA({xy: pubkey, curve: curveName})

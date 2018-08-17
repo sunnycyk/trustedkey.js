@@ -134,7 +134,51 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
 
   context('base64url', () => {
     it('takes Buffer, returns string', () => {
-      Assert.strictEqual(Utils.base64url(Buffer.from('_-w', 'base64')), '_-w')
+      const base64urlTest = '_-w'
+      Assert.strictEqual(Utils.base64url(Buffer.from(base64urlTest, 'base64')), base64urlTest)
+    })
+  })
+
+  context('jws', () => {
+    const msg = 'msg'
+    const secret = 'secret'
+    const cred = Utils.generateKeyPair()
+
+    it('createEcdsaJws', () => {
+      const jws = Utils.createEcdsaJws(msg, cred)
+      const [h, m, s] = jws.split('.').map(p => Buffer.from(p, 'base64').toString('binary'))
+      Assert.strictEqual(h, '{"alg":"ES256"}')
+      Assert.strictEqual(m, msg)
+      Assert.strictEqual(s.length, 64)
+    })
+    it('createEcdsaJws+verifyJws', () => {
+      const jws = Utils.createEcdsaJws(msg, cred)
+      Assert.strictEqual(Utils.verifyJws(jws, cred).toString(), msg)
+    })
+    it('createHmacJws', () => {
+      const jws = Utils.createHmacJws(msg, secret)
+      Assert.strictEqual(jws, 'eyJhbGciOiJIUzI1NiJ9.bXNn.e8OZURoOjKajjBlfApR_nT8jbjdZakDJEfMDdqJhZhQ')
+      const [h, m, s] = jws.split('.').map(p => Buffer.from(p, 'base64').toString('binary'))
+      Assert.strictEqual(h, '{"alg":"HS256"}')
+      Assert.strictEqual(m, msg)
+      Assert.strictEqual(s.length, 32)
+    })
+    it('createHmacJws+verifyJws', () => {
+      const jws = Utils.createHmacJws(msg, secret)
+      Assert.strictEqual(Utils.verifyJws(jws, secret).toString(), msg)
+    })
+    it('createHmacJws+verifyJws with wrong secret', () => {
+      const jws = Utils.createHmacJws(msg, secret)
+      Assert.strictEqual(Utils.verifyJws(jws, 'wrong secret'), null)
+    })
+    it('"alg":"none"', () => {
+      Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', '').toString(), msg)
+    })
+    it('"alg":"none" fail if sig present', () => {
+      Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.e8OZURoOjKajjBlfApR_nT8jbjdZakDJEfMDdqJhZhQ', ''), null)
+    })
+    it('"alg":"none" fail if secret given', () => {
+      Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', secret), null)
     })
   })
 
