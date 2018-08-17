@@ -180,6 +180,11 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
     it('"alg":"none" fail if secret given', () => {
       Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', secret), null)
     })
+    it('verifyJws with "typ":"JWT"', () => {
+      const claims = {a: 2}
+      const jws = Utils.createHmacJws(claims, secret, {typ: 'JWT'})
+      Assert.deepStrictEqual(Utils.verifyJws(jws, secret), claims)
+    })
   })
 
   context('parseHexString', () => {
