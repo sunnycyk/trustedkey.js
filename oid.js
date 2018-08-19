@@ -225,6 +225,13 @@ module.exports = {
   publicKey: '1.3.6.1.4.1.53318295.15',
 
   /**
+     * The OID in dotted notation for the claim's level of assurance.
+     * @constant
+     * @default
+     */
+  levelOfAssurance: '1.3.6.1.4.1.53318295.16',
+
+  /**
      * The OID in dotted notation for a claim that the user is at least 21 years old.
      * @constant
      * @default

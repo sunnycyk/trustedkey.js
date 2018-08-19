@@ -46,5 +46,6 @@ module.exports = {
   'https://auth.trustedkey.com/courseName': OID.courseName,
   'https://auth.trustedkey.com/courseContents': OID.courseContents,
   'https://auth.trustedkey.com/publicKey': OID.publicKey,
+  'https://auth.trustedkey.com/levelOfAssurance': OID.levelOfAssurance,
   'https://auth.trustedkey.com/age21OrUp': OID.age21OrUp
 }
