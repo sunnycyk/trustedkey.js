@@ -309,6 +309,10 @@ utils.pemToJwk = function (pem) {
   }
 }
 
+function wrap (str) {
+  return str.replace(/(.{64})/g, '$1\n')
+}
+
 /**
  * Convert a JWK into a hex public key
  * @param {String} jwk - JSON Web Key for public EC key
@@ -321,9 +325,9 @@ utils.jwkToPem = function (jwk) {
     const all = Buffer.concat([Buffer.from(jwk.x, 'base64'), Buffer.from(jwk.y, 'base64')]).toString('base64')
     Assert.strictEqual(all.length, 88)
     // Basic template for the PEM; we'll overwrite the coordinates in-place
-    return `-----BEGIN PUBLIC KEY-----
+    return wrap(`-----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
------END PUBLIC KEY-----`.replace(/(.{64})/g, '$1\n')
+-----END PUBLIC KEY-----`)
   } else if (jwk.kty === 'RSA') {
     // Convert public key from JWK to base64 encoded public key
     const pub = Buffer.from(jwk.n, 'base64')
@@ -335,9 +339,9 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
     const der = createDerChunk(0x30, Buffer.from('300d06092a864886f70d0101010500', 'hex'), pkey)
     const all = der.toString('base64')
     // Basic template for the PEM; we'll overwrite the coordinates in-place
-    return `-----BEGIN PUBLIC KEY-----
+    return wrap(`-----BEGIN PUBLIC KEY-----
 ${all}
------END PUBLIC KEY-----`.replace(/(.{64})/g, '$1\n')
+-----END PUBLIC KEY-----`)
   }
   throw Error('Unsupported JWK:' + jwk)
 }
@@ -487,7 +491,7 @@ utils.oneTimePassword = function (key, message) {
  */
 utils.parseHexString = function (hex) {
   Assert.strictEqual(typeof hex, 'string', 'hex must be of type `string`')
-  return decodeURIComponent(hex.replace(/(..)/g, '%$1'))
+  return Buffer.from(hex, 'hex').toString('binary')
 }
 
 /**
