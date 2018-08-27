@@ -572,6 +572,7 @@ function verifySignature (cert, caCert) {
  * @property {string} subjectaddress The public key hash
  * @property {string} serialNo
  * @property {string} issuer The X.500 issuer name
+ * @property {string?} issuerPem The issuer X.509 PEM
  * @property {Array.<string>} ocsp Array of OCSP responders
  * @property {Array.<string>} caissuer Array of issuers
  * @property {Array.<string>} crl Array of CRL distribution URIs
@@ -591,8 +592,12 @@ utils.parsePem = function (pem, chain) {
   var cert = readPEM(pem)
 
   // Validate certificate chain (issuer whitelist)
-  if (chain && !chain.some(caPem => verifySignature(cert, readPEM(caPem)))) {
-    throw Error('Signature verification failed')
+  let issuerPem = null
+  if (chain) {
+    issuerPem = chain.find(caPem => verifySignature(cert, readPEM(caPem)))
+    if (issuerPem == null) {
+      throw Error('Signature verification failed')
+    }
   }
 
   const serialNo = utils.serialToAddress(cert.getSerialNumberHex())
@@ -621,7 +626,7 @@ utils.parsePem = function (pem, chain) {
     }
   } catch (err) {}
 
-  return {subjectaddress, serialNo, notBefore, notAfter, attributes, issuer, ...ocsp, crl}
+  return {subjectaddress, serialNo, notBefore, notAfter, attributes, issuer, crl, issuerPem, ...ocsp}
 }
 
 /**

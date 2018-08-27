@@ -268,6 +268,7 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
         'notAfter': new Date('2019-08-15T05:23:19.000Z'),
         'notBefore': new Date('2018-08-15T05:23:19.000Z'),
         'issuer': '/C=US/ST=Seattle/L=Seattle/O=Trusted Key test/OU=IT/CN=trustedkey.com',
+        'issuerPem': null,
         'attributes': [{
           'oid': '1.3.6.1.4.1.53318295.1',
           'value': 'test0.5440265651291942@example.com'
@@ -307,7 +308,7 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
     })
 
     it('parse PEM and succeed with multiple issuers', () => {
-      Assert.doesNotThrow(() => Utils.parsePem(CommonName, [CommonName, Issuer]))
+      Assert.strictEqual(Utils.parsePem(CommonName, [CommonName, Issuer]).issuerPem, Issuer)
     })
 
     it('parse issuer PEM', () => {
@@ -340,6 +341,7 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
           }
         ],
         'issuer': '/C=US/ST=Seattle/L=Seattle/O=Trusted Key test/OU=IT/CN=trustedkey.com',
+        'issuerPem': null,
         'notAfter': new Date('2018-08-15T23:06:43.000Z'),
         'notBefore': new Date('2018-08-14T23:06:43.000Z'),
         'serialNo': '0x000000000000000000000000e973395209c6932b',
@@ -352,7 +354,7 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
 
     it('parse tkroot', () => {
       const tkroot = FS.readFileSync(Utils.getRootPemPath(), 'ascii')
-      Assert.doesNotThrow(() => Utils.parsePem(tkroot))
+      Assert.doesNotThrow(() => Utils.parsePem(tkroot, [tkroot]))
     })
 
     it('validate self-signed PEM', () => {
