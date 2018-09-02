@@ -52,19 +52,20 @@ ClaimIssuerService.prototype.getClaims = function (requestIdString) {
 }
 
 /**
- * @typedef {string} Dotted
+ * @typedef {string|{data:string,loa:number=}} AttributeValue
  *
  * @typedef ImageInfo
  * @type {object}
  * @property {string} name - A unique file name for this image.
  * @property {string} data - The base64 encoded image data.
  * @property {Dotted} [oid] - An optional OID for this image.
+ * @property {number} [loa] - An optional level of assurance.
  *
  * @typedef RequestInfo
  * @type {object}
  * @property {string} pubkey - The HEX-encoded ES256 public key of the subject.
  * @property {string} expiry - The expiry date and time for the issued claims.
- * @property {Object.<Dotted,string>} attributes - A map with `"OID":"value"` pairs.
+ * @property {Object.<Dotted,AttributeValue>} attributes - A map with `"OID":"value"` pairs.
  * @property {string} [requestid] - A unique ID for this request (for example, an UUID) for retries and notifications.
  * @property {Array.<ImageInfo>} [images] - An array with images, each with a `ImageInfo` map.
 */

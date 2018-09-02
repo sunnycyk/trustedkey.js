@@ -20,7 +20,7 @@ const utils = module.exports = {}
 /**
  * Add new query parameters to an existing URL.
  * @param {String} path - the current url (may be relative)
- * @param {Object?} [params] - object with new query parameters
+ * @param {?Object} [params] - object with new query parameters
  * @returns {String} new URL with the query parameters merged
  */
 utils.mergeQueryParams = function (path, params) {
@@ -138,7 +138,7 @@ utils.createEcdsaJws = function (message, credential, header) {
  *
  * @param {String} jws the JWT or JWT as string
  * @param {String|Promise|function} secretCallback HMAC shared secret or public key
- * @returns {Object?} the parsed claims or `null`
+ * @returns {?Object} the parsed claims or `null`
  */
 utils.verifyJws = function (jws, secretCallback) {
   Assert.strictEqual(typeof jws, 'string', 'jws must be of type `string`')
@@ -497,7 +497,7 @@ utils.parseHexString = function (hex) {
 /**
  * Parse ASN.1 YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ into a Date object.
  * @param {string} date ASN.1 YYMMDDHHMMSSZ or YYYYMMDDHHMMSSZ date string.
- * @returns {Date?} New date object or `null` for invalid dates
+ * @returns {?Date} New date object or `null` for invalid dates
  */
 utils.parseX509Date = function (date) {
   Assert.strictEqual(typeof date, 'string', 'date must be of type `string`')
@@ -572,7 +572,7 @@ function verifySignature (cert, caCert) {
  * @property {string} subjectaddress The public key hash
  * @property {string} serialNo
  * @property {string} issuer The X.500 issuer name
- * @property {string?} issuerPem The issuer X.509 PEM
+ * @property {?string} issuerPem The issuer X.509 PEM
  * @property {Array.<string>} ocsp Array of OCSP responders
  * @property {Array.<string>} caissuer Array of issuers
  * @property {Array.<string>} crl Array of CRL distribution URIs
