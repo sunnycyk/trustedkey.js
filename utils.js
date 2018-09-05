@@ -487,11 +487,12 @@ utils.oneTimePassword = function (key, message) {
 /**
  * Decode a string with HEX-encoded data into a plain binary string.
  * @param {string} hex String with HEX-encoded data
+ * @param {string} [encoding='binary'] Optional encoding of the data
  * @returns {string} String with binary encoded data
  */
-utils.parseHexString = function (hex) {
+utils.parseHexString = function (hex, encoding) {
   Assert.strictEqual(typeof hex, 'string', 'hex must be of type `string`')
-  return Buffer.from(hex, 'hex').toString('binary')
+  return Buffer.from(hex, 'hex').toString(encoding || 'binary')
 }
 
 /**
@@ -619,7 +620,8 @@ utils.parsePem = function (pem, chain) {
       const oidHex = Jsrsasign.ASN1HEX.getVbyList(tlv, 0, [0, 0])
       if (oidHex === '') break
       const valueHex = Jsrsasign.ASN1HEX.getVbyList(tlv, 0, [0, 1])
-      const value = utils.parseHexString(valueHex)
+      // CONSIDER: use encoding based on ASN.1 value type
+      const value = utils.parseHexString(valueHex, 'utf-8')
 
       const oid = Jsrsasign.ASN1HEX.hextooidstr(oidHex)
       attributes.push({oid, value})
