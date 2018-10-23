@@ -21,8 +21,8 @@
   "dependencies": {
     "jsrsasign": "^8.0.12",
     "moment": "^2.20.1",
-    "request": "^2.79.0",
-    "request-promise-native": "^1.0.3"
+    "request": "^2.88.0",
+    "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
     "body-parser": "^1.18.2",
