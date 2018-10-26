@@ -47,5 +47,7 @@ module.exports = {
   'https://auth.trustedkey.com/courseContents': OID.courseContents,
   'https://auth.trustedkey.com/publicKey': OID.publicKey,
   'https://auth.trustedkey.com/levelOfAssurance': OID.levelOfAssurance,
-  'https://auth.trustedkey.com/age21OrUp': OID.age21OrUp
+  'https://auth.trustedkey.com/age21OrUp': OID.age21OrUp,
+  'https://auth.trustedkey.com/memberId': OID.memberId,
+  'https://auth.trustedkey.com/groupId': OID.groupId
 }

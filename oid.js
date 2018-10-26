@@ -236,5 +236,20 @@ module.exports = {
      * @constant
      * @default
      */
-  age21OrUp: '1.3.6.1.4.1.53318295.21'
+  age21OrUp: '1.3.6.1.4.1.53318295.21',
+
+  /**
+     * The OID in dotted notation for the member Id number.
+     * @constant
+     * @default
+     */
+  memberId: '1.3.6.1.4.1.53318295.22',
+
+  /**
+       * The OID in dotted notation for the group Id number.
+       * @constant
+       * @default
+       */
+  groupId: '1.3.6.1.4.1.53318295.23'
+
 }
