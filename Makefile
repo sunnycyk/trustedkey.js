@@ -1,4 +1,4 @@
-all: lock docs
+all: docs
 
 docs:
 	npx jsdoc -r -c jsdoc.json -d doc --verbose --pedantic . README.md
