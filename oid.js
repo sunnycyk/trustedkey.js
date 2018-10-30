@@ -19,77 +19,77 @@ module.exports = {
      * @constant
      * @default
      */
-  documentID: '1.3.6.1.4.1.53318295.2',
+  documentID: '1.3.6.1.4.1.51341.2',
 
   /**
      * The OID in dotted notation for an identity document's type, for example "Michigan (MI) Driver License".
      * @constant
      * @default
      */
-  documentType: '1.3.6.1.4.1.53318295.1',
+  documentType: '1.3.6.1.4.1.51341.1',
 
   /**
      * The OID in dotted notation for an identity document's class, for example "Passport", "Drivers License".
      * @constant
      * @default
      */
-  documentClass: '1.3.6.1.4.1.53318295.6',
+  documentClass: '1.3.6.1.4.1.51341.6',
 
   /**
      * The OID in dotted notation for an identity document's photo.
      * @constant
      * @default
      */
-  documentImageFront: '1.3.6.1.4.1.53318295.3',
+  documentImageFront: '1.3.6.1.4.1.51341.3',
 
   /**
      * The OID in dotted notation for an identity document's photo.
      * @constant
      * @default
      */
-  documentImageBack: '1.3.6.1.4.1.53318295.7',
+  documentImageBack: '1.3.6.1.4.1.51341.7',
 
   /**
      * The OID in dotted notation for an identity document's photo (headshot).
      * @constant
      * @default
      */
-  documentImageHead: '1.3.6.1.4.1.53318295.8',
+  documentImageHead: '1.3.6.1.4.1.51341.8',
 
   /**
      * The OID in dotted notation for an identity document's issuer.
      * @constant
      * @default
      */
-  documentIssuer: '1.3.6.1.4.1.53318295.4',
+  documentIssuer: '1.3.6.1.4.1.51341.4',
 
   /**
      * The OID in dotted notation for the result of the document verification.
      * @constant
      * @default
      */
-  documentResult: '1.3.6.1.4.1.53318295.5',
+  documentResult: '1.3.6.1.4.1.51341.5',
 
   /**
      * The OID in dotted notation for the original documents issue date.
      * @constant
      * @default
      */
-  documentIssueDate: '1.3.6.1.4.1.53318295.9',
+  documentIssueDate: '1.3.6.1.4.1.51341.9',
 
   /**
      * The OID in dotted notation for the original documents SHA256 digest.
      * @constant
      * @default
      */
-  documentDigest: '1.3.6.1.4.1.53318295.10',
+  documentDigest: '1.3.6.1.4.1.51341.10',
 
   /**
      * The OID in dotted notation for the documents Base64 thumbnail.
      * @constant
      * @default
      */
-  documentThumb: '1.3.6.1.4.1.53318295.11',
+  documentThumb: '1.3.6.1.4.1.51341.11',
 
   /**
      * The OID in dotted notation for the gender (F/M) on an identity document.
@@ -201,55 +201,55 @@ module.exports = {
      * @constant
      * @default
      */
-  socialProfile: '1.3.6.1.4.1.53318295.12',
+  socialProfile: '1.3.6.1.4.1.51341.12',
 
   /**
      * The OID in dotted notation for a completed course's name.
      * @constant
      * @default
      */
-  courseName: '1.3.6.1.4.1.53318295.13',
+  courseName: '1.3.6.1.4.1.51341.13',
 
   /**
      * The OID in dotted notation for a completed course's contents.
      * @constant
      * @default
      */
-  courseContents: '1.3.6.1.4.1.53318295.14',
+  courseContents: '1.3.6.1.4.1.51341.14',
 
   /**
      * The OID in dotted notation for the user's public key.
      * @constant
      * @default
      */
-  publicKey: '1.3.6.1.4.1.53318295.15',
+  publicKey: '1.3.6.1.4.1.51341.15',
 
   /**
      * The OID in dotted notation for the claim's level of assurance.
      * @constant
      * @default
      */
-  levelOfAssurance: '1.3.6.1.4.1.53318295.16',
+  levelOfAssurance: '1.3.6.1.4.1.51341.16',
 
   /**
      * The OID in dotted notation for a claim that the user is at least 21 years old.
      * @constant
      * @default
      */
-  age21OrUp: '1.3.6.1.4.1.53318295.21',
+  age21OrUp: '1.3.6.1.4.1.51341.21',
 
   /**
      * The OID in dotted notation for the member Id number.
      * @constant
      * @default
      */
-  memberId: '1.3.6.1.4.1.53318295.22',
+  memberId: '1.3.6.1.4.1.51341.22',
 
   /**
        * The OID in dotted notation for the group Id number.
        * @constant
        * @default
        */
-  groupId: '1.3.6.1.4.1.53318295.23'
+  groupId: '1.3.6.1.4.1.51341.23'
 
 }
