@@ -24,6 +24,7 @@ module.exports = {
   phone_number_verified: OID.telephoneNumber,
   gender: OID.gender,
   birthdate: OID.dateOfBirth,
+  middle_name: OID.middleName,
   'https://auth.trustedkey.com/root': null,
   // These are the known OIDs, excluding claims declared by OIDC spec:
   'https://auth.trustedkey.com/documentID': OID.documentID,
@@ -49,5 +50,6 @@ module.exports = {
   'https://auth.trustedkey.com/levelOfAssurance': OID.levelOfAssurance,
   'https://auth.trustedkey.com/age21OrUp': OID.age21OrUp,
   'https://auth.trustedkey.com/memberId': OID.memberId,
-  'https://auth.trustedkey.com/groupId': OID.groupId
+  'https://auth.trustedkey.com/groupId': OID.groupId,
+  'https://auth.trustedkey.com/suffix': OID.suffix
 }
