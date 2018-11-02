@@ -250,6 +250,20 @@ module.exports = {
        * @constant
        * @default
        */
-  groupId: '1.3.6.1.4.1.51341.23'
+  groupId: '1.3.6.1.4.1.51341.23',
+
+  /**
+       * The OID in dotted notation for a person's middle name.
+       * @constant
+       * @default
+       */
+  middleName: '1.3.6.1.4.1.51341.17',
+
+  /**
+       * TThe OID in dotted notation for a person's suffix. eg. Jr. Sr.
+       * @constant
+       * @default
+       */
+  suffix: '1.3.6.1.4.1.51341.18'
 
 }
