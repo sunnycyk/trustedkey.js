@@ -47,7 +47,7 @@ CredentialRegistryService.prototype.revokeCredential = function (delegateAddress
  * Revoke claim by sending a request to the blockchain.  The receiver must have been registered as
  * a delegate in the smart contract.
  *
- * @param {string} address When revoking a cliam, its address
+ * @param {string} address The address is its serial number
  * @returns {Promise.<object>} return JSON from API
  */
 CredentialRegistryService.prototype.revokeClaim = function (address) {
