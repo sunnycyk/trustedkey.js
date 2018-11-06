@@ -8,9 +8,9 @@ module.exports = CredentialRegistryService
  * Utility class with wrappers for the various Credential Registry API endpoints.
  *
  * @constructor
- * @param {String} backendUrl - The base backend URL
- * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
- * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
+ * @param {String} backendUrl The base backend URL
+ * @param {String} [appId] Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] Application shared secret, without this only unauthorized APIs can be used
  */
 function CredentialRegistryService (backendUrl, appId, appSecret) {
   this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
@@ -21,9 +21,9 @@ function CredentialRegistryService (backendUrl, appId, appSecret) {
  * a delegate in the smart contract. A challenge is signed by the default registered credential, which is
  * verified by the smart contract.
  *
- * @param {string} delegateAddressString: The hex-encoded blockchain address of the registered delegate credential.
- * @param {Object} keyPair: Jsrsasign keypair object
- * @param {string} [address]: When revoking a claim, its address
+ * @param {string} delegateAddressString The hex-encoded blockchain address of the registered delegate credential.
+ * @param {Object} keyPair Jsrsasign keypair object
+ * @param {string} [address] When revoking a claim, its address
  * @returns {Promise.<object>} returning JSON from API
  */
 CredentialRegistryService.prototype.revokeCredential = function (delegateAddressString, keyPair, address) {
@@ -39,6 +39,21 @@ CredentialRegistryService.prototype.revokeCredential = function (delegateAddress
   return this.httpClient.get('revoke', {
     signature: sig,
     pubkey: keyPair.pubKeyHex,
+    address: address
+  })
+}
+
+/**
+ * Revoke claim by sending a request to the blockchain.  The receiver must have been registered as
+ * a delegate in the smart contract.
+ *
+ * @param {string} address The address is its serial number
+ * @returns {Promise.<object>} return JSON from API
+ */
+CredentialRegistryService.prototype.revokeClaim = function (address) {
+  Assert.strictEqual(typeof address, 'string', 'address must be of type `string`')
+
+  return this.httpClient.get('revoke', {
     address: address
   })
 }
