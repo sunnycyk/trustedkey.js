@@ -25,6 +25,7 @@ module.exports = {
   gender: OID.gender,
   birthdate: OID.dateOfBirth,
   middle_name: OID.middleName,
+  preferred_username: null,
   'https://auth.trustedkey.com/root': null,
   // These are the known OIDs, excluding claims declared by OIDC spec:
   'https://auth.trustedkey.com/documentID': OID.documentID,
