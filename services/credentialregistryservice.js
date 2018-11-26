@@ -36,7 +36,7 @@ CredentialRegistryService.prototype.revokeCredential = function (delegateAddress
   var digest = hash.update(addressWithout0x, 'hex').update(address ? 'indirect' : 'revocation').digest('hex')
   var sig = keyPair.signWithMessageHash(digest)
 
-  return this.httpClient.get('revoke', {
+  return this.httpClient.post('revoke', {
     signature: sig,
     pubkey: keyPair.pubKeyHex,
     address: address
@@ -53,7 +53,7 @@ CredentialRegistryService.prototype.revokeCredential = function (delegateAddress
 CredentialRegistryService.prototype.revokeClaim = function (address) {
   Assert.strictEqual(typeof address, 'string', 'address must be of type `string`')
 
-  return this.httpClient.get('revoke', {
+  return this.httpClient.post('revoke', {
     address: address
   })
 }
