@@ -6,6 +6,7 @@
     "oid.js",
     "tkroot.pem",
     "utils.js",
+    "recoveryUtils.js",
     "services/docsig.js",
     "services/validateservice.js",
     "services/index.js",
