@@ -6,7 +6,7 @@ const Utils = require('../utils')
 const Http = require('../services/http')
 const WalletService = require('../services/walletservice')
 
-describe('http server', () => {
+describe('http server', function () {
   let app, http, server
   const secret = 'secret'
   const appid = 'id'
@@ -23,8 +23,8 @@ describe('http server', () => {
   after(done => {
     server.close(done)
   })
-  describe('http', () => {
-    before(() => {
+  describe('http', function () {
+    before(function () {
       function Auth (req, res, next) {
         const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
         if (req.headers.authorization) {
@@ -47,15 +47,15 @@ describe('http server', () => {
       app.get('/get', Auth, (req, res) => res.send('gotten'))
       app.post('/post', Auth, (req, res) => res.send('posted'))
     })
-    it('can build URL without params', () => {
+    it('can build URL without params', function () {
       const h = http.buildUrl('/test')
       Assert.strictEqual(h, `http://localhost:${server.address().port}/test`)
     })
-    it('can build URL with params', () => {
+    it('can build URL with params', function () {
       const h = http.buildUrl('/test', {a: 2})
       Assert.strictEqual(h, `http://localhost:${server.address().port}/test?a=2`)
     })
-    it('can create JWT header without body', async () => {
+    it('can create JWT header without body', async function () {
       const h = http.getHeaders('url')
       Assert.strictEqual(h.Authorization.split(' ')[0], 'Bearer')
       const claims = Utils.verifyJws(h.Authorization.split(' ')[1], secret)
@@ -68,7 +68,7 @@ describe('http server', () => {
       }
       Assert.deepStrictEqual(claims, payload)
     })
-    it('can create JWT header with body', async () => {
+    it('can create JWT header with body', async function () {
       const h = http.getHeaders('url', 'body')
       Assert.strictEqual(h.Authorization.split(' ')[0], 'Bearer')
       const claims = Utils.verifyJws(h.Authorization.split(' ')[1], secret)
@@ -81,40 +81,40 @@ describe('http server', () => {
       }
       Assert.deepStrictEqual(claims, payload)
     })
-    it('can POST without contents', async () => {
+    it('can POST without contents', async function () {
       Assert.strictEqual(await http.post('post'), 'posted')
     })
-    it('can POST with query parameters', async () => {
+    it('can POST with query parameters', async function () {
       Assert.strictEqual(await http.post('post', {a: 4}), 'posted')
     })
-    it('can POST string', async () => {
+    it('can POST string', async function () {
       Assert.strictEqual(await http.post('post', {}, 's'), 'posted')
     })
-    it('can POST object', async () => {
+    it('can POST object', async function () {
       Assert.strictEqual(await http.post('post', {}, {a: 2}), 'posted')
     })
-    it('can GET', async () => {
+    it('can GET', async function () {
       Assert.strictEqual(await http.get('get'), 'gotten')
     })
-    it('can GET with query parameters', async () => {
+    it('can GET with query parameters', async function () {
       Assert.strictEqual(await http.get('get', {a: 3}), 'gotten')
     })
-    it('can GET with trailing slash', async () => {
+    it('can GET with trailing slash', async function () {
       Assert.strictEqual(await http.get('/get', {a: 3}), 'gotten')
     })
-    it('can GET with absolute url', async () => {
+    it('can GET with absolute url', async function () {
       Assert.strictEqual(await http.get(`http://localhost:${server.address().port}/get`), 'gotten')
     })
   })
 
-  context('wallet OAuth', () => {
+  context('wallet OAuth', function () {
     const Code = 'codex'
     const State = 'statx'
     const AccessToken = 'access_tokenx'
     const UserInfo = {name: 'John Doe'}
     const RedirectUri = `https://localhost:123/callback`
     let walletservice
-    before(() => {
+    before(function () {
       walletservice = new WalletService(`http://localhost:${server.address().port}`, appid, secret)
       app.get('/oauth/authorize', (req, res) => {
         Assert.deepStrictEqual(req.query, {
@@ -152,11 +152,11 @@ describe('http server', () => {
         res.json(UserInfo)
       })
     })
-    it('can build /authorize URL', () => {
+    it('can build /authorize URL', function () {
       const url = walletservice.buildAuthorizeUrl(RedirectUri, State)
       Assert.strictEqual(url, `http://localhost:${server.address().port}/oauth/authorize?client_id=id&redirect_uri=${encodeURIComponent(RedirectUri)}&state=${State}&response_type=code&scope=openid`)
     })
-    it('can get code from /authorize', async () => {
+    it('can get code from /authorize', async function () {
       const url = walletservice.buildAuthorizeUrl(RedirectUri, State)
       try {
         await RP.get(url, {followRedirect: false})
@@ -165,7 +165,7 @@ describe('http server', () => {
         Assert.strictEqual(err.response.statusCode, 302)
       }
     })
-    it('can get access_token from /token', async () => {
+    it('can get access_token from /token', async function () {
       const grant = await walletservice.token(RedirectUri, Code)
       Assert.deepStrictEqual(grant, {
         'access_token': AccessToken,
@@ -173,7 +173,7 @@ describe('http server', () => {
         'token_type': 'Bearer'
       })
     })
-    it('can get user info from /user', async () => {
+    it('can get user info from /user', async function () {
       const userInfo = await walletservice.userInfo('access_tokenx')
       Assert.deepStrictEqual(userInfo, UserInfo)
     })

@@ -2,20 +2,20 @@
 const Assert = require('assert')
 const ValidateService = require('../services/validateservice')
 
-describe('ValidateService', () => {
+describe('ValidateService', function () {
   const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
   let validateService
 
-  it('can contruct with defaults', () => {
+  it('can contruct with defaults', function () {
     validateService = new ValidateService()
   })
 
-  it('can validate', async () => {
+  it('can validate', async function () {
     const valid = await validateService.validateCredential(ZERO_ADDR)
     Assert.strictEqual(valid, false)
   })
 
-  it('can get info', async () => {
+  it('can get info', async function () {
     const keyinfo = await validateService.keyInfo(ZERO_ADDR)
     Assert.deepStrictEqual(keyinfo,
       { '0x0000000000000000000000000000000000000000':
@@ -29,7 +29,7 @@ describe('ValidateService', () => {
       })
   })
 
-  it('can get info for many', async () => {
+  it('can get info for many', async function () {
     const keyinfo = await validateService.keyInfo([ZERO_ADDR, '0x0000000000000000000000000000000000000001'])
     Assert.deepStrictEqual(keyinfo,
       { '0x0000000000000000000000000000000000000000':

@@ -3,7 +3,7 @@ const Assert = require('assert')
 const Utils = require('../utils')
 const FS = require('fs')
 
-describe('Utils', () => {
+describe('Utils', function () {
   const jwkEC = {'kty': 'EC', 'crv': 'P-256', 'x': 'P77Gc65MCzCAFSL3ym4jzVkBHPFRk2wREBVmi94ga74', 'y': 'qjzjb7UInV3zDzN0wwkCaVqtyOLGaCmLBdLee9SXKQw'}
   const pemEC = `-----BEGIN PUBLIC KEY-----
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEP77Gc65MCzCAFSL3ym4jzVkBHPFR
@@ -20,49 +20,49 @@ UzWW9chCnB0+b29Qg4R9n1glTVqqNQj0F9grWetJXw2NXQOVMKn+w81WzwH4s3IZ
 QwIDAQAB
 -----END PUBLIC KEY-----`
 
-  context('serial', () => {
-    it('Converts serialNo to address', () => {
+  context('serial', function () {
+    it('Converts serialNo to address', function () {
       Assert.strictEqual(Utils.serialToAddress('e3b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4')
       Assert.strictEqual(Utils.serialToAddress('b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0x00b0c44298fc1c149afbf4c8996fb92427ae41e4')
       Assert.strictEqual(Utils.serialToAddress('4'), '0x0000000000000000000000000000000000000004')
     })
-    it('Is a NOP for addresses', () => {
+    it('Is a NOP for addresses', function () {
       Assert.strictEqual(Utils.serialToAddress('0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4')
     })
   })
 
-  context('address', () => {
-    it('Passes for valid addresses', () => {
+  context('address', function () {
+    it('Passes for valid addresses', function () {
       Assert.strictEqual(Utils.isAddress('0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4'), true)
       Assert.strictEqual(Utils.isAddress('0xE3b0c44298fC1c149afbf4D8996fb92427ae41e4'), true)
     })
-    it('Fails for invalid addresses', () => {
+    it('Fails for invalid addresses', function () {
       Assert.strictEqual(Utils.isAddress('asdf'), false)
       Assert.strictEqual(Utils.isAddress('0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'), false)
     })
   })
 
-  context('jwkToHex', () => {
-    it('converts RSA key', () => {
+  context('jwkToHex', function () {
+    it('converts RSA key', function () {
       const hex = 'ce084ac94cde6a54cfd321b62654dc052798900fd634a2c23194d045bb44afd2b5d68683b03994498facddc95e85b6d9f5258dcbdc727507f36f404c758dbea26593ea4a1d617f1ffbaa7ee0e0a7a372c7139c8ce143a41199dcd653b3e55cd46be75e304c242c95e2aae135c106e703ac9a408772f2f0033612038502b121114e1436e4d52d35b0497e39cdd515c63456ca1aa425690047ebd4b0c27ad39ee91c6cbc50c57b1d3d9eebd6e5e8456e38a83af63afe31bed597132816ac0d531614ba040b39587cf0507c18a2a76ad6533596f5c8429c1d3e6f6f5083847d9f58254d5aaa3508f417d82b59eb495f0d8d5d039530a9fec3cd56cf01f8b3721943'
       Assert.strictEqual(Utils.jwkToHex(jwkRSA), hex)
     })
-    it('converts EC key', () => {
+    it('converts EC key', function () {
       const hex = '043fbec673ae4c0b30801522f7ca6e23cd59011cf151936c111015668bde206bbeaa3ce36fb5089d5df30f3374c30902695aadc8e2c668298b05d2de7bd497290c'
       Assert.strictEqual(Utils.jwkToHex(jwkEC), hex)
     })
-    it('throws on invalid jwk', () => {
+    it('throws on invalid jwk', function () {
       Assert.throws(() => Utils.jwkToHex({kty: 'RSA'}), /Unsupported/)
       Assert.throws(() => Utils.jwkToHex({}), /Unsupported/)
     })
-    it('throws on RSA jwk with PK', () => {
+    it('throws on RSA jwk with PK', function () {
       Assert.throws(() => Utils.jwkToHex(Object.assign({d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE'}, jwkEC)))
       Assert.throws(() => Utils.jwkToHex(Object.assign({d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE'}, jwkRSA)))
     })
   })
 
-  context('pemToJwk', () => {
-    it('converts RSA key', () => {
+  context('pemToJwk', function () {
+    it('converts RSA key', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(pemRSA), jwkRSA)
       Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDNXFJO5cFMie4oQraVqnniopSW
@@ -75,10 +75,10 @@ xcbCgN76nCO1NGBgbQIDAQAB
         'n': 'zVxSTuXBTInuKEK2lap54qKUllfYQrrelpbj1Wx25b6sh_dHQqn2aPjOrgAcYsa8clhP1OiiZQAJ6Ek1tKhLrgGJR2TxbJjL_pMOw9WQaDwQ7D77mtHY4olUsjM2mmR1f3drwAXIVKAnafwlT46bEqp4x8XGwoDe-pwjtTRgYG0'
       })
     })
-    it('converts EC key', () => {
+    it('converts EC key', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(pemEC), jwkEC)
     })
-    it('converts small RSA key', () => {
+    it('converts small RSA key', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
 MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMiwb6VuAvJwHJyRZq1PJO8PpaaYjOXp
 iUpBdB8ZntA5vj9KB/ke4HU3gO/hqLEXZ7JkBW6O+ID0ZWlubkqkD7UCAwEAAQ==
@@ -89,7 +89,7 @@ iUpBdB8ZntA5vj9KB/ke4HU3gO/hqLEXZ7JkBW6O+ID0ZWlubkqkD7UCAwEAAQ==
         'e': 'AQAB'
       })
     })
-    it('converts small RSA key, e=3', () => {
+    it('converts small RSA key, e=3', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
 MFowDQYJKoZIhvcNAQEBBQADSQAwRgJBAM0cWN/vHXq5p6kIGCQ68JALYAUlUI/2
 RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
@@ -100,62 +100,62 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
         'e': 'Aw'
       })
     })
-    it('throws on invalid PEM', () => {
+    it('throws on invalid PEM', function () {
       Assert.throws(() => Utils.pemToJwk(``), /Unsupported/)
     })
   })
 
-  context('jwkToPem', () => {
-    it('converts RSA key', () => {
+  context('jwkToPem', function () {
+    it('converts RSA key', function () {
       Assert.strictEqual(Utils.jwkToPem(jwkRSA), pemRSA)
     })
-    it('converts EC key', () => {
+    it('converts EC key', function () {
       Assert.strictEqual(Utils.jwkToPem(jwkEC), pemEC)
     })
   })
 
-  context('mergeQueryParams', () => {
-    it('accepts null arg', () => {
+  context('mergeQueryParams', function () {
+    it('accepts null arg', function () {
       Assert.strictEqual(Utils.mergeQueryParams('abc', null), 'abc')
     })
-    it('merges params', () => {
+    it('merges params', function () {
       Assert.strictEqual(Utils.mergeQueryParams('abc', {a: 2, b: 'b c'}), 'abc?a=2&b=b%20c')
     })
   })
 
-  context('sha256', () => {
-    it('accepts and returns buffer', () => {
+  context('sha256', function () {
+    it('accepts and returns buffer', function () {
       Assert.ok(Utils.sha256(Buffer.from('')) instanceof Buffer)
     })
-    it('takes optional encoding', () => {
+    it('takes optional encoding', function () {
       Assert.strictEqual(Utils.sha256('', 'hex'), 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
     })
   })
 
-  context('base64url', () => {
-    it('takes Buffer, returns string', () => {
+  context('base64url', function () {
+    it('takes Buffer, returns string', function () {
       const base64urlTest = '_-w'
       Assert.strictEqual(Utils.base64url(Buffer.from(base64urlTest, 'base64')), base64urlTest)
     })
   })
 
-  context('jws', () => {
+  context('jws', function () {
     const msg = 'msg'
     const secret = 'secret'
     const cred = Utils.generateKeyPair()
 
-    it('createEcdsaJws', () => {
+    it('createEcdsaJws', function () {
       const jws = Utils.createEcdsaJws(msg, cred)
       const [h, m, s] = jws.split('.').map(p => Buffer.from(p, 'base64').toString('binary'))
       Assert.strictEqual(h, '{"alg":"ES256"}')
       Assert.strictEqual(m, msg)
       Assert.strictEqual(s.length, 64)
     })
-    it('createEcdsaJws+verifyJws', () => {
+    it('createEcdsaJws+verifyJws', function () {
       const jws = Utils.createEcdsaJws(msg, cred)
       Assert.strictEqual(Utils.verifyJws(jws, cred).toString(), msg)
     })
-    it('createHmacJws', () => {
+    it('createHmacJws', function () {
       const jws = Utils.createHmacJws(msg, secret)
       Assert.strictEqual(jws, 'eyJhbGciOiJIUzI1NiJ9.bXNn.e8OZURoOjKajjBlfApR_nT8jbjdZakDJEfMDdqJhZhQ')
       const [h, m, s] = jws.split('.').map(p => Buffer.from(p, 'base64').toString('binary'))
@@ -163,66 +163,66 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
       Assert.strictEqual(m, msg)
       Assert.strictEqual(s.length, 32)
     })
-    it('createHmacJws+verifyJws', () => {
+    it('createHmacJws+verifyJws', function () {
       const jws = Utils.createHmacJws(msg, secret)
       Assert.strictEqual(Utils.verifyJws(jws, secret).toString(), msg)
     })
-    it('createHmacJws+verifyJws with wrong secret', () => {
+    it('createHmacJws+verifyJws with wrong secret', function () {
       const jws = Utils.createHmacJws(msg, secret)
       Assert.strictEqual(Utils.verifyJws(jws, 'wrong secret'), null)
     })
-    it('"alg":"none"', () => {
+    it('"alg":"none"', function () {
       Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', '').toString(), msg)
     })
-    it('"alg":"none" fail if sig present', () => {
+    it('"alg":"none" fail if sig present', function () {
       Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.e8OZURoOjKajjBlfApR_nT8jbjdZakDJEfMDdqJhZhQ', ''), null)
     })
-    it('"alg":"none" fail if secret given', () => {
+    it('"alg":"none" fail if secret given', function () {
       Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', secret), null)
     })
-    it('verifyJws with "typ":"JWT"', () => {
+    it('verifyJws with "typ":"JWT"', function () {
       const claims = {a: 2}
       const jws = Utils.createHmacJws(claims, secret, {typ: 'JWT'})
       Assert.deepStrictEqual(Utils.verifyJws(jws, secret), claims)
     })
   })
 
-  context('parseHexString', () => {
-    it('parses hex into string', () => {
+  context('parseHexString', function () {
+    it('parses hex into string', function () {
       Assert.strictEqual(Utils.parseHexString('00'), '\0')
     })
   })
 
-  context('parseX509Date', () => {
-    it('parses string into date', () => {
+  context('parseX509Date', function () {
+    it('parses string into date', function () {
       Assert.ok(Utils.parseX509Date('141213110908Z') instanceof Date)
     })
-    it('parses short string into date', () => {
+    it('parses short string into date', function () {
       Assert.strictEqual(Utils.parseX509Date('141213110908Z').toUTCString(), 'Sat, 13 Dec 2014 11:09:08 GMT')
     })
-    it('parses long string into date', () => {
+    it('parses long string into date', function () {
       Assert.strictEqual(Utils.parseX509Date('19141213110908Z').toUTCString(), 'Sun, 13 Dec 1914 11:09:08 GMT')
     })
   })
 
-  context('dateToString', () => {
-    it('turns current Date into string', () => {
+  context('dateToString', function () {
+    it('turns current Date into string', function () {
       Assert.strictEqual(typeof Utils.dateToString(new Date()), 'string')
     })
-    it('turns past Date into short string', () => {
+    it('turns past Date into short string', function () {
       Assert.strictEqual(Utils.dateToString(new Date(Date.UTC(1970, 0, 1, 0, 2, 3))), '700101000203Z')
     })
-    it('turns future Date into long string', () => {
+    it('turns future Date into long string', function () {
       Assert.strictEqual(Utils.dateToString(new Date(Date.UTC(2080, 0, 1, 0, 0, 0))), '20800101000000Z')
     })
   })
 
-  it('has path to tkroot', () => {
+  it('has path to tkroot', function () {
     const tkroot = Utils.getRootPemPath()
     Assert.ok(/^\/.+\/tkroot.pem$/.test(tkroot), 'Not an absolute path to tkroot.pem')
   })
 
-  context('parsePem', () => {
+  context('parsePem', function () {
     const CommonName = `-----BEGIN CERTIFICATE-----
 MIIC3zCCAkqgAwIBAgIUXirhK4wUAJPiLMOaKoNm7LPygJ0wCwYJKoZIhvcNAQEL
 MHIxCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdTZWF0dGxlMRAwDgYDVQQHDAdTZWF0
@@ -260,7 +260,7 @@ AQELBQADgYEAH7Go0o8PGkS2QUXMSiFAm2UKU0GUFI17B6D1zxRyDpo6BI0AkbVl
 bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
 -----END CERTIFICATE-----`
 
-    it('parse EC PEM and attributes', () => {
+    it('parse EC PEM and attributes', function () {
       const parsed = Utils.parsePem(CommonName)
       Assert.deepStrictEqual(parsed, {
         'subjectaddress': '0xc0a4afdef2b560e61576117d4c8e6b38cdf68467',
@@ -287,31 +287,31 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
       })
     })
 
-    it('parse RSA PEM', () => {
+    it('parse RSA PEM', function () {
       Assert.doesNotThrow(() => Utils.parsePem(Issuer))
     })
 
-    it('parse PEM without header', () => {
+    it('parse PEM without header', function () {
       Assert.doesNotThrow(() => Utils.parsePem(CommonName.replace(/-----[^-]+-----|\r|\n/g, '')))
     })
 
-    it('parse PEM and fail without CA certs', () => {
+    it('parse PEM and fail without CA certs', function () {
       Assert.throws(() => Utils.parsePem(CommonName, []), 'Signature verification failed')
     })
 
-    it('parse PEM and fail with unknown issuer', () => {
+    it('parse PEM and fail with unknown issuer', function () {
       Assert.throws(() => Utils.parsePem(CommonName, [CommonName]), 'Signature verification failed')
     })
 
-    it('parse PEM and succeed with valid signature', () => {
+    it('parse PEM and succeed with valid signature', function () {
       Assert.doesNotThrow(() => Utils.parsePem(CommonName, [Issuer]))
     })
 
-    it('parse PEM and succeed with multiple issuers', () => {
+    it('parse PEM and succeed with multiple issuers', function () {
       Assert.strictEqual(Utils.parsePem(CommonName, [CommonName, Issuer]).issuerPem, Issuer)
     })
 
-    it('parse issuer PEM', () => {
+    it('parse issuer PEM', function () {
       const parsed = Utils.parsePem(Issuer)
       Assert.deepStrictEqual(parsed, {
         'attributes': [
@@ -352,30 +352,30 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
       })
     })
 
-    it('parse tkroot', () => {
+    it('parse tkroot', function () {
       const tkroot = FS.readFileSync(Utils.getRootPemPath(), 'ascii')
       Assert.doesNotThrow(() => Utils.parsePem(tkroot, [tkroot]))
     })
 
-    it('validate self-signed PEM', () => {
+    it('validate self-signed PEM', function () {
       Assert.doesNotThrow(() => Utils.parsePem(Issuer, [Issuer]))
     })
   })
 
-  context('wait*', () => {
-    it('wait', async () => {
+  context('wait*', function () {
+    it('wait', async function () {
       const now = new Date()
       await Utils.wait(50)
       Assert.ok(new Date().getTime() - now >= 50)
     })
 
-    it('waitUntil immediate', async () => {
+    it('waitUntil immediate', async function () {
       const now = new Date()
       Assert.strictEqual(await Utils.waitUntil(500, () => 2), 2)
       Assert.ok(new Date().getTime() - now < 500)
     })
 
-    it('waitUntil timeout', async () => {
+    it('waitUntil timeout', async function () {
       const now = new Date()
       Assert.strictEqual(await Utils.waitUntil(50, () => false), false)
       Assert.ok(new Date().getTime() - now >= 50)
