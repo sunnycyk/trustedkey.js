@@ -4,7 +4,6 @@ mkShell {
   buildInputs = [
     nodejs-8_x
     nodePackages_8_x.pnpm
-    nodePackages_8_x.yarn
   ];
 
   shellHook = ''

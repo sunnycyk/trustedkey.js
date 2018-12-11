@@ -15,7 +15,7 @@ const Moment = require('moment')
  *
  * @exports utils
 */
-const utils = module.exports = {}
+const utils = module.exports
 
 /**
  * Add new query parameters to an existing URL.
