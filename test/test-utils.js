@@ -125,10 +125,21 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
 
   context('sha256', function () {
     it('accepts and returns buffer', function () {
-      Assert.ok(Utils.sha256(Buffer.from('')) instanceof Buffer)
+      Assert.ok(Utils.sha256(Buffer.from('')) instanceof Buffer, 'Expected instanceof Buffer')
     })
     it('takes optional encoding', function () {
       Assert.strictEqual(Utils.sha256('', 'hex'), 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855')
+      Assert.strictEqual(Utils.sha256('', 'base64'), '47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=')
+    })
+  })
+
+  context('keccak256', function () {
+    it('accepts and returns buffer', function () {
+      Assert.ok(Utils.keccak256(Buffer.from('')) instanceof Buffer, 'Expected instanceof Buffer')
+    })
+    it('takes optional encoding', function () {
+      Assert.strictEqual(Utils.keccak256('', 'hex'), 'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470')
+      Assert.strictEqual(Utils.keccak256('', 'base64'), 'xdJGAYb3IzySfn2y3McDwOUAtlPKgic7e/rYBF2FpHA=')
     })
   })
 

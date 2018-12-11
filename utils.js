@@ -5,6 +5,7 @@
 //
 
 const Crypto = require('crypto')
+const CryptoJS = require('crypto-js')
 const Assert = require('assert')
 const Jsrsasign = require('jsrsasign')
 const URL = require('url')
@@ -43,8 +44,32 @@ utils.mergeQueryParams = function (path, params) {
  * @returns {Buffer|String} Buffer or string with SHA256
  */
 utils.sha256 = function (blob, encoding) {
-  var hash = Crypto.createHash('sha256')
+  const hash = Crypto.createHash('sha256')
   return hash.update(blob).digest(encoding)
+}
+
+/**
+ * Get the SHA3/KECCAK256 of the specified blob
+ *
+ * @param {String|Buffer} blob - String or Buffer
+ * @param {String} [encoding] - Optional encoding for the final digest
+ * @returns {Buffer|String} Buffer or string with SHA3/KECCAK256
+ */
+utils.keccak256 = function (blob, encoding) {
+  Assert.ok(encoding == null || encoding === 'hex' || encoding === 'base64', 'encoding should be `hex` or undefined')
+
+  if (blob instanceof Buffer) {
+    blob = CryptoJS.enc.Base64.parse(blob.toString('base64'))
+  }
+
+  const digest = CryptoJS.SHA3(blob, {outputLength: 256})
+  if (encoding === 'hex') {
+    return digest.toString(CryptoJS.enc.Hex)
+  } else if (encoding === 'base64') {
+    return digest.toString(CryptoJS.enc.Base64)
+  } else {
+    return Buffer.from(digest.toString(CryptoJS.enc.Base64), 'base64')
+  }
 }
 
 function pad0 (string, len) {
@@ -136,6 +161,7 @@ utils.createEcdsaJws = function (message, credential, header) {
 /**
  * Verify a JSON Web Signature
  *
+ * @deprecated
  * @param {String} jws the JWT or JWT as string
  * @param {String|Promise|function} secretCallback HMAC shared secret or public key
  * @returns {?Object} the parsed claims or `null`
@@ -187,7 +213,7 @@ utils.verifyJws = function (jws, secretCallback) {
   }
 
   const secret = typeof secretCallback === 'function' ? secretCallback(jose) : secretCallback
-  if (typeof secret.then === 'function') {
+  if (typeof secret === 'object' && typeof secret.then === 'function') {
     return secret.then(verify)
   } else {
     return verify(secret)
