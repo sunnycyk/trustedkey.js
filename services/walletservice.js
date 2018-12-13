@@ -82,7 +82,8 @@ WalletService.prototype.token = function (redirectUri, code) {
   const url = this.httpClient.buildUrl('/oauth/token')
   return RP.post(url, {
     json: true,
-    form: required
+    form: required,
+    forever: true
   })
 }
 
@@ -96,7 +97,8 @@ WalletService.prototype.userInfo = function (accessToken) {
   const url = this.httpClient.buildUrl('/oauth/user')
   return RP.get(url, {
     headers: {authorization: 'Bearer ' + accessToken},
-    json: true
+    json: true,
+    forever: true
   })
 }
 

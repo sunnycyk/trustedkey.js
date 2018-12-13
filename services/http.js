@@ -69,6 +69,7 @@ httpUtils.prototype.get = function (path, params) {
   return RP.get({
     uri: absoluteUrl,
     json: true,
+    forever: true,
     headers: this.getHeaders(absoluteUrl)
   })
 }
@@ -80,6 +81,7 @@ httpUtils.prototype.post = function (path, params, jsonBody) {
   return RP.post({
     uri: absoluteUrl,
     json: true,
+    forever: true,
     headers: this.getHeaders(absoluteUrl, body),
     body: jsonBody
   })

@@ -14,7 +14,7 @@ function ValidateService (backendUrl = 'https://issuer.trustedkey.com') {
   this.httpClient = {
     get: function (url, params) {
       const uri = Utils.mergeQueryParams(url, params || {})
-      return RP({baseUrl: backendUrl, url: uri, json: true})
+      return RP({baseUrl: backendUrl, url: uri, json: true, forever: true})
     }
   }
 }
