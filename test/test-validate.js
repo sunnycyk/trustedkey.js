@@ -6,7 +6,7 @@ describe('ValidateService', function () {
   const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
   let validateService
 
-  it('can contruct with defaults', function () {
+  it('can construct with defaults', function () {
     validateService = new ValidateService()
   })
 
