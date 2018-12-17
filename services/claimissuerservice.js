@@ -1,4 +1,4 @@
-//const HttpUtils = require('./http')
+const HttpUtils = require('./http')
 
 // Error strings
 const errPending = 'The operation is pending.'
@@ -28,9 +28,10 @@ function ClaimIssuerService (backendUrl, appId, appSecret) {
  * @returns {Promise.<Array.<String>>} - Promise containing PEM array
 */
 ClaimIssuerService.prototype.getClaims = function (requestIdString, pubkey) {
-  const query = { requestid: requestIdString }
-  if (pubkey != null) query["pubkey"] = pubkey
-  return this.httpClient.get('getTokens', query).then(json => {
+  return this.httpClient.get('getTokens',  {
+    requestid: requestIdString,
+    pubkey: pubkey
+  }).then(json => {
     if (!json.data) {
       throw new Error(errJsonWithoutData)
     }
