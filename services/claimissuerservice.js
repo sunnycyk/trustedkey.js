@@ -28,7 +28,7 @@ function ClaimIssuerService (backendUrl, appId, appSecret) {
  * @returns {Promise.<Array.<String>>} - Promise containing PEM array
 */
 ClaimIssuerService.prototype.getClaims = function (requestIdString, pubkey) {
-  return this.httpClient.get('getTokens',  {
+  return this.httpClient.get('getTokens', {
     requestid: requestIdString,
     pubkey: pubkey
   }).then(json => {
