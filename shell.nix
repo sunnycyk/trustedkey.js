@@ -1,9 +1,14 @@
 with import <nixpkgs> {};
-
-mkShell {
+let
+  pnpm = (nodePackages_8_x.pnpm.override (old: {
+    preRebuild = ''
+      sed -i 's|link:|file:|' package.json
+    '';
+  }));
+in mkShell {
   buildInputs = [
     nodejs-8_x
-    nodePackages_8_x.pnpm
+    pnpm
   ];
 
   shellHook = ''

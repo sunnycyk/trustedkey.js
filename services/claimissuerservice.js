@@ -1,4 +1,4 @@
-const HttpUtils = require('./http')
+//const HttpUtils = require('./http')
 
 // Error strings
 const errPending = 'The operation is pending.'
@@ -24,12 +24,13 @@ function ClaimIssuerService (backendUrl, appId, appSecret) {
  * Get the claim(s) for the request identified by the given requestID.
  *
  * @param {String} requestIdString - The requestID that was provided during a prior call to the issuer-specific `requestClaims` API.
+ * @param {String} pubkey -  Optional.  Only issuer needs to provide user's public key to get the claim
  * @returns {Promise.<Array.<String>>} - Promise containing PEM array
 */
-ClaimIssuerService.prototype.getClaims = function (requestIdString) {
-  return this.httpClient.get('getTokens', {
-    requestid: requestIdString
-  }).then(json => {
+ClaimIssuerService.prototype.getClaims = function (requestIdString, pubkey) {
+  const query = { requestid: requestIdString }
+  if (pubkey != null) query["pubkey"] = pubkey
+  return this.httpClient.get('getTokens', query).then(json => {
     if (!json.data) {
       throw new Error(errJsonWithoutData)
     }
