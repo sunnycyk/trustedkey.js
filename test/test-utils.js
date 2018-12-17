@@ -1,4 +1,4 @@
-w/* eslint-env mocha */
+/* eslint-env mocha */
 const Assert = require('assert')
 const Utils = require('../utils')
 const FS = require('fs')
