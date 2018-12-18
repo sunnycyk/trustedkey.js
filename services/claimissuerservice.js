@@ -40,11 +40,11 @@ ClaimIssuerService.prototype.getClaims = function (requestIdString, pubkey) {
       throw new Error(errPending)
     }
 
-    if (!json.data.pems || json.data.pems.length === 0) {
+    if (!json.data.pem || json.data.pem.length === 0) {
       throw new Error(errInvalidPemData)
     }
 
-    var pemArray = json.data.pems.replace(/-\r?\n-/g, '-\n!-').split('!')
+    var pemArray = json.data.pem.replace(/-\r?\n-/g, '-\n!-').split('!')
     if (pemArray.length === 0) {
       throw new Error(errInvalidPemArray)
     }
