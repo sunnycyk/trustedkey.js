@@ -53,7 +53,7 @@ CredentialRegistryService.prototype.revokeCredential = function (delegateAddress
 CredentialRegistryService.prototype.revokeClaim = function (address) {
   Assert.strictEqual(typeof address, 'string', 'address must be of type `string`')
 
-  return this.httpClient.post('revoke', {
+  return this.httpClient.post('revokeClaim', {
     address: address
   })
 }
