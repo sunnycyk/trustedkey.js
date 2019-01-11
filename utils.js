@@ -20,8 +20,8 @@ const utils = module.exports
 
 /**
  * Add new query parameters to an existing URL.
- * @param {String} path - the current url (may be relative)
- * @param {?Object} [params] - object with new query parameters
+ * @param {String} path the current url (may be relative)
+ * @param {?Object} [params] object with new query parameters
  * @returns {String} new URL with the query parameters merged
  */
 utils.mergeQueryParams = function (path, params) {
@@ -39,8 +39,8 @@ utils.mergeQueryParams = function (path, params) {
 /**
  * Get the SHA256 of the specified blob
  *
- * @param {String|Buffer} blob - String or Buffer
- * @param {String} [encoding] - Optional encoding for the final digest
+ * @param {String|Buffer} blob String or Buffer
+ * @param {String} [encoding] Optional encoding for the final digest
  * @returns {Buffer|String} Buffer or string with SHA256
  */
 utils.sha256 = function (blob, encoding) {
@@ -51,8 +51,8 @@ utils.sha256 = function (blob, encoding) {
 /**
  * Get the SHA3/KECCAK256 of the specified blob
  *
- * @param {String|Buffer} blob - String or Buffer
- * @param {String} [encoding] - Optional encoding for the final digest
+ * @param {String|Buffer} blob String or Buffer
+ * @param {String} [encoding] Optional encoding for the final digest
  * @returns {Buffer|String} Buffer or string with SHA3/KECCAK256
  */
 utils.keccak256 = function (blob, encoding) {
@@ -79,7 +79,7 @@ function pad0 (string, len) {
 /**
  * Convert a certificate serial number to blockchain address
  *
- * @param {String} serialhex - Hex encoded serial number
+ * @param {String} serialhex Hex encoded serial number
  * @returns {String} 0x prefixed address
  */
 utils.serialToAddress = function (serialhex) {
@@ -91,8 +91,8 @@ utils.serialToAddress = function (serialhex) {
 /**
  * Base64 encode URL string
  *
- * @param {String} data - URL string to encode
- * @param {String} [encoding] - Optional encoding of data
+ * @param {String|Uint8Array|Array} data data to encode
+ * @param {String} [encoding] Optional encoding of data
  * @returns {String} base64-encoded URL
  */
 utils.base64url = function (data, encoding) {
@@ -102,7 +102,7 @@ utils.base64url = function (data, encoding) {
 /**
  * Get UTC seconds since UNIX epoch or convert date into unix time
  *
- * @param {Date} [date] - Optional date object
+ * @param {Date} [date] Optional date object
  * @returns {Number} Unix timestamp
  */
 utils.getUnixTime = function (date) {
@@ -112,9 +112,9 @@ utils.getUnixTime = function (date) {
 /**
  * Create a JSON Web Signature
  *
- * @param {object|String|Buffer} message - Message can be string or object. Objects will be JSON stringified
- * @param {String} secret - HMAC shared secret
- * @param {object} [header={alg: "HS256"}] - JOSE header OPTIONAL
+ * @param {object|String|Buffer} message Message can be string or object. Objects will be JSON stringified
+ * @param {String} secret HMAC shared secret
+ * @param {object} [header={alg: "HS256"}] JOSE header OPTIONAL
  * @returns {String} Concatenated JWS HMAC
  */
 utils.createHmacJws = function (message, secret, header) {
@@ -134,9 +134,9 @@ utils.createHmacJws = function (message, secret, header) {
 /**
  * Create a JSON Web Signature
  *
- * @param {object|String|Buffer} message - Message can be string or object. Objects will be JSON stringified
- * @param {object} credential - key pair
- * @param {object} [header={alg: "ES256"}] - JOSE header OPTIONAL
+ * @param {object|String|Buffer} message Message can be string or object. Objects will be JSON stringified
+ * @param {object} credential key pair
+ * @param {object} [header={alg: "ES256"}] JOSE header OPTIONAL
  * @returns {String} Concatenated JWS
  */
 utils.createEcdsaJws = function (message, credential, header) {
@@ -221,8 +221,24 @@ utils.verifyJws = function (jws, secretCallback) {
 }
 
 /**
+ * @typedef JwkEC
+ * @type {object}
+ * @property {'EC'} kty Key Type
+ * @property {'P-256'} crv Elliptic Curve
+ * @property {string} x Base64-URL encoded X coordinate
+ * @property {string} y Base64-URL encoded Y coordinate
+ * @property {string} [d] Base64-URL encoded private key
+ *
+ * @typedef JwkRSA
+ * @type {object}
+ * @property {'RSA'} kty Key Type
+ * @property {string} e Base64-URL encoded exponent
+ * @property {string} n Base64-URL encoded modulus
+ */
+
+/**
  * Convert a JWK into a hex public key
- * @param {String} jwk - JSON Web Key for public EC key
+ * @param {JwkEC|JwkRSA} jwk JSON Web Key for public EC key
  * @return {String} string with hex public key
  */
 utils.jwkToHex = function (jwk) {
@@ -240,8 +256,8 @@ utils.jwkToHex = function (jwk) {
 
 /**
  * Convert a hex public key into JWK
- * @param {String} pubKeyHex - hex encoded ECC public key
- * @return {String} JSON Web Key
+ * @param {String} pubKeyHex hex encoded ECC public key
+ * @return {JwkEC} JSON Web Key
  */
 utils.hexToJwk = function (pubKeyHex) {
   Assert.strictEqual(pubKeyHex.length, 130)
@@ -295,7 +311,7 @@ function readDerChunk (buffer, offset = 0) {
 /**
  * Convert a PEM encoded public key to JWK, with minimal checking.
  * @param {string} pem Public key in PEM format
- * @returns {string} JSON Web Key
+ * @returns {JwkRSA|JwkEC} JSON Web Key
  */
 utils.pemToJwk = function (pem) {
   const base64 = pem.match(/^-----BEGIN PUBLIC KEY-----([^-]+)-----END PUBLIC KEY-----/)
@@ -315,8 +331,8 @@ utils.pemToJwk = function (pem) {
       const e = readDerChunk(key, n.length + lenSize + 2)
       return {
         'kty': 'RSA',
-        'n': utils.base64url(n),
-        'e': utils.base64url(e)
+        'e': utils.base64url(e),
+        'n': utils.base64url(n)
       }
     }
     case '06072a8648ce3d020106082a8648ce3d030107': {
@@ -341,7 +357,7 @@ function wrap (str) {
 
 /**
  * Convert a JWK into a hex public key
- * @param {String} jwk - JSON Web Key for public EC key
+ * @param {JwkEC|JwkRSA} jwk JSON Web Key for public EC key
  * @return {String} string with PEM public key
  */
 utils.jwkToPem = function (jwk) {
@@ -375,10 +391,10 @@ ${all}
 /**
  * Verify an ECDSA named curve signed message
  *
- * @param {String} curveName - Curve name (secp256r1)
- * @param {String} message - Message payload
- * @param {String|Object} pubkey - Public key to check signature against (hex)
- * @param {Buffer|String} signature - Signature payload (hex)
+ * @param {String} curveName Curve name (secp256r1)
+ * @param {String} message Message payload
+ * @param {String|Object} pubkey Public key to check signature against (hex)
+ * @param {Buffer|String} signature Signature payload (hex)
  * @return {boolean} Indicate whether signature is correct
  */
 utils.checkECDSA = function (curveName, message, pubkey, signature) {
@@ -410,7 +426,7 @@ utils.checkECDSA = function (curveName, message, pubkey, signature) {
 /**
  * Convert a user public key to blockchain address
  *
- * @param {String} pubkeyhex - User ECC public key (hex encoded)
+ * @param {String} pubkeyhex User ECC public key (hex encoded)
  * @returns {String} User address with leading 0x
  */
 utils.userPubKeyHexToAddress = function (pubkeyhex) {
@@ -444,8 +460,8 @@ utils.promisify = function (call) {
 
 /**
  * Generate a 32-byte random nonce.
- * @param {String} [encoding] - Encoding for result (default base64)
- * @param {Number} [length] - Number of bytes for the result (default 32)
+ * @param {String} [encoding] Encoding for result (default base64)
+ * @param {Number} [length] Number of bytes for the result (default 32)
  * @returns {String} The encoding of the nonce
  */
 utils.generateNonce = function (encoding, length) {
@@ -663,4 +679,14 @@ utils.parsePem = function (pem, chain) {
  */
 utils.getRootPemPath = function () {
   return require('path').join(__dirname, 'tkroot.pem')
+}
+
+/**
+ * Get the JWK thumbprint for the given key.
+ * @param {JwkEC|JwkRSA} jwk JSON Web Key
+ * @returns {string} Base64-URL encoded thumbprint for the JWK
+ */
+utils.getJwkThumbprint = function (jwk) {
+  const json = JSON.stringify(jwk, Object.keys(jwk).sort())
+  return this.base64url(utils.sha256(json))
 }

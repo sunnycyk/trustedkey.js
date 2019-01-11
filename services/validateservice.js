@@ -8,7 +8,7 @@ module.exports = ValidateService
  * An implementation of a the validation API, used to check to validity of credentials and claims.
  *
  * @constructor
- * @param {String} backendUrl - The base backend URL
+ * @param {String} backendUrl The base backend URL
  */
 function ValidateService (backendUrl = 'https://issuer.trustedkey.com') {
   this.httpClient = {
@@ -32,7 +32,7 @@ function validate (httpClient, address) {
 /**
  * Check the status of the specified blockchain transaction ID.
  *
- * @param {String} txid - Transaction ID to check.
+ * @param {String} txid Transaction ID to check.
  * @returns {Promise.<string>} Transaction status
 */
 ValidateService.prototype.getTransactionStatus = function (txid) {
@@ -48,7 +48,7 @@ ValidateService.prototype.getTransactionStatus = function (txid) {
 /**
  * Validate the given credential by calling into the smart contract.
  *
- * @param {String} credentialAddressString - Credential to check.
+ * @param {String} credentialAddressString Credential to check.
  * @returns {Promise.<boolean>} Status indicating valid address
 */
 ValidateService.prototype.validateCredential = function (credentialAddressString) {
@@ -58,7 +58,7 @@ ValidateService.prototype.validateCredential = function (credentialAddressString
 /**
  * Validate given claim(s) by calling into the smart contract.
  *
- * @param {String|Array.<string>} claimSerialNumbers - Array of claim serial numbers.
+ * @param {String|Array.<string>} claimSerialNumbers Array of claim serial numbers.
  * @returns {Promise.<boolean>} Status indicating valid address
 */
 ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
@@ -74,12 +74,12 @@ ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
 /**
  * @typedef KeyInfo
  * @type {object}
- * @property {boolean} isRevoked - whether the address was revoked
- * @property {number} timestamp - the unix-epoch timestamp of the last operation
- * @property {string} revokedBy - the address of the revoker
- * @property {string} replaces - the address of the credential that is replaced by this
- * @property {string} recovery - the address of the registered recovery key
- * @property {string} rootAddress - the root address of this credential
+ * @property {boolean} isRevoked whether the address was revoked
+ * @property {number} timestamp the unix-epoch timestamp of the last operation
+ * @property {string} revokedBy the address of the revoker
+ * @property {string} replaces the address of the credential that is replaced by this
+ * @property {string} recovery the address of the registered recovery key
+ * @property {string} rootAddress the root address of this credential
  *
  * @typedef {Object.<string,KeyInfo>} KeyInfoMap
  */
@@ -87,7 +87,7 @@ ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
 /**
  * Get extensive key information for given address.
  *
- * @param {String|Array.<string>} address - blockchain address(es) of claim/credential to query
+ * @param {String|Array.<string>} address blockchain address(es) of claim/credential to query
  * @returns {Promise.<KeyInfoMap>} KeyInfoMap structure from smart contract
 */
 ValidateService.prototype.keyInfo = function (address) {

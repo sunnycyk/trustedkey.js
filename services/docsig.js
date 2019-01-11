@@ -7,12 +7,12 @@ module.exports = DocsigService
  * Submit
  *
  * @constructor
- * @param {String} backendUrl - The base backend URL
- * @param {String} appId - Wallet application ID
- * @param {String} appSecret - Wallet shared secret
+ * @param {String} backendUrl The base backend URL
+ * @param {String} appId Wallet application ID
+ * @param {String} appSecret Wallet shared secret
  *
- * @param {String} docsigAppId - Docsig application ID
- * @param {String} docsigAppSecret - Docsig shared secret
+ * @param {String} docsigAppId Docsig application ID
+ * @param {String} docsigAppSecret Docsig shared secret
  */
 function DocsigService (backendUrl, appId, appSecret, docsigAppId, docsigAppSecret) {
   this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
@@ -23,10 +23,10 @@ function DocsigService (backendUrl, appId, appSecret, docsigAppId, docsigAppSecr
 /**
  * Submit a document to be signed
  *
- * @param {String} signatoryEmail - Signatory email address
- * @param {String} callbackUrl - Url where signed PDF will be uploaded with PUT
- * @param {String} documentUrl - Url where document can be downloaded
- * @param {Array.<Dotted>} objectIds - Array of objectIds to request from signatory
+ * @param {String} signatoryEmail Signatory email address
+ * @param {String} callbackUrl Url where signed PDF will be uploaded with PUT
+ * @param {String} documentUrl Url where document can be downloaded
+ * @param {Array.<Dotted>} objectIds Array of objectIds to request from signatory
  * @returns {Promise.<Object>} JSON response from API
  */
 DocsigService.prototype.documentSignRequest = function (signatoryEmail, callbackUrl, documentUrl, objectIds) {

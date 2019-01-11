@@ -16,9 +16,9 @@ function checkSuccess (jsonData) {
  * The API calls for implementing an identity claim/credential wallet.
  *
  * @constructor
- * @param {String} backendUrl - The base backend URL
- * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
- * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
+ * @param {String} backendUrl The base backend URL
+ * @param {String} [appId] Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] Application shared secret, without this only unauthorized APIs can be used
  */
 function WalletService (backendUrl, appId, appSecret) {
   this.httpClient = new HttpUtils(backendUrl, appId, appSecret)
@@ -32,22 +32,22 @@ function WalletService (backendUrl, appId, appSecret) {
  *
  * @typedef AuthorizeOptions
  * @type {object}
- * @property {string} [scope] - space delimited OpenID-Connect scopes; defaults to `openid`
- * @property {string} [response_type] - the authorization processing flow to be used; defaults to 'code'
- * @property {string} [response_mode] - the mechanism to be used for returning parameters
- * @property {string} [nonce] - string value used to associate a Client session with an ID Token
- * @property {string} [display] - specifies how to displays the user interface pages
- * @property {string} [prompt] - space delimited values that specifies whether to prompt for reauthentication
- * @property {string} [login_hint] - the login identifier the End-User might use to log in
- * @property {ClaimsOptions|string} [claims] - JSON with the specific Claims be returned
+ * @property {string} [scope] space delimited OpenID-Connect scopes; defaults to `openid`
+ * @property {string} [response_type] the authorization processing flow to be used; defaults to 'code'
+ * @property {string} [response_mode] the mechanism to be used for returning parameters
+ * @property {string} [nonce] string value used to associate a Client session with an ID Token
+ * @property {string} [display] specifies how to displays the user interface pages
+ * @property {string} [prompt] space delimited values that specifies whether to prompt for reauthentication
+ * @property {string} [login_hint] the login identifier the End-User might use to log in
+ * @property {ClaimsOptions|string} [claims] JSON with the specific Claims be returned
  */
 
 /**
  * Create a new OAuth/OpenID-Connect authorization request
  *
- * @param {String} redirectUri - Redirection URI to which the response will be sent
- * @param {String} state - Opaque value used to maintain state between the request and the callback
- * @param {AuthorizeOptions} [options] - Additional authorization options
+ * @param {String} redirectUri Redirection URI to which the response will be sent
+ * @param {String} state Opaque value used to maintain state between the request and the callback
+ * @param {AuthorizeOptions} [options] Additional authorization options
  * @returns {String} URL for OAuth/OpenID-Connect authorization request
  */
 WalletService.prototype.buildAuthorizeUrl = function (redirectUri, state, options) {
@@ -67,8 +67,8 @@ WalletService.prototype.buildAuthorizeUrl = function (redirectUri, state, option
 /**
  * Get an OAuth access_token from an OAuth authorization code
  *
- * @param {String} redirectUri - Redirection URI to which the response will be sent
- * @param {String} code - the authorization code received from `/authorize`
+ * @param {String} redirectUri Redirection URI to which the response will be sent
+ * @param {String} code the authorization code received from `/authorize`
  * @returns {Promise.<object>} JSON result from API
  */
 WalletService.prototype.token = function (redirectUri, code) {
@@ -90,7 +90,7 @@ WalletService.prototype.token = function (redirectUri, code) {
 /**
  * Get a user-information object associated with an access token
  *
- * @param {String} accessToken - Access Token received from `/token`
+ * @param {String} accessToken Access Token received from `/token`
  * @returns {Promise.<object>} JSON result from API
  */
 WalletService.prototype.userInfo = function (accessToken) {
@@ -114,7 +114,7 @@ WalletService.prototype.getPendingSignatureRequest = function () {
 /**
  * Remove the pending request identified by its nonce.
  *
- * @param {String} nonceString - The unique nonce for the login request, as received from the notification or pending request.
+ * @param {String} nonceString The unique nonce for the login request, as received from the notification or pending request.
  * @returns {Promise.<object>} JSON result from API
 */
 WalletService.prototype.removeSignatureRequest = function (nonceString) {
@@ -139,10 +139,10 @@ WalletService.prototype.registerDevice = function (deviceTokenString) {
 /**
  * Send notification to a device
  *
- * @param {String} address - Device to notify
- * @param {String} nonce - Request nonce
- * @param {String} message - Notification message
- * @param {String} [walletId] - Wallet-ID of the receiving Wallet App
+ * @param {String} address Device to notify
+ * @param {String} nonce Request nonce
+ * @param {String} message Notification message
+ * @param {String} [walletId] Wallet-ID of the receiving Wallet App
  * @returns {Promise.<object>} JSON result from API
  */
 WalletService.prototype.notify = function (address, nonce, message, walletId) {
@@ -157,21 +157,21 @@ WalletService.prototype.notify = function (address, nonce, message, walletId) {
 /**
  * @typedef RequestOptions
  * @type {object}
- * @property {string} [username] - Username of the account trying to log in (if known)
- * @property {string} [documentUrl] - The URL to a document for PDF signing
- * @property {string|Array.<Dotted>} [objectIds] - A comma-separated list of OIDs
- * @property {string} [message] - An optional text message for transaction authorization
- * @property {string} [callbackType] - The type of callback, one of "POST", "SYSTEM", or "JSON"
- * @property {number|string} [timeout] - The timeout for the request in minutes
+ * @property {string} [username] Username of the account trying to log in (if known)
+ * @property {string} [documentUrl] The URL to a document for PDF signing
+ * @property {string|Array.<Dotted>} [objectIds] A comma-separated list of OIDs
+ * @property {string} [message] An optional text message for transaction authorization
+ * @property {string} [callbackType] The type of callback, one of "POST", "SYSTEM", or "JSON"
+ * @property {number|string} [timeout] The timeout for the request in minutes
  */
 
 /**
  * Send signature request to a device
  *
- * @param {string} address - Device or user to notify
- * @param {string} nonce - Request nonce
- * @param {string} callbackUrl - Callback URL
- * @param {RequestOptions} [options] - Optional request options
+ * @param {string} address Device or user to notify
+ * @param {string} nonce Request nonce
+ * @param {string} callbackUrl Callback URL
+ * @param {RequestOptions} [options] Optional request options
  * @returns {Promise.<object>} JSON result from API
  */
 WalletService.prototype.request = function (address, nonce, callbackUrl, options) {

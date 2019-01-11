@@ -10,9 +10,9 @@ module.exports = httpUtils
  * Utility class with wrappers for calling authenticated API endpoints.
  *
  * @constructor
- * @param {String} backendUrl - The base backend URL
- * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
- * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
+ * @param {String} backendUrl The base backend URL
+ * @param {String} [appId] Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] Application shared secret, without this only unauthorized APIs can be used
  */
 function httpUtils (backendUrl, appId, appSecret) {
   Assert.strictEqual(typeof backendUrl, 'string', 'backendUrl must be of type `string`')
@@ -40,8 +40,8 @@ function getAuthHeader (url, appId, appSecret, body) {
 /**
  * Get the headers for the request
  *
- * @param {string} absoluteUrl - the absolute URL for the request
- * @param {string} [body] - optional HTTP body
+ * @param {string} absoluteUrl the absolute URL for the request
+ * @param {string} [body] optional HTTP body
  * @returns {object} Object with headers for the request; empty object if no auth is needed
  */
 httpUtils.prototype.getHeaders = function (absoluteUrl, body) {
@@ -55,8 +55,8 @@ httpUtils.prototype.getHeaders = function (absoluteUrl, body) {
 /**
  * Build a URL with optional query string
  *
- * @param {string} path - the endpoint to build
- * @param {*} [params] - optional parameters to add to the query string
+ * @param {string} path the endpoint to build
+ * @param {*} [params] optional parameters to add to the query string
  * @returns {string} the absolute URL
  */
 httpUtils.prototype.buildUrl = function (path, params) {

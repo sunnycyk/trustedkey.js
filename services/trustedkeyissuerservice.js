@@ -7,9 +7,9 @@ module.exports = TrustedKeyIssuerService
  *
  * @constructor
  * @augments {ClaimIssuerService}
- * @param {String} backendUrl - The base backend URL
- * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
- * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
+ * @param {String} backendUrl The base backend URL
+ * @param {String} [appId] Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] Application shared secret, without this only unauthorized APIs can be used
  */
 function TrustedKeyIssuerService (backendUrl, appId, appSecret) {
   ClaimIssuerService.call(this, backendUrl, appId, appSecret)

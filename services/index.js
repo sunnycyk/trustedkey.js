@@ -11,10 +11,10 @@ module.exports = services
  *
  * @exports services
  * @constructor
- * @param {String} [appId] - Application ID, without this only unauthorized APIs can be used
- * @param {String} [appSecret] - Application shared secret, without this only unauthorized APIs can be used
- * @param {String} issuerBaseUrl - The base issuer backend URL
- * @param {String} walletBaseUrl - The base wallet backend URL
+ * @param {String} [appId] Application ID, without this only unauthorized APIs can be used
+ * @param {String} [appSecret] Application shared secret, without this only unauthorized APIs can be used
+ * @param {String} issuerBaseUrl The base issuer backend URL
+ * @param {String} walletBaseUrl The base wallet backend URL
 */
 function services (appId, appSecret, issuerBaseUrl, walletBaseUrl) {
   this.credentialRegistryService = new CredentialRegistryService(issuerBaseUrl, appId, appSecret)

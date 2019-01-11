@@ -233,6 +233,24 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
     Assert.ok(/^\/.+\/tkroot.pem$/.test(tkroot), 'Not an absolute path to tkroot.pem')
   })
 
+  context('getJwkThumbprint', function () {
+    it('getJwkThumbprint(jwkEC)', function () {
+      const thumbprint = Utils.getJwkThumbprint(jwkEC)
+      Assert.strictEqual(thumbprint, 't0SeLs6tHEgrSplyGDH-Sb600WfOgDWFbxfJsWnFlVQ')
+    })
+
+    it('getJwkThumbprint(jwkRSA)', function () {
+      const thumbprint = Utils.getJwkThumbprint(jwkRSA)
+      Assert.strictEqual(thumbprint, 'E74oqrEZWBKPrFTjsNLeIUtnVKMm2EW5ZhpNEaV-4RY')
+    })
+
+    it('key order doesn\'t matter', function () {
+      const jwkEC2 = Object.entries(jwkEC).reduceRight((p, [k, v]) => ({...p, [k]: v}), {})
+      const thumbprint = Utils.getJwkThumbprint(jwkEC2)
+      Assert.strictEqual(thumbprint, 't0SeLs6tHEgrSplyGDH-Sb600WfOgDWFbxfJsWnFlVQ')
+    })
+  })
+
   context('parsePem', function () {
     const CommonName = `-----BEGIN CERTIFICATE-----
 MIIC3zCCAkqgAwIBAgIUXirhK4wUAJPiLMOaKoNm7LPygJ0wCwYJKoZIhvcNAQEL
