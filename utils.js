@@ -10,6 +10,7 @@ const Assert = require('assert')
 const Jsrsasign = require('jsrsasign')
 const URL = require('url')
 const Moment = require('moment')
+const JWT = require('jsonwebtoken')
 
 /**
  * Static Trustedkey utility functions
@@ -112,111 +113,81 @@ utils.getUnixTime = function (date) {
 /**
  * Create a JSON Web Signature
  *
+ * @deprecated
  * @param {object|String|Buffer} message Message can be string or object. Objects will be JSON stringified
  * @param {String} secret HMAC shared secret
  * @param {object} [header={alg: "HS256"}] JOSE header OPTIONAL
- * @returns {String} Concatenated JWS HMAC
+ * @returns {String} Signed JWS
  */
-utils.createHmacJws = function (message, secret, header) {
-  if (typeof message !== 'string' && !(message instanceof Buffer)) {
-    message = JSON.stringify(message)
-  }
-  if (typeof header === 'undefined') {
-    header = {}
-  }
-  header.alg = 'HS256'
-  const jose = JSON.stringify(header)
-  const jws = utils.base64url(jose) + '.' + utils.base64url(message)
-  const hmac = Crypto.createHmac('sha256', secret)
-  return jws + '.' + utils.base64url(hmac.update(jws, secret).digest())
+utils.createHmacJws = function (message, secret, header = {}) {
+  Assert.strictEqual(typeof secret, 'string', 'secret must be of type `string`')
+  Assert.strictEqual(typeof header, 'object', 'header must be of type `object`')
+
+  const options = {header, algorithm: 'HS256'}
+  return JWT.sign(message, secret, options)
 }
 
 /**
  * Create a JSON Web Signature
  *
+ * @deprecated
  * @param {object|String|Buffer} message Message can be string or object. Objects will be JSON stringified
  * @param {object} credential key pair
  * @param {object} [header={alg: "ES256"}] JOSE header OPTIONAL
- * @returns {String} Concatenated JWS
+ * @returns {String} Signed JWS
  */
-utils.createEcdsaJws = function (message, credential, header) {
-  if (typeof message !== 'string' && !(message instanceof Buffer)) {
-    message = JSON.stringify(message)
-  }
-  if (typeof header === 'undefined') {
-    header = {}
-  }
-  header.alg = 'ES256'
-  const jose = JSON.stringify(header)
-  const jws = utils.base64url(jose) + '.' + utils.base64url(message)
-  // Sign a digest value
-  const sigDer = credential.signWithMessageHash(utils.sha256(jws, 'hex'))
-  const seq = readDerChunk(Buffer.from(sigDer, 'hex'))
-  const r = readDerChunk(seq)
-  const s = readDerChunk(seq, r.length + 2)
-  const sig = Buffer.from(pad0(r.toString('hex'), 64) + pad0(s.toString('hex'), 64), 'hex')
-  return jws + '.' + utils.base64url(sig)
+utils.createEcdsaJws = function (message, credential, header = {}) {
+  Assert.strictEqual(typeof credential, 'object', 'credential must be of type `object`')
+  Assert.strictEqual(typeof header, 'object', 'header must be of type `object`')
+
+  const jwk = utils.hexToJwk(credential.pubKeyHex)
+  // Add the private key to the public key JWK
+  jwk.d = utils.base64url(credential.prvKeyHex, 'hex')
+  const pem = utils.jwkToPem(jwk)
+  const options = {header, algorithm: 'ES256'}
+  return JWT.sign(message, pem, options)
 }
 
 /**
- * Verify a JSON Web Signature
+ * Verify a JSON Web Signature.
  *
  * @deprecated
- * @param {String} jws the JWT or JWT as string
- * @param {String|Promise|function} secretCallback HMAC shared secret or public key
- * @returns {?Object} the parsed claims or `null`
+ * @param {String} jws the JWS or JWT as string
+ * @param {String|function|Object} secretOrCallback Shared secret or public key
+ * @returns {Object|String|null} the parsed claims or `null` on failure
  */
-utils.verifyJws = function (jws, secretCallback) {
+utils.verifyJws = function (jws, secretOrCallback) {
   Assert.strictEqual(typeof jws, 'string', 'jws must be of type `string`')
 
-  const parts = jws.split('.')
-  if (parts.length !== 3) { // JWE has 5 parts
-    return null
+  // Convert the given secret into a secret or public key for jsonwebtoken,
+  if (typeof secretOrCallback === 'function') {
+    // JWT.verify will no longer return a value if we use the callback overload
+    const decoded = JWT.decode(jws, {complete: true})
+    // Removed promise support since it was never actually used anywhere
+    secretOrCallback = secretOrCallback(decoded.header)
+  }
+  if (typeof secretOrCallback === 'object' && secretOrCallback.pubKeyHex) {
+    // Convert jsrsasign credential to hex public key
+    secretOrCallback = secretOrCallback.pubKeyHex
+  }
+  if (typeof secretOrCallback === 'string' && secretOrCallback.length === 130) {
+    // Convert uncompressed hex public key to JWK
+    secretOrCallback = utils.hexToJwk(secretOrCallback)
+  }
+  if (typeof secretOrCallback === 'object' && secretOrCallback.kty) {
+    // Convert JWK to PEM public key
+    secretOrCallback = utils.jwkToPem(secretOrCallback)
   }
 
-  const jose = JSON.parse(Buffer.from(parts[0], 'base64'))
-  const message = Buffer.from(parts[1], 'base64')
-  const signature = Buffer.from(parts[2], 'base64')
-  const signeddata = parts[0] + '.' + parts[1]
-
-  function verify (secret) {
-    if (jose.alg === 'ES256') {
-      // ECDSA-SHA256
-      var pubkeyhex = secret.pubKeyHex || secret || utils.jwkToHex(jose.jwk)
-      if (!utils.checkECDSA('secp256r1', signeddata, pubkeyhex, signature)) {
-        return null
-      }
-    } else if (jose.alg === 'HS256') {
-      // HMAC-SHA256
-      const hmac = Crypto.createHmac('sha256', secret)
-      if (!hmac.update(signeddata).digest().equals(signature)) {
-        return null
-      }
-    } else if (jose.alg === 'none') {
-      // NONE, only allow if callback returns empty string
-      if (signature.length !== 0 || secret.length !== 0) {
-        return null
-      }
+  try {
+    return JWT.verify(jws, secretOrCallback)
+  } catch (err) {
+    // Keep the old behavior of returning null instead of throwing
+    if (err.name === 'JsonWebTokenError') {
+      return null
     } else {
-      // TODO: support RS256
-      throw new Error('Unsupported JWS: ' + jws)
+      throw err
     }
-
-    // Verify any nested JWT
-    if (jose.cty === 'JWT') {
-      return utils.verifyJws(message, secretCallback)
-    } else if (jose.typ === 'JWT') {
-      return JSON.parse(message)
-    } else {
-      return message
-    }
-  }
-
-  const secret = typeof secretCallback === 'function' ? secretCallback(jose) : secretCallback
-  if (typeof secret === 'object' && typeof secret.then === 'function') {
-    return secret.then(verify)
-  } else {
-    return verify(secret)
   }
 }
 
@@ -242,7 +213,7 @@ utils.verifyJws = function (jws, secretCallback) {
  * @return {String} string with hex public key
  */
 utils.jwkToHex = function (jwk) {
-  Assert.strictEqual(typeof jwk.d, 'undefined', 'jwk.d must be of type `undefined`')
+  Assert.strictEqual(jwk.d, undefined, 'jwk.d must be of type `undefined`')
   if (jwk.kty === 'EC' && jwk.crv === 'P-256') {
     // Convert x,y coordinates from JWK to hex encoded public key
     const hex = '04' + Buffer.concat([Buffer.from(jwk.x, 'base64'), Buffer.from(jwk.y, 'base64')]).toString('hex')
@@ -255,20 +226,25 @@ utils.jwkToHex = function (jwk) {
 }
 
 /**
- * Convert a hex public key into JWK
- * @param {String} pubKeyHex hex encoded ECC public key
+ * Convert a hex key into JWK
+ * @param {String} keyHex hex encoded ECC key
+ * @param {String} [crv] curve identifier ("P-256" by default)
  * @return {JwkEC} JSON Web Key
  */
-utils.hexToJwk = function (pubKeyHex) {
-  Assert.strictEqual(pubKeyHex.length, 130)
-  Assert.ok(pubKeyHex.startsWith('04'), 'pubKeyHex must be an uncompressed ECC public key')
+utils.hexToJwk = function (keyHex, crv = 'P-256') {
+  Assert.strictEqual(typeof keyHex, 'string', 'pubKeyHex must be of type `string`')
 
-  const buffer = Buffer.from(pubKeyHex, 'hex')
-  return {
-    'kty': 'EC',
-    'crv': 'P-256',
-    'x': utils.base64url(buffer.slice(1, 33)),
-    'y': utils.base64url(buffer.slice(33))
+  const buffer = Buffer.from(keyHex, 'hex')
+  if (buffer.length === 65) {
+    Assert.ok(keyHex.startsWith('04'), 'pubKeyHex must be an uncompressed ECC public key')
+    return {
+      crv,
+      'kty': 'EC',
+      'x': utils.base64url(buffer.slice(1, 33)),
+      'y': utils.base64url(buffer.slice(33))
+    }
+  } else {
+    throw Error('Unsupported key: ' + keyHex)
   }
 }
 
@@ -361,15 +337,25 @@ function wrap (str) {
  * @return {String} string with PEM public key
  */
 utils.jwkToPem = function (jwk) {
-  Assert.strictEqual(typeof jwk.d, 'undefined', 'jwk.d must be of type `undefined`')
   if (jwk.kty === 'EC' && jwk.crv === 'P-256') {
-    // Convert x,y coordinates from JWK to base64 encoded public key
-    const all = Buffer.concat([Buffer.from(jwk.x, 'base64'), Buffer.from(jwk.y, 'base64')]).toString('base64')
-    Assert.strictEqual(all.length, 88)
-    // Basic template for the PEM; we'll overwrite the coordinates in-place
-    return wrap(`-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
+    // Convert x,y coordinates from JWK to public key
+    const xy = Buffer.concat([Buffer.from(jwk.x, 'base64'), Buffer.from(jwk.y, 'base64')])
+    Assert.strictEqual(xy.length, 64)
+    if (jwk.d) {
+      // Add the private key as well
+      const header = Buffer.from('30770201010420', 'hex')
+      const pk = Buffer.from(jwk.d, 'base64')
+      const xyhdr = Buffer.from('a00a06082a8648ce3d030107a14403420004', 'hex')
+      const all = Buffer.concat([header, pk, xyhdr, xy])
+      return wrap(`-----BEGIN EC PRIVATE KEY-----
+${all.toString('base64')}
+-----END EC PRIVATE KEY-----`)
+    } else {
+      // Basic template for the PEM; we'll overwrite the coordinates in-place
+      return wrap(`-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${xy.toString('base64')}
 -----END PUBLIC KEY-----`)
+    }
   } else if (jwk.kty === 'RSA') {
     // Convert public key from JWK to base64 encoded public key
     const pub = Buffer.from(jwk.n, 'base64')
@@ -379,10 +365,8 @@ MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE${all}
     const key = createDerChunk(0x30, pubDer, expDer)
     const pkey = createDerChunk(0x03, Buffer.alloc(1), key)
     const der = createDerChunk(0x30, Buffer.from('300d06092a864886f70d0101010500', 'hex'), pkey)
-    const all = der.toString('base64')
-    // Basic template for the PEM; we'll overwrite the coordinates in-place
     return wrap(`-----BEGIN PUBLIC KEY-----
-${all}
+${der.toString('base64')}
 -----END PUBLIC KEY-----`)
   }
   throw Error('Unsupported JWK:' + jwk)
