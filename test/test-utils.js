@@ -9,6 +9,7 @@ describe('Utils', function () {
 MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEP77Gc65MCzCAFSL3ym4jzVkBHPFR
 k2wREBVmi94ga76qPONvtQidXfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
 -----END PUBLIC KEY-----`
+  const hexEC = '043fbec673ae4c0b30801522f7ca6e23cd59011cf151936c111015668bde206bbeaa3ce36fb5089d5df30f3374c30902695aadc8e2c668298b05d2de7bd497290c'
   const jwkRSA = {'kty': 'RSA', 'n': 'zghKyUzealTP0yG2JlTcBSeYkA_WNKLCMZTQRbtEr9K11oaDsDmUSY-s3clehbbZ9SWNy9xydQfzb0BMdY2-omWT6kodYX8f-6p-4OCno3LHE5yM4UOkEZnc1lOz5VzUa-deMEwkLJXiquE1wQbnA6yaQIdy8vADNhIDhQKxIRFOFDbk1S01sEl-Oc3VFcY0VsoapCVpAEfr1LDCetOe6RxsvFDFex09nuvW5ehFbjioOvY6_jG-1ZcTKBasDVMWFLoECzlYfPBQfBiip2rWUzWW9chCnB0-b29Qg4R9n1glTVqqNQj0F9grWetJXw2NXQOVMKn-w81WzwH4s3IZQw', 'e': 'AQAB'}
   const pemRSA = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzghKyUzealTP0yG2JlTc
@@ -43,26 +44,32 @@ QwIDAQAB
   })
 
   context('jwkToHex', function () {
-    it('converts RSA key', function () {
-      const hex = 'ce084ac94cde6a54cfd321b62654dc052798900fd634a2c23194d045bb44afd2b5d68683b03994498facddc95e85b6d9f5258dcbdc727507f36f404c758dbea26593ea4a1d617f1ffbaa7ee0e0a7a372c7139c8ce143a41199dcd653b3e55cd46be75e304c242c95e2aae135c106e703ac9a408772f2f0033612038502b121114e1436e4d52d35b0497e39cdd515c63456ca1aa425690047ebd4b0c27ad39ee91c6cbc50c57b1d3d9eebd6e5e8456e38a83af63afe31bed597132816ac0d531614ba040b39587cf0507c18a2a76ad6533596f5c8429c1d3e6f6f5083847d9f58254d5aaa3508f417d82b59eb495f0d8d5d039530a9fec3cd56cf01f8b3721943'
-      Assert.strictEqual(Utils.jwkToHex(jwkRSA), hex)
+    it('converts RSA public key', function () {
+      const hexRSA = 'ce084ac94cde6a54cfd321b62654dc052798900fd634a2c23194d045bb44afd2b5d68683b03994498facddc95e85b6d9f5258dcbdc727507f36f404c758dbea26593ea4a1d617f1ffbaa7ee0e0a7a372c7139c8ce143a41199dcd653b3e55cd46be75e304c242c95e2aae135c106e703ac9a408772f2f0033612038502b121114e1436e4d52d35b0497e39cdd515c63456ca1aa425690047ebd4b0c27ad39ee91c6cbc50c57b1d3d9eebd6e5e8456e38a83af63afe31bed597132816ac0d531614ba040b39587cf0507c18a2a76ad6533596f5c8429c1d3e6f6f5083847d9f58254d5aaa3508f417d82b59eb495f0d8d5d039530a9fec3cd56cf01f8b3721943'
+      Assert.strictEqual(Utils.jwkToHex(jwkRSA), hexRSA)
     })
-    it('converts EC key', function () {
-      const hex = '043fbec673ae4c0b30801522f7ca6e23cd59011cf151936c111015668bde206bbeaa3ce36fb5089d5df30f3374c30902695aadc8e2c668298b05d2de7bd497290c'
-      Assert.strictEqual(Utils.jwkToHex(jwkEC), hex)
+    it('converts EC public key', function () {
+      Assert.strictEqual(Utils.jwkToHex(jwkEC), hexEC)
     })
     it('throws on invalid jwk', function () {
       Assert.throws(() => Utils.jwkToHex({kty: 'RSA'}), /Unsupported/)
       Assert.throws(() => Utils.jwkToHex({}), /Unsupported/)
     })
     it('throws on RSA jwk with PK', function () {
-      Assert.throws(() => Utils.jwkToHex(Object.assign({d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE'}, jwkEC)))
-      Assert.throws(() => Utils.jwkToHex(Object.assign({d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE'}, jwkRSA)))
+      Assert.throws(() => Utils.jwkToHex({d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE', ...jwkEC}))
+      Assert.throws(() => Utils.jwkToHex({d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE', ...jwkRSA}))
+    })
+  })
+
+  context('hexToJwk', function () {
+    it('EC public key', function () {
+      const jwk = Utils.hexToJwk(hexEC)
+      Assert.deepEqual(jwk, jwkEC)
     })
   })
 
   context('pemToJwk', function () {
-    it('converts RSA key', function () {
+    it('converts RSA public key', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(pemRSA), jwkRSA)
       Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDNXFJO5cFMie4oQraVqnniopSW
@@ -75,10 +82,10 @@ xcbCgN76nCO1NGBgbQIDAQAB
         'n': 'zVxSTuXBTInuKEK2lap54qKUllfYQrrelpbj1Wx25b6sh_dHQqn2aPjOrgAcYsa8clhP1OiiZQAJ6Ek1tKhLrgGJR2TxbJjL_pMOw9WQaDwQ7D77mtHY4olUsjM2mmR1f3drwAXIVKAnafwlT46bEqp4x8XGwoDe-pwjtTRgYG0'
       })
     })
-    it('converts EC key', function () {
+    it('converts EC public key', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(pemEC), jwkEC)
     })
-    it('converts small RSA key', function () {
+    it('converts small RSA public key', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
 MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMiwb6VuAvJwHJyRZq1PJO8PpaaYjOXp
 iUpBdB8ZntA5vj9KB/ke4HU3gO/hqLEXZ7JkBW6O+ID0ZWlubkqkD7UCAwEAAQ==
@@ -89,7 +96,7 @@ iUpBdB8ZntA5vj9KB/ke4HU3gO/hqLEXZ7JkBW6O+ID0ZWlubkqkD7UCAwEAAQ==
         'e': 'AQAB'
       })
     })
-    it('converts small RSA key, e=3', function () {
+    it('converts small RSA public key, e=3', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
 MFowDQYJKoZIhvcNAQEBBQADSQAwRgJBAM0cWN/vHXq5p6kIGCQ68JALYAUlUI/2
 RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
@@ -106,11 +113,19 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
   })
 
   context('jwkToPem', function () {
-    it('converts RSA key', function () {
+    it('converts RSA public key', function () {
       Assert.strictEqual(Utils.jwkToPem(jwkRSA), pemRSA)
     })
-    it('converts EC key', function () {
+    it('converts EC public key', function () {
       Assert.strictEqual(Utils.jwkToPem(jwkEC), pemEC)
+    })
+    it('converts EC private key', function () {
+      const jwk = {...jwkEC, d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE'}
+      Assert.strictEqual(Utils.jwkToPem(jwk), `-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEILPN2ZrlirXKm6ZzBOdddr8WaqSqQhXLROCcnvwZ3lcRoAoGCCqGSM49
+AwEHoUQDQgAEP77Gc65MCzCAFSL3ym4jzVkBHPFRk2wREBVmi94ga76qPONvtQid
+XfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
+-----END EC PRIVATE KEY-----`)
     })
   })
 
@@ -152,49 +167,91 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
 
   context('jws', function () {
     const msg = 'msg'
-    const secret = 'secret'
-    const cred = Utils.generateKeyPair()
 
-    it('createEcdsaJws', function () {
-      const jws = Utils.createEcdsaJws(msg, cred)
-      const [h, m, s] = jws.split('.').map(p => Buffer.from(p, 'base64').toString('binary'))
-      Assert.strictEqual(h, '{"alg":"ES256"}')
-      Assert.strictEqual(m, msg)
-      Assert.strictEqual(s.length, 64)
+    context('none', function () {
+      it('verifyJws', function () {
+        Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', '').toString(), msg)
+      })
+      it('verifyJws callback', function () {
+        Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', jose => {
+          Assert.deepStrictEqual(jose, {alg: 'none'})
+          return ''
+        }).toString(), msg)
+      })
+      it('verifyJws fail if sig present', function () {
+        Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.e8OZURoOjKajjBlfApR_nT8jbjdZakDJEfMDdqJhZhQ', ''), null)
+      })
+      it('verifyJws fail if secret given', function () {
+        Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', 'secret'), null)
+      })
     })
-    it('createEcdsaJws+verifyJws', function () {
-      const jws = Utils.createEcdsaJws(msg, cred)
-      Assert.strictEqual(Utils.verifyJws(jws, cred).toString(), msg)
+
+    context('ES256', function () {
+      const cred = Utils.generateKeyPair()
+
+      it('createEcdsaJws with credential', function () {
+        const jws = Utils.createEcdsaJws(msg, cred)
+        const [h, m, s] = jws.split('.').map(p => Buffer.from(p, 'base64').toString('binary'))
+        Assert.strictEqual(h, '{"alg":"ES256"}')
+        Assert.strictEqual(m, msg)
+        Assert.strictEqual(s.length, 64)
+      })
+      it('createEcdsaJws+verifyJws', function () {
+        const jws = Utils.createEcdsaJws(msg, cred)
+        Assert.strictEqual(Utils.verifyJws(jws, cred).toString(), msg)
+      })
+      it('createEcdsaJws+verifyJws callback', function () {
+        const jws = Utils.createEcdsaJws(msg, cred)
+        Assert.strictEqual(Utils.verifyJws(jws, jose => {
+          Assert.deepStrictEqual(jose, {alg: 'ES256'})
+          return cred.pubKeyHex
+        }).toString(), msg)
+      })
+      it('createEcdsaJws+verifyJws with JWK', function () {
+        const jwk = Utils.hexToJwk(cred.pubKeyHex)
+        const jws = Utils.createEcdsaJws(msg, cred)
+        Assert.strictEqual(Utils.verifyJws(jws, jwk).toString(), msg)
+      })
+      it('createEcdsaJws+verifyJws JWT', function () {
+        const payload = {iat: 1234, msg}
+        const jws = Utils.createEcdsaJws(payload, cred, {typ: 'JWT'})
+        Assert.deepEqual(Utils.verifyJws(jws, cred), payload)
+      })
+      it('createEcdsaJws+verifyJws pubKeyHex', function () {
+        const jws = Utils.createEcdsaJws(msg, cred)
+        Assert.strictEqual(Utils.verifyJws(jws, cred.pubKeyHex).toString(), msg)
+      })
     })
-    it('createHmacJws', function () {
-      const jws = Utils.createHmacJws(msg, secret)
-      Assert.strictEqual(jws, 'eyJhbGciOiJIUzI1NiJ9.bXNn.e8OZURoOjKajjBlfApR_nT8jbjdZakDJEfMDdqJhZhQ')
-      const [h, m, s] = jws.split('.').map(p => Buffer.from(p, 'base64').toString('binary'))
-      Assert.strictEqual(h, '{"alg":"HS256"}')
-      Assert.strictEqual(m, msg)
-      Assert.strictEqual(s.length, 32)
-    })
-    it('createHmacJws+verifyJws', function () {
-      const jws = Utils.createHmacJws(msg, secret)
-      Assert.strictEqual(Utils.verifyJws(jws, secret).toString(), msg)
-    })
-    it('createHmacJws+verifyJws with wrong secret', function () {
-      const jws = Utils.createHmacJws(msg, secret)
-      Assert.strictEqual(Utils.verifyJws(jws, 'wrong secret'), null)
-    })
-    it('"alg":"none"', function () {
-      Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', '').toString(), msg)
-    })
-    it('"alg":"none" fail if sig present', function () {
-      Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.e8OZURoOjKajjBlfApR_nT8jbjdZakDJEfMDdqJhZhQ', ''), null)
-    })
-    it('"alg":"none" fail if secret given', function () {
-      Assert.strictEqual(Utils.verifyJws('eyJhbGciOiJub25lIn0.bXNn.', secret), null)
-    })
-    it('verifyJws with "typ":"JWT"', function () {
-      const claims = {a: 2}
-      const jws = Utils.createHmacJws(claims, secret, {typ: 'JWT'})
-      Assert.deepStrictEqual(Utils.verifyJws(jws, secret), claims)
+
+    context('HS256', function () {
+      const JWS = 'eyJhbGciOiJIUzI1NiJ9.bXNn.e8OZURoOjKajjBlfApR_nT8jbjdZakDJEfMDdqJhZhQ'
+      const secret = 'secret'
+
+      it('createHmacJws with secret', function () {
+        const jws = Utils.createHmacJws(msg, secret)
+        Assert.strictEqual(jws, JWS)
+        const [h, m, s] = jws.split('.').map(p => Buffer.from(p, 'base64').toString('binary'))
+        Assert.strictEqual(h, '{"alg":"HS256"}')
+        Assert.strictEqual(m, msg)
+        Assert.strictEqual(s.length, 32)
+      })
+      it('verifyJws', function () {
+        Assert.strictEqual(Utils.verifyJws(JWS, secret).toString(), msg)
+      })
+      it('verifyJws callback', function () {
+        Assert.strictEqual(Utils.verifyJws(JWS, jose => {
+          Assert.deepStrictEqual(jose, {alg: 'HS256'})
+          return secret
+        }).toString(), msg)
+      })
+      it('verifyJws with wrong secret', function () {
+        Assert.strictEqual(Utils.verifyJws(JWS, 'wrong secret'), null)
+      })
+      it('createHmacJws+verifyJws JWT', function () {
+        const payload = {iat: 1234, msg}
+        const jws = Utils.createHmacJws(payload, secret, {typ: 'JWT'})
+        Assert.deepStrictEqual(Utils.verifyJws(jws, secret), payload)
+      })
     })
   })
 
