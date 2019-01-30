@@ -118,7 +118,7 @@ WalletService.prototype.getPendingSignatureRequest = function () {
  * @returns {Promise.<object>} JSON result from API
 */
 WalletService.prototype.removeSignatureRequest = function (nonceString) {
-  return this.httpClient.get('removePendingRequest', {
+  return this.httpClient.delete('removePendingRequest', {
     nonce: nonceString
   }).then(checkSuccess)
 }
@@ -131,7 +131,7 @@ WalletService.prototype.removeSignatureRequest = function (nonceString) {
  * @returns {Promise.<object>} JSON result from API
 */
 WalletService.prototype.registerDevice = function (deviceTokenString) {
-  return this.httpClient.get('registerDevice', {
+  return this.httpClient.post('registerDevice', {
     devicetoken: deviceTokenString
   }).then(checkSuccess)
 }

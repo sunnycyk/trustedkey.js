@@ -17,13 +17,15 @@ function TrustedKeyIssuerService (backendUrl, appId, appSecret) {
 TrustedKeyIssuerService.prototype = Object.create(ClaimIssuerService.prototype)
 
 /**
- * Request mock claims, for testing during development only. See `requestClaims`.
+ * Request mock claims, for testing during development only. See `issueClaims`.
  * @param {string} requestIdString: A unique ID for this request (for example, an UUID) for retries and notifications.
+ * @param {string} expiry: Claim expiry date
  * @returns {Promise.<Object>} JSON result from API
 */
-TrustedKeyIssuerService.prototype.requestMockClaims = function (requestIdString) {
-  return this.httpClient.get('registerIdentity', {
-    requestid: requestIdString
+TrustedKeyIssuerService.prototype.requestMockClaims = function (requestIdString, expiry) {
+  return this.httpClient.post('requestMockClaims', {
+    requestid: requestIdString,
+    expiry: expiry
   })
 }
 
@@ -42,7 +44,7 @@ TrustedKeyIssuerService.prototype.requestMockClaims = function (requestIdString)
  * @returns {Promise.<Object>} JSON result from API
 */
 TrustedKeyIssuerService.prototype.requestAuthenticIDClaims = function (requestIdString, catfishAirTransactionIDString, catfishAirVersionNumber) {
-  return this.httpClient.get('registerAuthenticId', {
+  return this.httpClient.post('registerAuthenticId', {
     transactionid: catfishAirTransactionIDString,
     version: catfishAirVersionNumber,
     requestid: requestIdString

@@ -86,3 +86,13 @@ httpUtils.prototype.post = function (path, params, jsonBody) {
     body: jsonBody
   })
 }
+
+httpUtils.prototype.delete = function (path, params) {
+  const absoluteUrl = this.buildUrl(path, params)
+  return RP.delete({
+    uri: absoluteUrl,
+    json: true,
+    forever: true,
+    headers: this.getHeaders(absoluteUrl)
+  })
+}

@@ -654,7 +654,7 @@ utils.parsePem = function (pem, chain) {
     }
   } catch (err) {}
 
-  return {subjectaddress, serialNo, notBefore, notAfter, attributes, issuer, crl, issuerPem, ...ocsp}
+  return Object.assign({subjectaddress, serialNo, notBefore, notAfter, attributes, issuer, crl, issuerPem}, ocsp)
 }
 
 /**

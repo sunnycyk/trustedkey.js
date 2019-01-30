@@ -49,6 +49,7 @@ describe('http server', function () {
       }
       app.get('/get', Auth, (req, res) => res.send('gotten'))
       app.post('/post', Auth, (req, res) => res.send('posted'))
+      app.delete('/delete', Auth, (req, res) => res.send('deleted'))
       app.all('/keep', (req, res) => res.send(req.get('connection')))
     })
 
@@ -125,6 +126,22 @@ describe('http server', function () {
 
     it('can GET with absolute url', async function () {
       Assert.strictEqual(await http.get(`http://localhost:${server.address().port}/get`), 'gotten')
+    })
+
+    it('can DELETE', async function () {
+      Assert.strictEqual(await http.delete('delete'), 'deleted')
+    })
+
+    it('can DELETE with query parameters', async function () {
+      Assert.strictEqual(await http.delete('delete', {b: 1}), 'deleted')
+    })
+
+    it('can DELETE with trailing slash', async function () {
+      Assert.strictEqual(await http.delete('/delete', {b: 1}), 'deleted')
+    })
+
+    it('can DELETE with absolute url', async function () {
+      Assert.strictEqual(await http.delete(`http://localhost:${server.address().port}/delete`), 'deleted')
     })
 
     it('reused connections', async function () {

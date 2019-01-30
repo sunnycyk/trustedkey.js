@@ -23,12 +23,12 @@ function ClaimIssuerService (backendUrl, appId, appSecret) {
 /**
  * Get the claim(s) for the request identified by the given requestID.
  *
- * @param {String} requestIdString The requestID that was provided during a prior call to the issuer-specific `requestClaims` API.
+ * @param {String} requestIdString The requestID that was provided during a prior call to the issuer-specific `issueClaims` API.
  * @param {String} [pubkey] Only issuer needs to provide user's public key to get the claim
  * @returns {Promise.<Array.<String>>} Promise containing PEM array
 */
 ClaimIssuerService.prototype.getClaims = function (requestIdString, pubkey) {
-  return this.httpClient.get('getTokens', {
+  return this.httpClient.get('getClaims', {
     requestid: requestIdString,
     pubkey: pubkey
   }).then(json => {
@@ -73,13 +73,34 @@ ClaimIssuerService.prototype.getClaims = function (requestIdString, pubkey) {
 */
 
 /**
- * Request claims with the specified attributes and optional document images.
+ * @deprecated Use `issueClaims`
+ * Request to issue claims with the specified attributes and optional document images.
  *
  * @param {RequestInfo} requestInfo The RequestInfo structure.
  * @returns {Promise.<boolean>} Promise returning true if success
 */
 ClaimIssuerService.prototype.requestImageClaims = function (requestInfo) {
   return this.httpClient.post('requestImageTokens', {}, requestInfo).then(json => {
+    if (!json.data) {
+      throw new Error(errJsonWithoutData)
+    }
+
+    if (!json.data.requestImageTokens) {
+      throw new Error(errFailed)
+    }
+
+    return true
+  })
+}
+
+/**
+ * Request to issue claims with the specified attributes and optional document images.
+ *
+ * @param {RequestInfo} requestInfo The RequestInfo structure.
+ * @returns {Promise.<boolean>} Promise returning true if success
+*/
+ClaimIssuerService.prototype.issueClaims = function (requestInfo) {
+  return this.httpClient.post('issueClaims', {}, requestInfo).then(json => {
     if (!json.data) {
       throw new Error(errJsonWithoutData)
     }
@@ -100,7 +121,7 @@ ClaimIssuerService.prototype.requestImageClaims = function (requestInfo) {
  * @returns {Promise.<boolean>} Promise returning true if success
 */
 ClaimIssuerService.prototype.deleteClaims = function (requestIdString) {
-  return this.httpClient.get(this.backendUrl, 'deleteRequest', {
+  return this.httpClient.delete(this.backendUrl, 'deleteRequest', {
     requestid: requestIdString
   }).then(json => {
     if (!json.data) {
@@ -122,7 +143,7 @@ ClaimIssuerService.prototype.deleteClaims = function (requestIdString) {
  * @returns {Promise.<boolean>} Promise returning true if success
 */
 ClaimIssuerService.prototype.deleteAllClaims = function () {
-  return this.httpClient.get(this.backendUrl, 'deleteAllRequests').then(json => {
+  return this.httpClient.delete(this.backendUrl, 'deleteAllRequests').then(json => {
     if (!json.data) {
       throw new Error(errJsonWithoutData)
     }
