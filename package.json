@@ -1,6 +1,6 @@
 {
   "name": "trustedkey-js",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "files": [
     "claims.js",
     "oid.js",
@@ -17,11 +17,11 @@
     "services/claimissuerservice.js"
   ],
   "scripts": {
-    "test": "standard && mocha test"
+    "test": "standard && mocha --use_strict test"
   },
   "dependencies": {
     "crypto-js": "^3.1.9-1",
-    "jsonwebtoken": "^8.4.0",
+    "jsonwebtoken": "^8.5.0",
     "jsrsasign": "^8.0.12",
     "moment": "^2.20.1",
     "request": "^2.88.0",
