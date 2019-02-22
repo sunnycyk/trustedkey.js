@@ -671,6 +671,7 @@ utils.getRootPemPath = function () {
  * @returns {string} Base64-URL encoded thumbprint for the JWK
  */
 utils.getJwkThumbprint = function (jwk) {
-  const json = JSON.stringify(jwk, Object.keys(jwk).sort())
+  // Only the required members of a key's representation are used when computing its JWK Thumbprint value.
+  const json = JSON.stringify(jwk, ['crv', 'e', 'k', 'kty', 'n', 'x', 'y'])
   return this.base64url(utils.sha256(json))
 }

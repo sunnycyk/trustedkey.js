@@ -301,6 +301,16 @@ XfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
       Assert.strictEqual(thumbprint, 'E74oqrEZWBKPrFTjsNLeIUtnVKMm2EW5ZhpNEaV-4RY')
     })
 
+    it('ignore optional members (jwkEC)', function () {
+      const thumbprint = Utils.getJwkThumbprint({...jwkEC, opt: 123})
+      Assert.strictEqual(thumbprint, 't0SeLs6tHEgrSplyGDH-Sb600WfOgDWFbxfJsWnFlVQ')
+    })
+
+    it('ignore optional members (jwkRSA)', function () {
+      const thumbprint = Utils.getJwkThumbprint({...jwkRSA, opt: 123})
+      Assert.strictEqual(thumbprint, 'E74oqrEZWBKPrFTjsNLeIUtnVKMm2EW5ZhpNEaV-4RY')
+    })
+
     it('key order doesn\'t matter', function () {
       const jwkEC2 = Object.entries(jwkEC).reduceRight((p, [k, v]) => ({...p, [k]: v}), {})
       const thumbprint = Utils.getJwkThumbprint(jwkEC2)
