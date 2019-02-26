@@ -675,3 +675,21 @@ utils.getJwkThumbprint = function (jwk) {
   const json = JSON.stringify(jwk, ['crv', 'e', 'k', 'kty', 'n', 'x', 'y'])
   return this.base64url(utils.sha256(json))
 }
+
+/**
+ * Verify x5c X509 cert chain
+ * @param {Array.string} chain encoded BASE64 PEMs in x5c
+ * @return {boolean} evaluation of chain validation
+ */
+utils.verifyChain = function (chain) {
+  Assert.ok(Array.isArray(chain), 'chain must be instance of `Array`')
+
+  const certs = chain.map(p => readPEM(p))
+  const getCAIdx = (i, v) => (i === certs.length - 1) ? v : i + 1
+  for (let i = 0, j = getCAIdx(i, 0); i < certs.length; i++, j = getCAIdx(i, i)) {
+    if (!verifySignature(certs[i], certs[j])) {
+      return false
+    }
+  }
+  return true
+}
