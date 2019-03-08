@@ -260,10 +260,17 @@ module.exports = {
   middleName: '1.3.6.1.4.1.51341.17',
 
   /**
-       * TThe OID in dotted notation for a person's suffix. eg. Jr. Sr.
+       * The OID in dotted notation for a person's suffix. eg. Jr. Sr.
        * @constant
        * @default
        */
-  suffix: '1.3.6.1.4.1.51341.18'
+  suffix: '1.3.6.1.4.1.51341.18',
+
+  /**
+       * The OID in dotted notation for distributed claim whose actual value needs to be extracted from an endpoint.
+       * @constant
+       * @default
+       */
+  endpoint: '1.3.6.1.4.1.51341.24'
 
 }
