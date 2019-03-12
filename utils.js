@@ -568,10 +568,10 @@ utils.isAddress = function (str) {
 function readPEM (pem) {
   Assert.strictEqual(typeof pem, 'string', 'pem must be of type `string`')
   // Ignore PEM headers (if present)
-  const base64 = pem.match(/^-----BEGIN CERTIFICATE-----([^-]+)-----END CERTIFICATE-----/)
+  const base64 = pem.replace(/^-----(BEGIN|END) CERTIFICATE-----/g, '')
   // Load the certificate from PEM string
   var cert = new Jsrsasign.X509()
-  cert.readCertHex(Buffer.from(base64 ? base64[1] : pem, 'base64').toString('hex'))
+  cert.readCertHex(Buffer.from(base64, 'base64').toString('hex'))
   return cert
 }
 
@@ -582,6 +582,7 @@ function readPEM (pem) {
  */
 function verifySignature (cert, caCert) {
   try {
+    // CONSIDER: replace with NodeJS built-in Crypto module
     return cert.verifySignature(caCert.getPublicKey())
   } catch (err) {
     return false
@@ -655,6 +656,30 @@ utils.parsePem = function (pem, chain) {
   } catch (err) {}
 
   return Object.assign({subjectaddress, serialNo, notBefore, notAfter, attributes, issuer, crl, issuerPem}, ocsp)
+}
+
+/**
+ * Validate the parsed claim
+ * @param {Claim} claim Parsed claim object
+ * @param {Date} [date] Optional date to test against
+ * @returns {Boolean} success or failure
+ */
+utils.validateClaim = function (claim, date) {
+  Assert.strictEqual(typeof claim, 'object', 'claim must be of type `object`')
+
+  const now = date || new Date()
+  if (claim.notAfter < now) {
+    return false
+  }
+  if (claim.notBefore > now) {
+    return false
+  }
+  if (claim.issuerPem) {
+    // Rescursively validate the issuer
+    const issuerClaim = utils.parsePem(claim.issuerPem)
+    return utils.validateClaim(issuerClaim, now)
+  }
+  return true
 }
 
 /**

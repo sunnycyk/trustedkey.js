@@ -318,8 +318,7 @@ XfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
     })
   })
 
-  context('parsePem', function () {
-    const CommonName = `-----BEGIN CERTIFICATE-----
+  const CommonNamePEM = `-----BEGIN CERTIFICATE-----
 MIIC3zCCAkqgAwIBAgIUXirhK4wUAJPiLMOaKoNm7LPygJ0wCwYJKoZIhvcNAQEL
 MHIxCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdTZWF0dGxlMRAwDgYDVQQHDAdTZWF0
 dGxlMRkwFwYDVQQKDBBUcnVzdGVkIEtleSB0ZXN0MQswCQYDVQQLDAJJVDEXMBUG
@@ -337,7 +336,8 @@ fOTUINYvhyedJDoeE/SoEXMIfweeTDCzQ/p6/QavYo1MdH2xXeiAoFHnA7kMZLr1
 JB/s48mt2utkQblZCGaEqdwJMWJtbqa0fP6Rrl7Gj1c/CetnYUHyqR7tXHBOefTB
 NBtwmvc2VcFjR3HVBpjtVtxnkA==
 -----END CERTIFICATE-----`
-    const Issuer = `-----BEGIN CERTIFICATE-----
+
+  const IssuerPEM = `-----BEGIN CERTIFICATE-----
 MIIC9TCCAl6gAwIBAgIJAOlzOVIJxpMrMA0GCSqGSIb3DQEBCwUAMHIxCzAJBgNV
 BAYTAlVTMRAwDgYDVQQIDAdTZWF0dGxlMRAwDgYDVQQHDAdTZWF0dGxlMRkwFwYD
 VQQKDBBUcnVzdGVkIEtleSB0ZXN0MQswCQYDVQQLDAJJVDEXMBUGA1UEAwwOdHJ1
@@ -356,8 +356,9 @@ AQELBQADgYEAH7Go0o8PGkS2QUXMSiFAm2UKU0GUFI17B6D1zxRyDpo6BI0AkbVl
 bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
 -----END CERTIFICATE-----`
 
+  context('parsePem', function () {
     it('parse EC PEM and attributes', function () {
-      const parsed = Utils.parsePem(CommonName)
+      const parsed = Utils.parsePem(CommonNamePEM)
       Assert.deepStrictEqual(parsed, {
         'subjectaddress': '0xc0a4afdef2b560e61576117d4c8e6b38cdf68467',
         'serialNo': '0x5e2ae12b8c140093e22cc39a2a8366ecb3f2809d',
@@ -384,31 +385,31 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
     })
 
     it('parse RSA PEM', function () {
-      Assert.doesNotThrow(() => Utils.parsePem(Issuer))
+      Assert.doesNotThrow(() => Utils.parsePem(IssuerPEM))
     })
 
     it('parse PEM without header', function () {
-      Assert.doesNotThrow(() => Utils.parsePem(CommonName.replace(/-----[^-]+-----|\r|\n/g, '')))
+      Assert.doesNotThrow(() => Utils.parsePem(CommonNamePEM.replace(/-----[^-]+-----|\r|\n/g, '')))
     })
 
     it('parse PEM and fail without CA certs', function () {
-      Assert.throws(() => Utils.parsePem(CommonName, []), 'Signature verification failed')
+      Assert.throws(() => Utils.parsePem(CommonNamePEM, []), 'Signature verification failed')
     })
 
     it('parse PEM and fail with unknown issuer', function () {
-      Assert.throws(() => Utils.parsePem(CommonName, [CommonName]), 'Signature verification failed')
+      Assert.throws(() => Utils.parsePem(CommonNamePEM, [CommonNamePEM]), 'Signature verification failed')
     })
 
     it('parse PEM and succeed with valid signature', function () {
-      Assert.doesNotThrow(() => Utils.parsePem(CommonName, [Issuer]))
+      Assert.doesNotThrow(() => Utils.parsePem(CommonNamePEM, [IssuerPEM]))
     })
 
     it('parse PEM and succeed with multiple issuers', function () {
-      Assert.strictEqual(Utils.parsePem(CommonName, [CommonName, Issuer]).issuerPem, Issuer)
+      Assert.strictEqual(Utils.parsePem(CommonNamePEM, [CommonNamePEM, IssuerPEM]).issuerPem, IssuerPEM)
     })
 
     it('parse issuer PEM', function () {
-      const parsed = Utils.parsePem(Issuer)
+      const parsed = Utils.parsePem(IssuerPEM)
       Assert.deepStrictEqual(parsed, {
         'attributes': [
           {
@@ -454,7 +455,7 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
     })
 
     it('validate self-signed PEM', function () {
-      Assert.doesNotThrow(() => Utils.parsePem(Issuer, [Issuer]))
+      Assert.doesNotThrow(() => Utils.parsePem(IssuerPEM, [IssuerPEM]))
     })
   })
 
@@ -475,6 +476,34 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
       const now = new Date()
       Assert.strictEqual(await Utils.waitUntil(50, () => false), false)
       Assert.ok(new Date().getTime() - now >= 50)
+    })
+  })
+
+  context('validateClaim', function () {
+    let claim
+
+    before(function () {
+      claim = Utils.parsePem(CommonNamePEM, [IssuerPEM])
+    })
+
+    it('validates', () => {
+      Assert.strictEqual(Utils.validateClaim(claim, new Date('2018-08-15T15:23:19.000Z')), true)
+    })
+
+    it('validates notBefore', () => {
+      Assert.strictEqual(Utils.validateClaim(claim, new Date('2018-08-15T04:23:19.000Z')), false)
+    })
+
+    it('validates notAfter', () => {
+      Assert.strictEqual(Utils.validateClaim(claim, new Date('2019-08-16T05:23:19.000Z')), false)
+    })
+
+    it('validates issuer notBefore', () => {
+      Assert.strictEqual(Utils.validateClaim(claim, new Date('2018-08-14T05:23:19.000Z')), false)
+    })
+
+    it('validates issuer notAfter', () => {
+      Assert.strictEqual(Utils.validateClaim(claim, new Date('2018-08-16T05:23:19.000Z')), false)
     })
   })
 
@@ -499,46 +528,8 @@ SIb3DQEBCwUAA4GBAAmQzCx4U+vorJ7sfIPTVo+Dsy2zccsa4K7sKKJexDiEm17x
 rpJ7fDZTnj4PPe2O0Af1GwBngShMfghoemeH1/vgyhKnxhjqxqHu0UWDfjt0
 -----END CERTIFICATE-----`
 
-    const CommonName = `-----BEGIN CERTIFICATE-----
-MIIC3zCCAkqgAwIBAgIUXirhK4wUAJPiLMOaKoNm7LPygJ0wCwYJKoZIhvcNAQEL
-MHIxCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdTZWF0dGxlMRAwDgYDVQQHDAdTZWF0
-dGxlMRkwFwYDVQQKDBBUcnVzdGVkIEtleSB0ZXN0MQswCQYDVQQLDAJJVDEXMBUG
-A1UEAwwOdHJ1c3RlZGtleS5jb20wHhcNMTgwODE1MDUyMzE5WhcNMTkwODE1MDUy
-MzE5WjB+MTIwMAYKKwYBBAGZtqUXAQwidGVzdDAuNTQ0MDI2NTY1MTI5MTk0MkBl
-eGFtcGxlLmNvbTEVMBMGCisGAQQBmbalFwYMBUVtYWlsMTEwLwYJKoZIhvcNAQkB
-DCJ0ZXN0MC41NDQwMjY1NjUxMjkxOTQyQGV4YW1wbGUuY29tMFkwEwYHKoZIzj0C
-AQYIKoZIzj0DAQcDQgAEdspUievqnYouHiMH59o3WBf0T0N8u1/o/T+1v0quVGp1
-8loTHIx4Z61y0oWpFZhB2s3KrKObWcqHLKPB8c7Pr6OBsDCBrTAfBgNVHSMEGDAW
-gBQejFCw55gOlNPaar6PfScFCRqe8jAMBgNVHRMBAf8EAjAAMEQGA1UdHwQ9MDsw
-OaA3oDWGM2V0aGVyZXVtOjB4NDg2MjRiZWFhZDE0ZWEzODZlMjE4NTgzOWFhMTBj
-MWZhZjZiOTczYTA2BggrBgEFBQcBAQQqMCgwJgYIKwYBBQUHMAGGGmh0dHA6Ly9v
-Y3NwLnRydXN0ZWRrZXkuY29tMAsGCSqGSIb3DQEBCwOBgQAmwx5os70/C15SA5HQ
-fOTUINYvhyedJDoeE/SoEXMIfweeTDCzQ/p6/QavYo1MdH2xXeiAoFHnA7kMZLr1
-JB/s48mt2utkQblZCGaEqdwJMWJtbqa0fP6Rrl7Gj1c/CetnYUHyqR7tXHBOefTB
-NBtwmvc2VcFjR3HVBpjtVtxnkA==
------END CERTIFICATE-----`
-
-    const Issuer = `-----BEGIN CERTIFICATE-----
-MIIC9TCCAl6gAwIBAgIJAOlzOVIJxpMrMA0GCSqGSIb3DQEBCwUAMHIxCzAJBgNV
-BAYTAlVTMRAwDgYDVQQIDAdTZWF0dGxlMRAwDgYDVQQHDAdTZWF0dGxlMRkwFwYD
-VQQKDBBUcnVzdGVkIEtleSB0ZXN0MQswCQYDVQQLDAJJVDEXMBUGA1UEAwwOdHJ1
-c3RlZGtleS5jb20wHhcNMTgwODE0MjMwNjQzWhcNMTgwODE1MjMwNjQzWjByMQsw
-CQYDVQQGEwJVUzEQMA4GA1UECAwHU2VhdHRsZTEQMA4GA1UEBwwHU2VhdHRsZTEZ
-MBcGA1UECgwQVHJ1c3RlZCBLZXkgdGVzdDELMAkGA1UECwwCSVQxFzAVBgNVBAMM
-DnRydXN0ZWRrZXkuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYIP4g
-x5CpzYawSeEMgtqqmDginuynxo3kikWyup+fo3Fq9qNT5P9+yEbXkzWB9ExwQ6Dq
-TOqQGr2ErUp99fTuvbnfuXfICUgSH6brsM2siETLgZIH7A72zPRL8HOBC+2qaeGG
-1yppZrIJBcAsAK5WxSKVmDGZGGDzsmJF6xFnnQIDAQABo4GSMIGPMBIGA1UdEwEB
-/wQIMAYBAf8CAQAwCwYDVR0PBAQDAgIEMCwGCWCGSAGG+EIBDQQfFh1PcGVuU1NM
-IEdlbmVyYXRlZCBDZXJ0aWZpY2F0ZTAdBgNVHQ4EFgQUHoxQsOeYDpTT2mq+j30n
-BQkanvIwHwYDVR0jBBgwFoAUHoxQsOeYDpTT2mq+j30nBQkanvIwDQYJKoZIhvcN
-AQELBQADgYEAH7Go0o8PGkS2QUXMSiFAm2UKU0GUFI17B6D1zxRyDpo6BI0AkbVl
-7320vYzyGU8RpINRUb+A4zGvBKre32hOAIEluECNSQzwKdjibKzQ0FrLFj3UBeE8
-bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
------END CERTIFICATE-----`
-
     it('parse chain with self signed (Issuer)', function () {
-      Assert.strictEqual(Utils.verifyChain([Issuer]), true)
+      Assert.strictEqual(Utils.verifyChain([IssuerPEM]), true)
     })
 
     it('parse chain with self signed (OtherIssuer)', function () {
@@ -546,19 +537,19 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
     })
 
     it('parse chain should fail without self signed cert', function () {
-      Assert.strictEqual(Utils.verifyChain([CommonName]), false)
+      Assert.strictEqual(Utils.verifyChain([CommonNamePEM]), false)
     })
 
     it('parse chain should fail with invalid chain', function () {
-      Assert.strictEqual(Utils.verifyChain([CommonName, OtherIssuer]), false)
+      Assert.strictEqual(Utils.verifyChain([CommonNamePEM, OtherIssuer]), false)
     })
 
     it('parse chain should fail with incorrect order', function () {
-      Assert.strictEqual(Utils.verifyChain([Issuer, CommonName]), false)
+      Assert.strictEqual(Utils.verifyChain([IssuerPEM, CommonNamePEM]), false)
     })
 
     it('parse chain with correct issuer', function () {
-      Assert.strictEqual(Utils.verifyChain([CommonName, Issuer]), true)
+      Assert.strictEqual(Utils.verifyChain([CommonNamePEM, IssuerPEM]), true)
     })
   })
 })
