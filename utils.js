@@ -12,6 +12,11 @@ const URL = require('url')
 const Moment = require('moment')
 const JWT = require('jsonwebtoken')
 
+const CrytoAlg = new Map([
+  ['SHA256withRSA', 'RSA-SHA256'],
+  ['SHA256withECDSA', 'sha256'],
+  ['SHA1withRSA', 'RSA-SHA1']
+])
 /**
  * Static Trustedkey utility functions
  *
@@ -490,8 +495,34 @@ utils.waitUntil = function (ms, callback, step = 1000) {
  * @param {string} [curveName] The name of the EC curve. (optional)
  * @return {Object} New jsrsasign key object of given curve
  */
-utils.generateKeyPair = function (curveName) {
-  return Jsrsasign.KEYUTIL.generateKeypair(curveName > 0 ? 'RSA' : 'EC', curveName || 'secp256r1').prvKeyObj
+utils.generateKeyPair = async function (curveName) {
+  let pair
+  try {
+    const {promisify} = require('util')
+    const keyOptions = Object.assign(curveName > 0 ? { modulusLength: curveName } : { namedCurve: curveName || 'prime256v1' },
+      {
+        publicKeyEncoding: {
+          type: 'spki',
+          format: 'pem'
+        },
+        privateKeyEncoding: {
+          type: 'pkcs8',
+          format: 'pem'
+        }
+      })
+    const {privateKey} = await promisify(Crypto.generateKeyPair)(
+      curveName > 0 ? 'rsa' : 'ec',
+      keyOptions
+    )
+    pair = Jsrsasign.KEYUTIL.getKey(privateKey)
+  } catch (err) {
+    pair = Jsrsasign.KEYUTIL.generateKeypair(curveName > 0 ? 'RSA' : 'EC', curveName || 'secp256r1').prvKeyObj
+  }
+
+  return {
+    prvKeyHex: pair.prvKeyHex,
+    pubKeyHex: pair.pubKeyHex
+  }
 }
 
 /**
@@ -581,12 +612,13 @@ function readPEM (pem) {
  * @returns {boolean} success or failure
  */
 function verifySignature (cert, caCert) {
-  try {
-    // CONSIDER: replace with NodeJS built-in Crypto module
-    return cert.verifySignature(caCert.getPublicKey())
-  } catch (err) {
-    return false
-  }
+  const algName = CrytoAlg.get(cert.getSignatureAlgorithmName())
+  const hSigVal = Buffer.from(cert.getSignatureValueHex(), 'hex')
+  const tbs = Buffer.from(Jsrsasign.ASN1HEX.getTLVbyList(cert.hex, 0, [0], '30'), 'hex')
+  const verify = Crypto.createVerify(algName)
+  verify.update(tbs)
+  const caPem = Jsrsasign.KEYUTIL.getPEM(caCert.getPublicKey())
+  return verify.verify(caPem, hSigVal)
 }
 
 /**
@@ -710,9 +742,9 @@ utils.verifyChain = function (chain) {
   Assert.ok(Array.isArray(chain), 'chain must be instance of `Array`')
 
   const certs = chain.map(p => readPEM(p))
-  const getCAIdx = (i, v) => (i === certs.length - 1) ? v : i + 1
-  for (let i = 0, j = getCAIdx(i, 0); i < certs.length; i++, j = getCAIdx(i, i)) {
-    if (!verifySignature(certs[i], certs[j])) {
+  const getCAIdx = (i) => (i === certs.length - 1) ? i : i + 1
+  for (let i = 0; i < certs.length; i++) {
+    if (!verifySignature(certs[i], certs[getCAIdx(i)])) {
       return false
     }
   }

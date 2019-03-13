@@ -187,7 +187,10 @@ XfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
     })
 
     context('ES256', function () {
-      const cred = Utils.generateKeyPair()
+      let cred
+      before(async () => {
+        cred = await Utils.generateKeyPair()
+      })
 
       it('createEcdsaJws with credential', function () {
         const jws = Utils.createEcdsaJws(msg, cred)
@@ -393,11 +396,11 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
     })
 
     it('parse PEM and fail without CA certs', function () {
-      Assert.throws(() => Utils.parsePem(CommonNamePEM, []), 'Signature verification failed')
+      Assert.throws(() => Utils.parsePem(CommonNamePEM, []), /Signature verification failed$/)
     })
 
     it('parse PEM and fail with unknown issuer', function () {
-      Assert.throws(() => Utils.parsePem(CommonNamePEM, [CommonNamePEM]), 'Signature verification failed')
+      Assert.throws(() => Utils.parsePem(CommonNamePEM, [CommonNamePEM]), /Signature verification failed$/)
     })
 
     it('parse PEM and succeed with valid signature', function () {

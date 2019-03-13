@@ -1,13 +1,13 @@
 with import <nixpkgs> {};
 let
-  pnpm = (nodePackages_8_x.pnpm.override (old: {
+  pnpm = (nodePackages_10_x.pnpm.override (old: {
     preRebuild = ''
       sed -i 's|link:|file:|' package.json
     '';
   }));
 in mkShell {
   buildInputs = [
-    nodejs-8_x
+    nodejs-10_x
     pnpm
   ];
 
