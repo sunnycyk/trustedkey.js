@@ -53,5 +53,6 @@ module.exports = {
   'https://auth.trustedkey.com/memberId': OID.memberId,
   'https://auth.trustedkey.com/groupId': OID.groupId,
   'https://auth.trustedkey.com/suffix': OID.suffix,
-  'https://auth.trustedkey.com/endpoint': OID.endpoint
+  'https://auth.trustedkey.com/endpoint': OID.endpoint,
+  'https://auth.trustedkey.com/docRef': OID.docRef
 }

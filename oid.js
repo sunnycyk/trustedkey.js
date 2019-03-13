@@ -271,6 +271,12 @@ module.exports = {
        * @constant
        * @default
        */
-  endpoint: '1.3.6.1.4.1.51341.24'
+  endpoint: '1.3.6.1.4.1.51341.24',
 
+  /**
+       * THE OID is dotted notion for DocRef which is assigned by Issuer
+       * @constant
+       * @default
+       */
+  docRef: '1.3.6.1.4.1.51341.25'
 }
