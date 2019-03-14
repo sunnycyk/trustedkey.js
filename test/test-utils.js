@@ -411,6 +411,14 @@ bPCx2Tty0FQNeijKZWRnH7H9dwqFS1eDYm2DRyAt/FDYQPdFz/hRtVo=
       Assert.strictEqual(Utils.parsePem(CommonNamePEM, [CommonNamePEM, IssuerPEM]).issuerPem, IssuerPEM)
     })
 
+    it('parse PEM and fail with bogus issuer', function () {
+      Assert.throws(() => Utils.parsePem(CommonNamePEM, ['bogus']), /Invalid PEM/)
+    })
+
+    it('parse PEM and fail with bogus cert', function () {
+      Assert.throws(() => Utils.parsePem('bogus', [IssuerPEM]), /Invalid PEM/)
+    })
+
     it('parse issuer PEM', function () {
       const parsed = Utils.parsePem(IssuerPEM)
       Assert.deepStrictEqual(parsed, {

@@ -492,8 +492,8 @@ utils.waitUntil = function (ms, callback, step = 1000) {
 
 /**
  * Generate a new key pair.
- * @param {string} [curveName] The name of the EC curve. (optional)
- * @return {Object} New jsrsasign key object of given curve
+ * @param {string|number} [curveNameOrModulusLength] The name of the EC curve. or RSA lmodulus length (optional)
+ * @return {Promise.<Object>} New jsrsasign key object of given curve
  */
 utils.generateKeyPair = async function (curveName) {
   let pair
@@ -612,13 +612,17 @@ function readPEM (pem) {
  * @returns {boolean} success or failure
  */
 function verifySignature (cert, caCert) {
-  const algName = CrytoAlg.get(cert.getSignatureAlgorithmName())
-  const hSigVal = Buffer.from(cert.getSignatureValueHex(), 'hex')
-  const tbs = Buffer.from(Jsrsasign.ASN1HEX.getTLVbyList(cert.hex, 0, [0], '30'), 'hex')
-  const verify = Crypto.createVerify(algName)
-  verify.update(tbs)
-  const caPem = Jsrsasign.KEYUTIL.getPEM(caCert.getPublicKey())
-  return verify.verify(caPem, hSigVal)
+  try {
+    const algName = CrytoAlg.get(cert.getSignatureAlgorithmName())
+    const hSigVal = Buffer.from(cert.getSignatureValueHex(), 'hex')
+    const tbs = Buffer.from(Jsrsasign.ASN1HEX.getTLVbyList(cert.hex, 0, [0], '30'), 'hex')
+    const verify = Crypto.createVerify(algName)
+    verify.update(tbs)
+    const caPem = Jsrsasign.KEYUTIL.getPEM(caCert.getPublicKey())
+    return verify.verify(caPem, hSigVal)
+  } catch (err) {
+    throw Error(`Invalid PEM: ${err}`)
+  }
 }
 
 /**
@@ -748,5 +752,6 @@ utils.verifyChain = function (chain) {
       return false
     }
   }
+
   return true
 }
