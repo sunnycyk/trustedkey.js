@@ -186,3 +186,17 @@ WalletService.prototype.request = function (address, nonce, callbackUrl, options
   }
   return this.httpClient.get('request', Object.assign(required, options || {})).then(checkSuccess)
 }
+
+/**
+ * Manual registration of an issued login name for the current credential.
+ *
+ * @param {String} identifier A unique login identifier for this user (for example, phone number.)
+ * @param {String} claim A claim issued to the user credential, proving ownership of the identifier.
+ * @returns {Promise.<object>} JSON result from API
+*/
+WalletService.prototype.registerLogin = function (identifier, claim) {
+  return this.httpClient.post('registerLogin', {}, {
+    identifier,
+    claim
+  }).then(checkSuccess)
+}
