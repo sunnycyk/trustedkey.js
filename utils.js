@@ -613,10 +613,14 @@ function readPEM (pem) {
  */
 function verifySignature (cert, caCert) {
   try {
-    const algName = CrytoAlg.get(cert.getSignatureAlgorithmName())
+    const algName = cert.getSignatureAlgorithmName()
+    const cryptoAlg = CrytoAlg.get(algName)
+    if (cryptoAlg == null) {
+      throw Error(`Unsupported signature algorithm: ${algName}`)
+    }
     const hSigVal = Buffer.from(cert.getSignatureValueHex(), 'hex')
     const tbs = Buffer.from(Jsrsasign.ASN1HEX.getTLVbyList(cert.hex, 0, [0], '30'), 'hex')
-    const verify = Crypto.createVerify(algName)
+    const verify = Crypto.createVerify(cryptoAlg)
     verify.update(tbs)
     const caPem = Jsrsasign.KEYUTIL.getPEM(caCert.getPublicKey())
     return verify.verify(caPem, hSigVal)
