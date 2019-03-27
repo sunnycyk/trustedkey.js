@@ -6,6 +6,14 @@ const Utils = require('../utils')
 
 module.exports = httpUtils
 
+// Common JSON sanity check callback
+function checkSuccess (jsonData) {
+  if (jsonData && jsonData.error) {
+    throw Error(jsonData.error.message || jsonData.error)
+  }
+  return jsonData
+}
+
 /**
  * Utility class with wrappers for calling authenticated API endpoints.
  *
@@ -16,9 +24,6 @@ module.exports = httpUtils
  */
 function httpUtils (backendUrl, appId, appSecret) {
   Assert.strictEqual(typeof backendUrl, 'string', 'backendUrl must be of type `string`')
-  // Assert.strictEqual(typeof appId, "string", 'appId must be of type `string`')
-  // Assert.strictEqual(typeof appSecret, "string", 'appSecret must be of type `string`')
-
   this.backendUrl = backendUrl
   this.appId = appId
   this.appSecret = appSecret
@@ -64,6 +69,13 @@ httpUtils.prototype.buildUrl = function (path, params) {
   return URL.resolve(this.backendUrl, url)
 }
 
+/**
+ * Authenticated GET request
+ *
+ * @param {string} path the endpoint to build
+ * @param {*} [params] optional parameters to add to the query string
+ * @returns {Promise.<*>} resolves to the API result
+ */
 httpUtils.prototype.get = function (path, params) {
   const absoluteUrl = this.buildUrl(path, params)
   return RP.get({
@@ -71,9 +83,17 @@ httpUtils.prototype.get = function (path, params) {
     json: true,
     forever: true,
     headers: this.getHeaders(absoluteUrl)
-  })
+  }).then(checkSuccess)
 }
 
+/**
+ * Authenticated POST request
+ *
+ * @param {string} path the endpoint to build
+ * @param {*} [params] optional parameters to add to the query string
+ * @param {*} [jsonBody] optional body
+ * @returns {Promise.<*>} resolves to the API result
+ */
 httpUtils.prototype.post = function (path, params, jsonBody) {
   const absoluteUrl = this.buildUrl(path, params)
   // Assume RP does the exact same serialization of the body
@@ -84,9 +104,16 @@ httpUtils.prototype.post = function (path, params, jsonBody) {
     forever: true,
     headers: this.getHeaders(absoluteUrl, body),
     body: jsonBody
-  })
+  }).then(checkSuccess)
 }
 
+/**
+ * Authenticated DELETE request
+ *
+ * @param {string} path the endpoint to build
+ * @param {*} [params] optional parameters to add to the query string
+ * @returns {Promise.<*>} resolves to the API result
+ */
 httpUtils.prototype.delete = function (path, params) {
   const absoluteUrl = this.buildUrl(path, params)
   return RP.delete({
@@ -94,5 +121,5 @@ httpUtils.prototype.delete = function (path, params) {
     json: true,
     forever: true,
     headers: this.getHeaders(absoluteUrl)
-  })
+  }).then(checkSuccess)
 }

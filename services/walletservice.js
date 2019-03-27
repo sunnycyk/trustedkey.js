@@ -3,15 +3,6 @@ const RP = require('request-promise-native')
 
 module.exports = WalletService
 
-// Common JSON sanity check callback
-function checkSuccess (jsonData) {
-  if (!jsonData.data) {
-    throw Error('API returned JSON without data')
-  }
-
-  return jsonData
-}
-
 /**
  * The API calls for implementing an identity claim/credential wallet.
  *
@@ -108,7 +99,6 @@ WalletService.prototype.userInfo = function (accessToken) {
 */
 WalletService.prototype.getPendingSignatureRequest = function () {
   return this.httpClient.get('getPendingRequest')
-    .then(checkSuccess)
 }
 
 /**
@@ -120,7 +110,7 @@ WalletService.prototype.getPendingSignatureRequest = function () {
 WalletService.prototype.removeSignatureRequest = function (nonceString) {
   return this.httpClient.delete('removePendingRequest', {
     nonce: nonceString
-  }).then(checkSuccess)
+  })
 }
 
 /**
@@ -133,7 +123,7 @@ WalletService.prototype.removeSignatureRequest = function (nonceString) {
 WalletService.prototype.registerDevice = function (deviceTokenString) {
   return this.httpClient.post('registerDevice', {
     devicetoken: deviceTokenString
-  }).then(checkSuccess)
+  })
 }
 
 /**
@@ -151,7 +141,7 @@ WalletService.prototype.notify = function (address, nonce, message, walletId) {
     nonce: nonce,
     message: message,
     walletId: walletId
-  }).then(checkSuccess)
+  })
 }
 
 /**
@@ -184,7 +174,7 @@ WalletService.prototype.request = function (address, nonce, callbackUrl, options
     // Convert Array to comma-separated string
     options = Object.assign({}, options, {objectIds: options.objectIds.join()})
   }
-  return this.httpClient.get('request', Object.assign(required, options || {})).then(checkSuccess)
+  return this.httpClient.get('request', Object.assign(required, options || {}))
 }
 
 /**
@@ -200,5 +190,5 @@ WalletService.prototype.registerLogin = function (address, identifier, claim) {
     address,
     identifier,
     claim
-  }).then(checkSuccess)
+  })
 }

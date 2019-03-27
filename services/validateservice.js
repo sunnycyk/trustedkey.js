@@ -1,6 +1,6 @@
 const Assert = require('assert')
 const Utils = require('../utils')
-const RP = require('request-promise-native')
+const HttpUtils = require('./http')
 
 module.exports = ValidateService
 
@@ -11,12 +11,7 @@ module.exports = ValidateService
  * @param {String} backendUrl The base backend URL
  */
 function ValidateService (backendUrl = 'https://issuer.trustedkey.com') {
-  this.httpClient = {
-    get: function (url, params) {
-      const uri = Utils.mergeQueryParams(url, params || {})
-      return RP({baseUrl: backendUrl, url: uri, json: true, forever: true})
-    }
-  }
+  this.httpClient = new HttpUtils(backendUrl)
 }
 
 function validate (httpClient, address) {
@@ -25,7 +20,7 @@ function validate (httpClient, address) {
   return httpClient.get('isRevoked', {
     address: address
   }).then(r => {
-    return !r.data.isRevoked
+    return r.data.isRevoked === false
   })
 }
 
