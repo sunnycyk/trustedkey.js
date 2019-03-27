@@ -85,6 +85,34 @@ xcbCgN76nCO1NGBgbQIDAQAB
     it('converts EC public key', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(pemEC), jwkEC)
     })
+    it('converts EC private key', function () {
+      Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PRIVATE KEY-----
+MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgAOGOr/M0YtSWmCHy
+bvuKEM9fWTDMIAX8shCVCLQBGkuhRANCAAQk/BzilAHvZcl/lzl8fQPRSdEUDO3p
+CykJvN9v8wxb7FidP8Cbf8s9KocSPOZp8Dal9tiyqU6CvnT7Nst5p4XG
+-----END PRIVATE KEY-----`),
+      {
+        'crv': 'P-256',
+        'd': 'AOGOr_M0YtSWmCHybvuKEM9fWTDMIAX8shCVCLQBGks',
+        'kty': 'EC',
+        'x': 'JPwc4pQB72XJf5c5fH0D0UnRFAzt6QspCbzfb_MMW-w',
+        'y': 'WJ0_wJt_yz0qhxI85mnwNqX22LKpToK-dPs2y3mnhcY'
+      })
+    })
+    it('converts EC private key', function () {
+      Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEICpwWU74cb+4k7lGEESlVl4OVY2G7MJEoCKZOOLzY3oeoAoGCCqGSM49
+AwEHoUQDQgAEtkWHN3zcQmemwa4aHHfKEgj1pzUWhFVca26mvAR7+fAqr2h97A00
+PTOsfcbelKnaElDneV/qWPfchMsU8gE1mA==
+-----END EC PRIVATE KEY-----`),
+      {
+        'crv': 'P-256',
+        'd': 'KnBZTvhxv7iTuUYQRKVWXg5VjYbswkSgIpk44vNjeh4',
+        'kty': 'EC',
+        'x': 'tkWHN3zcQmemwa4aHHfKEgj1pzUWhFVca26mvAR7-fA',
+        'y': 'Kq9ofewNND0zrH3G3pSp2hJQ53lf6lj33ITLFPIBNZg'
+      })
+    })
     it('converts small RSA public key', function () {
       Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN PUBLIC KEY-----
 MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMiwb6VuAvJwHJyRZq1PJO8PpaaYjOXp

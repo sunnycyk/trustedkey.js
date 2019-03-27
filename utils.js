@@ -214,7 +214,7 @@ utils.verifyJws = function (jws, secretOrCallback) {
 
 /**
  * Convert a JWK into a hex public key
- * @param {JwkEC|JwkRSA} jwk JSON Web Key for public EC key
+ * @param {JwkEC} jwk JSON Web Key for public EC key
  * @return {String} string with hex public key
  */
 utils.jwkToHex = function (jwk) {
@@ -295,21 +295,30 @@ function readDerChunk (buffer, offset = 0) {
  * @returns {JwkRSA|JwkEC} JSON Web Key
  */
 utils.pemToJwk = function (pem) {
-  const base64 = pem.match(/^-----BEGIN PUBLIC KEY-----([^-]+)-----END PUBLIC KEY-----/)
+  const base64 = pem.match(/^-----BEGIN [A-V ]{6,10} KEY-----([^-]+)-----END [A-V ]{6,10} KEY-----/)
   if (!base64) {
     throw Error('Unsupported PEM:' + pem)
   }
   const der = Buffer.from(base64[1], 'base64')
+  return utils.derToJwk(der)
+}
+
+/**
+ * Convert a DER encoded public key to JWK, with minimal checking.
+ * @param {Buffer} der Public key in DER format
+ * @returns {JwkRSA|JwkEC} JSON Web Key
+ */
+utils.derToJwk = function (der) {
   const main = readDerChunk(der)
   const type = readDerChunk(main)
-  const pub = readDerChunk(main, type.length + 2)
+  const key = readDerChunk(main, type.length + 2)
   switch (type.toString('hex')) {
     case '06092a864886f70d0101010500': {
-      // RSA
-      const key = readDerChunk(pub, 1)
-      const n = readDerChunk(key).slice(1)
+      // RSA public
+      const rsa = readDerChunk(key, 1)
+      const n = readDerChunk(rsa).slice(1)
       const lenSize = n.length >= 0x100 ? 3 : (n.length >= 0x80 ? 2 : 1)
-      const e = readDerChunk(key, n.length + lenSize + 2)
+      const e = readDerChunk(rsa, n.length + lenSize + 2)
       return {
         'kty': 'RSA',
         'e': utils.base64url(e),
@@ -317,12 +326,36 @@ utils.pemToJwk = function (pem) {
       }
     }
     case '06072a8648ce3d020106082a8648ce3d030107': {
-      // EC
+      // EC public
+      Assert.strictEqual(key.length, 66)
+      const x = key.slice(2, 34)
+      const y = key.slice(34, 66)
+      return {
+        'crv': 'P-256',
+        'kty': 'EC',
+        'x': utils.base64url(x),
+        'y': utils.base64url(y)
+      }
+    }
+    case '00': {
+      // EC private (nested)
+      const nested = readDerChunk(main, 5 + key.length)
+      return utils.derToJwk(nested)
+    }
+    case '01': {
+      // EC private
+      let skip = 5 + key.length
+      while (main[skip] !== 0xa1) {
+        skip += 2 + readDerChunk(main, skip).length
+      }
+      const pub = readDerChunk(main, 2 + skip)
+      Assert.strictEqual(pub.length, 66)
       const x = pub.slice(2, 34)
       const y = pub.slice(34, 66)
       return {
-        'kty': 'EC',
         'crv': 'P-256',
+        'kty': 'EC',
+        'd': utils.base64url(key, 'hex'),
         'x': utils.base64url(x),
         'y': utils.base64url(y)
       }
@@ -492,14 +525,14 @@ utils.waitUntil = function (ms, callback, step = 1000) {
 
 /**
  * Generate a new key pair.
- * @param {string|number} [curveNameOrModulusLength] The name of the EC curve. or RSA lmodulus length (optional)
+ * @param {string|number} [curveOrLength] The name of the EC curve or RSA modulus length (optional)
  * @return {Promise.<Object>} New jsrsasign key object of given curve
  */
-utils.generateKeyPair = async function (curveName) {
+utils.generateKeyPair = async function (curveOrLength) {
   let pair
   try {
     const {promisify} = require('util')
-    const keyOptions = Object.assign(curveName > 0 ? { modulusLength: curveName } : { namedCurve: curveName || 'prime256v1' },
+    const keyOptions = Object.assign(curveOrLength > 0 ? { modulusLength: curveOrLength } : { namedCurve: curveOrLength || 'prime256v1' },
       {
         publicKeyEncoding: {
           type: 'spki',
@@ -511,12 +544,12 @@ utils.generateKeyPair = async function (curveName) {
         }
       })
     const {privateKey} = await promisify(Crypto.generateKeyPair)(
-      curveName > 0 ? 'rsa' : 'ec',
+      curveOrLength > 0 ? 'rsa' : 'ec',
       keyOptions
     )
     pair = Jsrsasign.KEYUTIL.getKey(privateKey)
   } catch (err) {
-    pair = Jsrsasign.KEYUTIL.generateKeypair(curveName > 0 ? 'RSA' : 'EC', curveName || 'secp256r1').prvKeyObj
+    pair = Jsrsasign.KEYUTIL.generateKeypair(curveOrLength > 0 ? 'RSA' : 'EC', curveOrLength || 'secp256r1').prvKeyObj
   }
 
   return {
