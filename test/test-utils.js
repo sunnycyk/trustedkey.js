@@ -20,6 +20,11 @@ A6yaQIdy8vADNhIDhQKxIRFOFDbk1S01sEl+Oc3VFcY0VsoapCVpAEfr1LDCetOe
 UzWW9chCnB0+b29Qg4R9n1glTVqqNQj0F9grWetJXw2NXQOVMKn+w81WzwH4s3IZ
 QwIDAQAB
 -----END PUBLIC KEY-----`
+  const pemECpk = `-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEILPN2ZrlirXKm6ZzBOdddr8WaqSqQhXLROCcnvwZ3lcRoAoGCCqGSM49
+AwEHoUQDQgAEP77Gc65MCzCAFSL3ym4jzVkBHPFRk2wREBVmi94ga76qPONvtQid
+XfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
+-----END EC PRIVATE KEY-----`
 
   context('serial', function () {
     it('Converts serialNo to address', function () {
@@ -100,17 +105,12 @@ CykJvN9v8wxb7FidP8Cbf8s9KocSPOZp8Dal9tiyqU6CvnT7Nst5p4XG
       })
     })
     it('converts EC private key', function () {
-      Assert.deepStrictEqual(Utils.pemToJwk(`-----BEGIN EC PRIVATE KEY-----
-MHcCAQEEICpwWU74cb+4k7lGEESlVl4OVY2G7MJEoCKZOOLzY3oeoAoGCCqGSM49
-AwEHoUQDQgAEtkWHN3zcQmemwa4aHHfKEgj1pzUWhFVca26mvAR7+fAqr2h97A00
-PTOsfcbelKnaElDneV/qWPfchMsU8gE1mA==
------END EC PRIVATE KEY-----`),
-      {
+      Assert.deepStrictEqual(Utils.pemToJwk(pemECpk), {
         'crv': 'P-256',
-        'd': 'KnBZTvhxv7iTuUYQRKVWXg5VjYbswkSgIpk44vNjeh4',
+        'd': 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE',
         'kty': 'EC',
-        'x': 'tkWHN3zcQmemwa4aHHfKEgj1pzUWhFVca26mvAR7-fA',
-        'y': 'Kq9ofewNND0zrH3G3pSp2hJQ53lf6lj33ITLFPIBNZg'
+        'x': 'P77Gc65MCzCAFSL3ym4jzVkBHPFRk2wREBVmi94ga74',
+        'y': 'qjzjb7UInV3zDzN0wwkCaVqtyOLGaCmLBdLee9SXKQw'
       })
     })
     it('converts small RSA public key', function () {
@@ -149,11 +149,14 @@ RcAR4NrO2TIb2+H5XpY6aLi27oedXXLq6EfYGEfSLxQ8jpkLFeG5BIkCAQM=
     })
     it('converts EC private key', function () {
       const jwk = {...jwkEC, d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE'}
-      Assert.strictEqual(Utils.jwkToPem(jwk), `-----BEGIN EC PRIVATE KEY-----
-MHcCAQEEILPN2ZrlirXKm6ZzBOdddr8WaqSqQhXLROCcnvwZ3lcRoAoGCCqGSM49
-AwEHoUQDQgAEP77Gc65MCzCAFSL3ym4jzVkBHPFRk2wREBVmi94ga76qPONvtQid
-XfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
------END EC PRIVATE KEY-----`)
+      Assert.strictEqual(Utils.jwkToPem(jwk), pemECpk)
+    })
+    it('converts EC private key jwk->pem->jwk', function () {
+      const jwk = {...jwkEC, d: 's83ZmuWKtcqbpnME5112vxZqpKpCFctE4Jye_BneVxE'}
+      Assert.deepStrictEqual(Utils.pemToJwk(Utils.jwkToPem(jwk)), jwk)
+    })
+    it('converts EC private key v.v. pem->jwk->pem', function () {
+      Assert.strictEqual(Utils.jwkToPem(Utils.pemToJwk(pemECpk)), pemECpk)
     })
   })
 
