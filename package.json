@@ -1,6 +1,11 @@
 {
   "name": "trustedkey-js",
   "version": "0.7.0",
+  "homepage": "https://github.com/trustedkey/trustedkey.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trustedkey/trustedkey.js.git"
+  },
   "files": [
     "claims.js",
     "oid.js",
