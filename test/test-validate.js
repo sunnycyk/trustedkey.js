@@ -6,8 +6,12 @@ describe('ValidateService', function () {
   const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
   let validateService
 
+  before('can construct with url', function () {
+    validateService = new ValidateService(process.env.test_walletURL)
+  })
+
   it('can construct with defaults', function () {
-    validateService = new ValidateService()
+    Assert.doesNotThrow(() => new ValidateService())
   })
 
   it('can validate', async function () {
