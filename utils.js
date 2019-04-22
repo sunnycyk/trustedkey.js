@@ -78,10 +78,6 @@ utils.keccak256 = function (blob, encoding) {
   }
 }
 
-function pad0 (string, len) {
-  return String('0'.repeat(len) + string).slice(-len)
-}
-
 /**
  * Convert a certificate serial number to blockchain address
  *
@@ -90,8 +86,7 @@ function pad0 (string, len) {
  */
 utils.serialToAddress = function (serialhex) {
   Assert.strictEqual(typeof serialhex, 'string', 'serialhex must be of type `string`')
-
-  return '0x' + pad0(serialhex, 40)
+  return '0x' + serialhex.replace('0x', '').padStart(40, '0')
 }
 
 /**
@@ -423,7 +418,7 @@ utils.checkECDSA = function (curveName, message, pubkey, signature) {
   Assert.strictEqual(typeof curveName, 'string', 'curveName must be of type `string`')
 
   // Verify a digest value
-  var digest = utils.sha256(message, 'hex')
+  const digest = utils.sha256(message, 'hex')
 
   if (pubkey.kty) {
     pubkey = utils.jwkToHex(pubkey)
@@ -441,7 +436,7 @@ utils.checkECDSA = function (curveName, message, pubkey, signature) {
     signature = createDerChunk(0x30, createDerChunk(0x02, r), createDerChunk(0x02, s)).toString('hex')
   }
 
-  var curve = new Jsrsasign.KJUR.crypto.ECDSA({xy: pubkey, curve: curveName})
+  const curve = new Jsrsasign.KJUR.crypto.ECDSA({xy: pubkey, curve: curveName})
   return curve.verifyHex(digest, signature, pubkey)
 }
 
@@ -457,8 +452,8 @@ utils.userPubKeyHexToAddress = function (pubkeyhex) {
   Assert.strictEqual(pubkeyhex.length, 130)
 
   // Get the uncompressed public key without prefix, take the sha256 hash, and skip the first 12 bytes
-  var blob = Buffer.from(pubkeyhex.substr(2), 'hex')
-  var digest = utils.sha256(blob, 'hex')
+  const blob = Buffer.from(pubkeyhex.substr(2), 'hex')
+  const digest = utils.sha256(blob, 'hex')
   return '0x' + digest.substr(2 * 12)
 }
 
@@ -470,8 +465,8 @@ utils.userPubKeyHexToAddress = function (pubkeyhex) {
 utils.promisify = function (call) {
   return function () {
     // Save the 'this' reference for use inside the promise
-    var self = this
-    var args = Array.prototype.slice.call(arguments)
+    const self = this
+    const args = Array.prototype.slice.call(arguments)
     return new Promise((resolve, reject) => {
       // Append the callback that either rejects or resolves the promise
       args.push((err, a, b, c, d) => err ? reject(err) : resolve(a, b, c, d))
@@ -593,7 +588,7 @@ utils.parseHexString = function (hex, encoding) {
 utils.parseX509Date = function (date) {
   Assert.strictEqual(typeof date, 'string', 'date must be of type `string`')
 
-  var match = /^([0-9]{2,4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})Z$/.exec(date)
+  const match = /^([0-9]{2,4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})Z$/.exec(date)
   if (match === null) {
     return null
   }
@@ -634,7 +629,7 @@ function readPEM (pem) {
   // Ignore PEM headers (if present)
   const base64 = pem.replace(/^-----(BEGIN|END) CERTIFICATE-----/g, '')
   // Load the certificate from PEM string
-  var cert = new Jsrsasign.X509()
+  const cert = new Jsrsasign.X509()
   cert.readCertHex(Buffer.from(base64, 'base64').toString('hex'))
   return cert
 }
@@ -690,7 +685,7 @@ function verifySignature (cert, caCert) {
  */
 utils.parsePem = function (pem, chain) {
   // Load the certificate from PEM string
-  var cert = readPEM(pem)
+  const cert = readPEM(pem)
 
   // Validate certificate chain (issuer whitelist)
   let issuerPem = null

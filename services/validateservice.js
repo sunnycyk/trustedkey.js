@@ -24,6 +24,14 @@ function validate (httpClient, address) {
   })
 }
 
+function makeAddressList (addresses) {
+  if (addresses instanceof Array) {
+    return addresses.map(Utils.serialToAddress).join(',')
+  } else {
+    return Utils.serialToAddress(addresses)
+  }
+}
+
 /**
  * Check the status of the specified blockchain transaction ID.
  *
@@ -57,13 +65,8 @@ ValidateService.prototype.validateCredential = function (credentialAddressString
  * @returns {Promise.<boolean>} Status indicating valid address
 */
 ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
-  var serialNumbers
-  if (claimSerialNumbers instanceof Array) {
-    serialNumbers = claimSerialNumbers.map(Utils.serialToAddress).join(',')
-  } else {
-    serialNumbers = Utils.serialToAddress(claimSerialNumbers)
-  }
-  return validate(this.httpClient, serialNumbers)
+  const addresses = makeAddressList(claimSerialNumbers)
+  return validate(this.httpClient, addresses)
 }
 
 /**
@@ -86,9 +89,7 @@ ValidateService.prototype.validateClaims = function (claimSerialNumbers) {
  * @returns {Promise.<KeyInfoMap>} KeyInfoMap structure from smart contract
 */
 ValidateService.prototype.keyInfo = function (address) {
-  if (address instanceof Array) {
-    address = address.join(',')
-  }
-  return this.httpClient.get('keyInfo', {address: address})
+  const addresses = makeAddressList(address)
+  return this.httpClient.get('keyInfo', {address: addresses})
     .then(r => r.data)
 }

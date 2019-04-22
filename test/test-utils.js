@@ -31,9 +31,12 @@ XfMPM3TDCQJpWq3I4sZoKYsF0t571JcpDA==
       Assert.strictEqual(Utils.serialToAddress('e3b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4')
       Assert.strictEqual(Utils.serialToAddress('b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0x00b0c44298fc1c149afbf4c8996fb92427ae41e4')
       Assert.strictEqual(Utils.serialToAddress('4'), '0x0000000000000000000000000000000000000004')
+      Assert.strictEqual(Utils.serialToAddress('0x4'), '0x0000000000000000000000000000000000000004')
     })
     it('Is a NOP for addresses', function () {
       Assert.strictEqual(Utils.serialToAddress('0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0xe3b0c44298fc1c149afbf4c8996fb92427ae41e4')
+      Assert.strictEqual(Utils.serialToAddress('0x00b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0x00b0c44298fc1c149afbf4c8996fb92427ae41e4')
+      Assert.strictEqual(Utils.serialToAddress('0x00b0c44298fc1c149afbf4c8996fb92427ae41e4,0x00b0c44298fc1c149afbf4c8996fb92427ae41e4'), '0x00b0c44298fc1c149afbf4c8996fb92427ae41e4,0x00b0c44298fc1c149afbf4c8996fb92427ae41e4')
     })
   })
 

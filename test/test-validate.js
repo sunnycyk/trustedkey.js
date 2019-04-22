@@ -33,6 +33,20 @@ describe('ValidateService', function () {
       })
   })
 
+  it('pads short addresses', async function () {
+    const keyinfo = await validateService.keyInfo('0x01772b7b1c48c3c13fe8c8d05935776eb97987')
+    Assert.deepStrictEqual(keyinfo,
+      { '0x0001772b7b1c48c3c13fe8c8d05935776eb97987':
+        { timestamp: 0,
+          revokedBy: ZERO_ADDR,
+          replaces: ZERO_ADDR,
+          recovery: ZERO_ADDR,
+          isRevoked: false,
+          rootAddress: '0x0001772b7b1c48c3c13fe8c8d05935776eb97987'
+        }
+      })
+  })
+
   it('can get info for many', async function () {
     const keyinfo = await validateService.keyInfo([ZERO_ADDR, '0x0000000000000000000000000000000000000001'])
     Assert.deepStrictEqual(keyinfo,
