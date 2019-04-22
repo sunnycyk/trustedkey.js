@@ -32,9 +32,9 @@ CredentialRegistryService.prototype.revokeCredential = function (delegateAddress
   Assert.strictEqual(0 in keyPair, false, 'keyPair should not be Buffer or Array-like')
 
   const addressWithout0x = delegateAddressString.replace('0x', '')
-  var hash = Crypto.createHash('sha256')
-  var digest = hash.update(addressWithout0x, 'hex').update(address ? 'indirect' : 'revocation').digest('hex')
-  var sig = keyPair.signWithMessageHash(digest)
+  const hash = Crypto.createHash('sha256')
+  const digest = hash.update(addressWithout0x, 'hex').update(address ? 'indirect' : 'revocation').digest('hex')
+  const sig = keyPair.signWithMessageHash(digest)
 
   return this.httpClient.post('revoke', {
     signature: sig,

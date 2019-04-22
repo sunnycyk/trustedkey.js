@@ -44,7 +44,7 @@ ClaimIssuerService.prototype.getClaims = function (requestIdString, pubkey) {
       throw new Error(errInvalidPemData)
     }
 
-    var pemArray = json.data.pem.replace(/-\r?\n-/g, '-\n!-').split('!')
+    const pemArray = json.data.pem.replace(/-\r?\n-/g, '-\n!-').split('!')
     if (pemArray.length === 0) {
       throw new Error(errInvalidPemArray)
     }
