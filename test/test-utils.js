@@ -573,28 +573,33 @@ SIb3DQEBCwUAA4GBAAmQzCx4U+vorJ7sfIPTVo+Dsy2zccsa4K7sKKJexDiEm17x
 rpJ7fDZTnj4PPe2O0Af1GwBngShMfghoemeH1/vgyhKnxhjqxqHu0UWDfjt0
 -----END CERTIFICATE-----`
 
-    it('parse chain with self signed (Issuer)', function () {
+    it('verify chain with self signed (Issuer)', function () {
       Assert.strictEqual(Utils.verifyChain([IssuerPEM]), true)
     })
 
-    it('parse chain with self signed (OtherIssuer)', function () {
+    it('verify chain with self signed (OtherIssuer)', function () {
       Assert.strictEqual(Utils.verifyChain([OtherIssuer]), true)
     })
 
-    it('parse chain should fail without self signed cert', function () {
+    it('verify chain should fail without self signed cert', function () {
       Assert.strictEqual(Utils.verifyChain([CommonNamePEM]), false)
     })
 
-    it('parse chain should fail with invalid chain', function () {
+    it('verify chain should fail with invalid chain', function () {
       Assert.strictEqual(Utils.verifyChain([CommonNamePEM, OtherIssuer]), false)
     })
 
-    it('parse chain should fail with incorrect order', function () {
+    it('verify chain should fail with incorrect order', function () {
       Assert.strictEqual(Utils.verifyChain([IssuerPEM, CommonNamePEM]), false)
     })
 
-    it('parse chain with correct issuer', function () {
+    it('verify chain with correct issuer', function () {
       Assert.strictEqual(Utils.verifyChain([CommonNamePEM, IssuerPEM]), true)
+    })
+
+    it('verify TK root with TK root', function () {
+      const RootPem = FS.readFileSync(Utils.getRootPemPath(), 'ascii')
+      Assert.strictEqual(Utils.verifyChain([RootPem]), true)
     })
   })
 })
