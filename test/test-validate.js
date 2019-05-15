@@ -27,7 +27,7 @@ describe('ValidateService', function () {
           revokedBy: ZERO_ADDR,
           replaces: ZERO_ADDR,
           recovery: ZERO_ADDR,
-          isRevoked: false,
+          isRevoked: true,
           rootAddress: ZERO_ADDR
         }
       })
@@ -55,7 +55,7 @@ describe('ValidateService', function () {
           revokedBy: ZERO_ADDR,
           replaces: ZERO_ADDR,
           recovery: ZERO_ADDR,
-          isRevoked: false,
+          isRevoked: true,
           rootAddress: ZERO_ADDR
         },
       '0x0000000000000000000000000000000000000001':
