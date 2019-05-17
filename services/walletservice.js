@@ -127,6 +127,17 @@ WalletService.prototype.registerDevice = function (deviceTokenString) {
 }
 
 /**
+ * Know the status of the oauth request. Confirm/Deny/timeout.
+ * @param {String} guid The unique guid for the login request, as received from the redirect page. Could pass in nonce too instead.
+ * @returns {Promise.<object>} JSON result from API
+*/
+WalletService.prototype.waitLogin = function (guid) {
+  return this.httpClient.post('/oauth/IDentify/waitLogin', {
+    guid: guid
+  })
+}
+
+/**
  * Send notification to a device
  *
  * @param {String} address Device to notify
