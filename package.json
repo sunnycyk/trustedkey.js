@@ -1,6 +1,6 @@
 {
   "name": "trustedkey-js",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "version": "0.7.3",
   "homepage": "https://github.com/trustedkey/trustedkey.js",
   "repository": {
